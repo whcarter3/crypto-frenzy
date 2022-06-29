@@ -68,7 +68,7 @@ export default function Home() {
       alert("Today is your last day! Better sell all your assets!")
     }
     if(currentDay >= 30) {
-      alert(`This round has been completed. You amassed ${numberWithCommas(cash)}. Click to start a new game`);
+      alert(`This round has been completed. You amassed $${numberWithCommas(cash)}. Click to start a new game`);
       init();
     } else {
       setCurrentDay(currentDay + 1);
@@ -258,8 +258,8 @@ export default function Home() {
               <td>{assets.bitcoin.assetName}</td>
               <td>${numberWithCommas(bitcoinPrice)}</td>
               <td>
-                <Button color="bg-blue-400" xPadding={3} yPadding={1} onClick={handleBuy} id="bitcoinBuy">Buy</Button>
-                <Button color="bg-green-400" xPadding={3} yPadding={1} onClick={handleSell} id="bitcoinSell">Sell</Button>
+                <button className="rounded-full bg-blue-400 px-3 py-1" onClick={handleBuy} id="bitcoinBuy">Buy</button>
+                <button className="rounded-full bg-green-400 px-3 py-1" onClick={handleSell} id="bitcoinSell">Sell</button>
               </td>
               <td>{bitcoinWallet}</td>
             </tr>
@@ -267,8 +267,8 @@ export default function Home() {
               <td>{assets.ethereum.assetName}</td>
               <td>${numberWithCommas(ethereumPrice)}</td>
               <td>
-                <Button color="bg-blue-400" xPadding={3} yPadding={1} onClick={handleBuy} id="ethereumBuy">Buy</Button>
-                <Button color="bg-green-400" xPadding={3} yPadding={1} onClick={handleSell} id="ethereumSell">Sell</Button>
+                <button className="rounded-full bg-blue-400 px-3 py-1" onClick={handleBuy} id="ethereumBuy">Buy</button>
+                <button className="rounded-full bg-green-400 px-3 py-1" onClick={handleSell} id="ethereumSell">Sell</button>
               </td>
               <td>{ethereumWallet}</td>
             </tr>
@@ -276,8 +276,8 @@ export default function Home() {
               <td>{assets.litecoin.assetName}</td>
               <td>${numberWithCommas(litecoinPrice)}</td>
               <td>
-                <Button color="bg-blue-400" xPadding={3} yPadding={1} onClick={handleBuy} id="litecoinBuy">Buy</Button>
-                <Button color="bg-green-400" xPadding={3} yPadding={1} onClick={handleSell} id="litecoinSell">Sell</Button>
+                <button className="rounded-full bg-blue-400 px-3 py-1" onClick={handleBuy} id="litecoinBuy">Buy</button>
+                <button className="rounded-full bg-green-400 px-3 py-1" onClick={handleSell} id="litecoinSell">Sell</button>
               </td>
               <td>{litecoinWallet}</td>
             </tr>
@@ -285,8 +285,8 @@ export default function Home() {
               <td>{assets.solana.assetName}</td>
               <td>${numberWithCommas(solanaPrice)}</td>
               <td>
-                <Button color="bg-blue-400" xPadding={3} yPadding={1} onClick={handleBuy} id="solanaBuy">Buy</Button>
-                <Button color="bg-green-400" xPadding={3} yPadding={1} onClick={handleSell} id="solanaSell">Sell</Button>
+                <button className="rounded-full bg-blue-400 px-3 py-1" onClick={handleBuy} id="solanaBuy">Buy</button>
+                <button className="rounded-full bg-green-400 px-3 py-1" onClick={handleSell} id="solanaSell">Sell</button>
               </td>
               <td>{solanaWallet}</td>
             </tr>
@@ -295,11 +295,11 @@ export default function Home() {
 
         <div className='mt-5 flex items-center'>
           <p className='mr-5'>Wallet Size (+100): $100,000</p>
-          <Button color="bg-emerald-400" xPadding={3} yPadding={1} onClick={increaseWalletCapacity}>Buy</Button>
+          <button className='bg-green-500 px-3 py-1 rounded-full' onClick={increaseWalletCapacity}>Buy</button>
         </div>
 
-        <Button color="bg-blue-500" xPadding={6} yPadding={4} margin={10} onClick={advanceDay}>Advance Day</Button>
-        <Button color="bg-red-500" xPadding={6} yPadding={4} margin={10} onClick={init}>New Game</Button>
+        <button className='bg-blue-500 px-6 py-4 rounded-full mt-10' onClick={advanceDay}>Advance Day</button>
+        <button className='bg-red-500 px-6 py-4 rounded-full' onClick={init}>New Game</button>
 
       </main>
     </div>
