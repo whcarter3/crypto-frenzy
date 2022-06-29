@@ -9,6 +9,9 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     font-size: 14px;
+    @apply bg-slate-800;
+    @apply text-slate-300;
+    white-space: pre-wrap;
 }
 
 * {
@@ -33,7 +36,7 @@ a {
   text-decoration: none;
 }
 
-tbody tr td:last-child {
+tbody tr td:last-child, tbody tr td:nth-child(3) {
   text-align: center;
 }
 
