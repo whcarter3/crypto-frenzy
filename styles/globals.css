@@ -33,4 +33,8 @@ a {
   text-decoration: none;
 }
 
+tbody tr td:last-child {
+  text-align: center;
+}
+
 

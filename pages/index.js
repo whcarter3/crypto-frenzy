@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React from 'react';
 import Head from 'next/head';
 import Button from '../components/Button.tsx';
 
@@ -64,6 +64,9 @@ export default function Home() {
 
   // GAME LOGIC ========================================
   const advanceDay = () => {
+    if(currentDay === 29) {
+      alert("Today is your last day! Better sell all your assets!")
+    }
     if(currentDay >= 30) {
       alert(`This round has been completed. You amassed ${numberWithCommas(cash)}. Click to start a new game`);
       init();
@@ -86,20 +89,22 @@ export default function Home() {
   }
   
   const calculateMaxShares = (assetPrice, walletAmount, walletCapacity, cash) => {
-    let max = 0;
     let shares = Math.floor( cash / assetPrice );
 
-    if(shares >= walletCapacity) {
-      max = walletCapacity;
-    } else {
-      max = shares;
-    }
-
-    return max - walletAmount;
+    return shares >= walletCapacity ? walletCapacity - walletAmount : shares;
   }
 
   const numberWithCommas = (str) => {
     return str.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  const increaseWalletCapacity = () => {
+    if(cash < 100000){
+      alert("You do not have enough cash to expand your wallet");
+    } else {
+      setWalletCapacity(walletCapacity += 100);
+      setCash(cash -= 100000);
+    }
   }
 
   //BUY LOGIC ===============================
@@ -145,7 +150,7 @@ export default function Home() {
             needCash();
           } else {
             let amt = (calculateMaxShares(solanaPrice, walletAmount, walletCapacity, cash));
-            setCash(cash - (amt * solanaPrice));
+            setCash(cash -= (amt * solanaPrice));
             setSolanaWallet(solanaWallet += amt);
             walletTotal();
           }
@@ -232,7 +237,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="prose">
+      <main className="prose px-10">
         <h1>Crypto Wars</h1>
 
         <p className='mt-5'>Day: {currentDay}</p>
@@ -287,6 +292,11 @@ export default function Home() {
             </tr>
           </tbody>
         </table>
+
+        <div className='mt-5 flex items-center'>
+          <p className='mr-5'>Wallet Size (+100): $100,000</p>
+          <Button color="bg-emerald-400" xPadding={3} yPadding={1} onClick={increaseWalletCapacity}>Buy</Button>
+        </div>
 
         <Button color="bg-blue-500" xPadding={6} yPadding={4} margin={10} onClick={advanceDay}>Advance Day</Button>
         <Button color="bg-red-500" xPadding={6} yPadding={4} margin={10} onClick={init}>New Game</Button>
