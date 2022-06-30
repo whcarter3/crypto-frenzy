@@ -15,8 +15,11 @@ export default function Home() {
   const [bitcoinWallet, setBitcoinWallet]   = React.useState(0);
   const [ethereumWallet, setEthereumWallet] = React.useState(0);
   const [litecoinWallet, setLitecoinWallet] = React.useState(0);
-  const [solanaWallet, setSolanaWallet]     = React.useState(0)
-  const [log, setLog]                       = React.useState([`Click Advance Day to start this round. \nYou have 30 days to make as much money as you can! 💎🙌\n`])
+  const [solanaWallet, setSolanaWallet]     = React.useState(0);
+  const [log, setLog]                       = React.useState([`Click Advance Day to start this round. \nYou have 30 days to make as much money as you can! 💎🙌\n`]);
+  const [highScore, setHighScore]           = React.useState(0);
+  const [walletExpansionCost, setWalletExpansionCost] = React.useState(100000);
+  const [debt, setDebt]                     = React.useState(2500);
 
 
   //STATIC DATA ================================================
@@ -26,8 +29,8 @@ export default function Home() {
       symbol: "BTC",
       range: {
         low:[3500,4550],
-        mid: [9000,40000],
-        high:[85000, 105000]
+        mid: [9000,65000],
+        high:[105000, 125000]
       }
     },
     ethereum: {
@@ -36,7 +39,7 @@ export default function Home() {
       range: {
         low:[175,350],
         mid: [700,4800],
-        high:[8000, 11000]
+        high:[10000, 12500]
       }
     },
     litecoin: {
@@ -44,8 +47,8 @@ export default function Home() {
       symbol: "LTC",
       range: {
         low:[20,45],
-        mid: [90,360],
-        high:[1000, 2200]
+        mid: [90,630],
+        high:[1200, 1500]
       }
     },
     solana: {
@@ -73,8 +76,9 @@ export default function Home() {
     setEthereumWallet(0);
     setLitecoinWallet(0);
     setSolanaWallet(0);
-    setLog([`Click Advance Day to start this round. \nYou have 30 days to make as much money as you can! 💎🙌\n`]);
-    addToLog('')
+    setWalletExpansionCost(100000);
+    setDebt(2500);
+    setLog([`- You borrowed $1,500 at 20% daily interest\n- Click Advance Day to start.\n- You have 30 days to make as much money as you can! 💎🙌\n`]);
   }
 
   // GAME LOGIC ========================================
@@ -83,7 +87,10 @@ export default function Home() {
       alert("Today is your last day! Better sell all your assets!")
     }
     if(currentDay >= 30) {
-      alert(`This round has been completed. You amassed $${numberWithCommas(cash)}. Click to start a new game`);
+      alert(`This round has been completed. You amassed $${numberWithCommas(cash - debt)}. Click to start a new game`);
+      if(cash > highScore){
+        setHighScore(cash);
+      }
       init();
     } else {
       if(currentDay === 0) {
@@ -98,6 +105,7 @@ export default function Home() {
         randomizePriceVariance("ETH");
         randomizePriceVariance("LTC");
         randomizePriceVariance("SOL");
+        setDebt(Math.floor(debt += (debt * .20)));
       }
       
       setCurrentDay(currentDay + 1);
@@ -119,47 +127,47 @@ export default function Home() {
         let coinFlipBTC = Math.floor(Math.random() * 100);
         if(coinFlipBTC < 2) {
           setBitcoinPrice(randomizePrice(assets.bitcoin.range.low[0], assets.bitcoin.range.low[1]))
-          addToLog("🐋 A whale has dumped Bitcoin and the price has plummeted! 🐋\n")
+          addToLog(`${new Date().toLocaleTimeString()} - 🐋 A whale has dumped Bitcoin and the price has plummeted!\n`)
         } else if (coinFlipBTC >=2 && coinFlipBTC <97) {
           setBitcoinPrice(randomizePrice(assets.bitcoin.range.mid[0], assets.bitcoin.range.mid[1]))
         } else {
           setBitcoinPrice(randomizePrice(assets.bitcoin.range.high[0], assets.bitcoin.range.high[1]))
-          addToLog("🚀🌕 Bitcoin is going to the moon!\n")
+          addToLog(`${new Date().toLocaleTimeString()} - 🚀🌕 Bitcoin is going to the moon!\n`)
         }
         break;
       case "ETH":
         let coinFlipETH = Math.floor(Math.random() * 100);
         if(coinFlipETH < 2) {
           setEthereumPrice(randomizePrice(assets.ethereum.range.low[0], assets.ethereum.range.low[1]))
-          addToLog("🐋 A whale has dumped Ethereum and the price has plummeted! 🐋\n")
+          addToLog(`${new Date().toLocaleTimeString()} - 🐋 A whale has dumped Ethereum and the price has plummeted!\n`)
         } else if (coinFlipETH >= 2 && coinFlipETH <97) {
           setEthereumPrice(randomizePrice(assets.ethereum.range.mid[0], assets.ethereum.range.mid[1]))
         } else {
           setEthereumPrice(randomizePrice(assets.ethereum.range.high[0], assets.ethereum.range.high[1]))
-          addToLog("🚀🌕 Ethereum is going to the moon!\n")
+          addToLog(`${new Date().toLocaleTimeString()} - 🚀🌕 Ethereum is going to the moon!\n`)
         }
         break;
       case "LTC":
         let coinFlipLTC = Math.floor(Math.random() * 100);
         if(coinFlipLTC < 2) {
           setLitecoinPrice(randomizePrice(assets.litecoin.range.low[0], assets.litecoin.range.low[1]))
-          addToLog("🐋 A whale has dumped Litecoin and the price has plummeted! 🐋\n")
+          addToLog(`${new Date().toLocaleTimeString()} - 🐋 A whale has dumped Litecoin and the price has plummeted!\n`)
         } else if (coinFlipLTC >=2 && coinFlipLTC <97) {
           setLitecoinPrice(randomizePrice(assets.litecoin.range.mid[0], assets.litecoin.range.mid[1]))
         } else {
           setLitecoinPrice(randomizePrice(assets.litecoin.range.high[0], assets.litecoin.range.high[1]))
-          addToLog("🚀🌕 Litecoin is going to the moon!\n")
+          addToLog(`${new Date().toLocaleTimeString()} - 🚀🌕 Litecoin is going to the moon!\n`)
         }
         break;
       case "SOL":
         let coinFlipSOL = Math.floor(Math.random() * 100);
-        if(coinFlipSOL < 20) {
+        if(coinFlipSOL < 10) {
           setSolanaPrice(randomizePrice(assets.solana.range.low[0], assets.solana.range.low[1]))
-        } else if (coinFlipSOL >=20 && coinFlipSOL <97) {
+        } else if (coinFlipSOL >=10 && coinFlipSOL <97) {
           setSolanaPrice(randomizePrice(assets.solana.range.mid[0], assets.solana.range.mid[1]))
         } else {
           setSolanaPrice(randomizePrice(assets.solana.range.high[0], assets.solana.range.high[1]))
-          addToLog("🚀🌕 Solana is going to the moon!")
+          addToLog(`${new Date().toLocaleTimeString()} - 🚀🌕 Solana is going to the moon!\n`)
         }
         break;
       default:
@@ -182,18 +190,37 @@ export default function Home() {
       needStartGame();
       return;
     }
-    if(cash < 100000){
+    if(cash < walletExpansionCost){
       alert("You do not have enough cash to expand your wallet");
     } else {
       setWalletCapacity(walletCapacity += 100);
-      setCash(cash -= 100000);
-      let log = `${new Date().toLocaleTimeString()} - You have increased your wallet capacity to ${walletCapacity}\n`
-      addToLog(log);
+      setCash(cash -= walletExpansionCost);
+      setWalletExpansionCost(walletExpansionCost += (walletExpansionCost * .25))
+      addToLog(`${new Date().toLocaleTimeString()} - You have increased your wallet capacity to ${walletCapacity}\n`);
+      addToLog(`${new Date().toLocaleTimeString()} - Wallet Expansion cost has increased in price by 25% to ${walletExpansionCost}\n`);
     }
   }
 
   const addToLog = (str) => {
     setLog(arr => [str, ...arr]);
+  }
+
+  const payDebt = () => {
+    if(currentDay == 0) {
+      needStartGame();
+      return;
+    }
+    if(debt === 0){
+      alert("You've already paid off your debt!");
+      return;
+    }
+    if(cash < debt){
+      alert("You do not have enough cash to pay off your debt")
+    } else {
+      addToLog(`${new Date().toLocaleTimeString()} - You have paid off your ${debt} debt! 🙌\n`)
+      setCash(cash -= debt);
+      setDebt(0);
+    }
   }
 
   //BUY LOGIC ===============================
@@ -337,21 +364,24 @@ export default function Home() {
     alert("You do not have enough wallet space to purchase this asset");
   }
 
+
+
   //PRESENTATION COMPONENTS =============================
   return (
-    <div className="container mx-auto mt-10">
+    <div className="container mx-auto mt-5">
       <Head>
         <title>Crypto Frenzy</title>
-        <meta name="description" content="Generated by create next app" />
+        <meta name="description" content="A crypto buying and selling game." />
         <link rel="icon" href="/favicon1.ico" />
       </Head>
 
-      <main className="prose px-10">
-        <h1>Crypto Frenzy</h1>
+      <main className="prose px-5">
+        <h1>Crypto Frenzy 🚀</h1>
 
-        <p className='mt-5'>Day: {currentDay}/30</p>
-        <p>Cash: ${numberWithCommas(cash)}</p>
-        <p>Wallet: {walletAmount}/{walletCapacity} </p>
+        <p className='mt-5'><span className='font-bold'>Day:</span> {currentDay}/30</p>
+        <p><span className='font-bold'>Cash:</span> ${numberWithCommas(cash)}</p>
+        <p><span className='font-bold'>Debt:</span> ${numberWithCommas(debt)}</p>
+        <p><span className='font-bold'>Wallet:</span> {walletAmount}/{walletCapacity} </p>
 
         <div className='w-96'>
           <table className='mt-5 w-full table-auto border-collapse'> 
@@ -368,7 +398,7 @@ export default function Home() {
                 <td>{assets.bitcoin.assetName}</td>
                 <td>${numberWithCommas(bitcoinPrice)}</td>
                 <td>
-                  <button className="rounded-full bg-blue-700 px-3 py-1" onClick={handleBuy} id="bitcoinBuy">Buy</button>
+                  <button className="rounded-full bg-blue-700 px-3 py-1 mr-4" onClick={handleBuy} id="bitcoinBuy">Buy</button>
                   <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="bitcoinSell">Sell</button>
                 </td>
                 <td>{bitcoinWallet}</td>
@@ -377,7 +407,7 @@ export default function Home() {
                 <td>{assets.ethereum.assetName}</td>
                 <td>${numberWithCommas(ethereumPrice)}</td>
                 <td>
-                  <button className="rounded-full bg-blue-700 px-3 py-1" onClick={handleBuy} id="ethereumBuy">Buy</button>
+                  <button className="rounded-full bg-blue-700 px-3 py-1 mr-5" onClick={handleBuy} id="ethereumBuy">Buy</button>
                   <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="ethereumSell">Sell</button>
                 </td>
                 <td>{ethereumWallet}</td>
@@ -386,7 +416,7 @@ export default function Home() {
                 <td>{assets.litecoin.assetName}</td>
                 <td>${numberWithCommas(litecoinPrice)}</td>
                 <td>
-                  <button className="rounded-full bg-blue-700 px-3 py-1" onClick={handleBuy} id="litecoinBuy">Buy</button>
+                  <button className="rounded-full bg-blue-700 px-3 py-1 mr-5" onClick={handleBuy} id="litecoinBuy">Buy</button>
                   <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="litecoinSell">Sell</button>
                 </td>
                 <td>{litecoinWallet}</td>
@@ -395,7 +425,7 @@ export default function Home() {
                 <td>{assets.solana.assetName}</td>
                 <td>${numberWithCommas(solanaPrice)}</td>
                 <td>
-                  <button className="rounded-full bg-blue-700 px-3 py-1" onClick={handleBuy} id="solanaBuy">Buy</button>
+                  <button className="rounded-full bg-blue-700 px-3 py-1 mr-5" onClick={handleBuy} id="solanaBuy">Buy</button>
                   <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="solanaSell">Sell</button>
                 </td>
                 <td>{solanaWallet}</td>
@@ -405,19 +435,28 @@ export default function Home() {
         </div>
         
 
-        <div className='mt-5 flex items-center'>
-          <p className='mr-5'>Wallet Size (+100): $100,000</p>
-          <button className='bg-green-500 px-3 py-1 rounded-full' onClick={increaseWalletCapacity}>Buy</button>
+        <div className='mt-5 flex flex-col max-w-xs'>
+          <div className='flex w-full justify-between items-center'>
+            <p>Wallet Size (+100): ${numberWithCommas(walletExpansionCost)}</p>
+            <button className='bg-green-500 px-3 py-1 rounded-full' onClick={increaseWalletCapacity}>Buy</button>
+          </div>
+          <div className='flex w-full justify-between items-center mt-3'>
+            <p>Pay off debt: ${numberWithCommas(debt)}</p>
+            <button className='bg-green-500 px-3 py-1 rounded-full' onClick={payDebt}>Pay</button>
+          </div>
         </div>
 
-        <button className='bg-blue-700 px-6 py-4 rounded-full mt-10' onClick={advanceDay}>Advance Day</button>
+        <div></div>
+        <button className='bg-blue-700 px-6 py-4 rounded-full mt-8 mr-5' onClick={advanceDay}>Advance Day</button>
         <button className='bg-red-700 px-6 py-4 rounded-full' onClick={init}>New Game</button>
 
-        <div>
-          <ul className='border border-sky-600 mt-10 max-h-56 w-auto p-4 overflow-auto inline-block text-xs'>
+        <div className='max-w-sm'>
+          <ul className='border border-sky-600 mt-8 max-h-56 w-auto p-4 overflow-auto inline-block text-xs'>
             <li>{log}</li>
           </ul>
         </div>
+
+        <h3 className='mt-5'>High Score (Session) ${numberWithCommas(highScore)}</h3>
 
       </main>
     </div>
