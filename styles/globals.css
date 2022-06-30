@@ -9,8 +9,8 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     font-size: 14px;
-    @apply bg-slate-800;
-    @apply text-slate-300;
+    background-color: #18212f;
+    @apply text-slate-200;
     white-space: pre-wrap;
 }
 
@@ -38,6 +38,26 @@ a {
 
 tbody tr td:last-child, tbody tr td:nth-child(3) {
   text-align: center;
+}
+
+tbody td {
+  @apply text-slate-300;
+}
+
+td {
+  @apply px-3;
+  @apply py-2;
+  @apply border-b;
+  @apply border-slate-700;
+}
+thead, td {
+  @apply border-b;
+  @apply border-slate-700;
+}
+
+ul {
+  @apply bg-slate-800;
+  @apply rounded;
 }
 
 

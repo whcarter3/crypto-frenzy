@@ -4,23 +4,19 @@ import Head from 'next/head';
 export default function Home() {
 
   //GAME STATE ================================================
-  const [bitcoinPrice, setBitcoinPrice]                   = React.useState(0);
-  const [ethereumPrice, setEthereumPrice]                 = React.useState(0);
-  const [litecoinPrice, setLitecoinPrice]                 = React.useState(0);
-  const [solanaPrice, setSolanaPrice]                     = React.useState(0);
-  const [currentDay, setCurrentDay]                       = React.useState(0);
-  const [cash, setCash]                                   = React.useState(1500);
-  const [walletCapacity, setWalletCapacity]               = React.useState(100);
-  const [walletAmount, setWalletAmount]                   = React.useState(0);
-  const [bitcoinWallet, setBitcoinWallet]                 = React.useState(0);
-  const [ethereumWallet, setEthereumWallet]               = React.useState(0);
-  const [litecoinWallet, setLitecoinWallet]               = React.useState(0);
-  const [solanaWallet, setSolanaWallet]                   = React.useState(0)
-  const [log, setLog]                                     = React.useState([`Click Advance Day to start this round. \n`])
-  const [bitcoinPriceIncrease, setBitcoinPriceIncrease]   = React.useState("");
-  const [ethereumPriceIncrease, setEthereumPriceIncrease] = React.useState("");
-  const [litecoinPriceIncrease, setLitecoinPriceIncrease] = React.useState("");
-  const [solanaPriceIncrease, setSolanaPriceIncrease]     = React.useState("");
+  const [bitcoinPrice, setBitcoinPrice]     = React.useState(0);
+  const [ethereumPrice, setEthereumPrice]   = React.useState(0);
+  const [litecoinPrice, setLitecoinPrice]   = React.useState(0);
+  const [solanaPrice, setSolanaPrice]       = React.useState(0);
+  const [currentDay, setCurrentDay]         = React.useState(0);
+  const [cash, setCash]                     = React.useState(1500);
+  const [walletCapacity, setWalletCapacity] = React.useState(100);
+  const [walletAmount, setWalletAmount]     = React.useState(0);
+  const [bitcoinWallet, setBitcoinWallet]   = React.useState(0);
+  const [ethereumWallet, setEthereumWallet] = React.useState(0);
+  const [litecoinWallet, setLitecoinWallet] = React.useState(0);
+  const [solanaWallet, setSolanaWallet]     = React.useState(0)
+  const [log, setLog]                       = React.useState([`Click Advance Day to start this round. \nYou have 30 days to make as much money as you can! 💎🙌\n`])
 
 
   //STATIC DATA ================================================
@@ -28,26 +24,38 @@ export default function Home() {
     bitcoin: {
       assetName: "Bitcoin",
       symbol: "BTC",
-      min: 12000,
-      max: 65000
+      range: {
+        low:[3500,4550],
+        mid: [9000,40000],
+        high:[85000, 105000]
+      }
     },
     ethereum: {
       assetName: "Ethereum",
       symbol: "ETH",
-      min: 250,
-      max: 6500
+      range: {
+        low:[175,350],
+        mid: [700,4800],
+        high:[8000, 11000]
+      }
     },
     litecoin: {
       assetName: "Litecoin",
       symbol: "LTC",
-      min: 65,
-      max: 650,
+      range: {
+        low:[20,45],
+        mid: [90,360],
+        high:[1000, 2200]
+      }
     },
     solana: {
       assetName: "Solana",
       symbol: "SOL",
-      min: 5,
-      max: 250
+      range: {
+        low:[1,10],
+        mid: [11,110],
+        high:[200, 300]
+      }
     }
   }
 
@@ -65,7 +73,8 @@ export default function Home() {
     setEthereumWallet(0);
     setLitecoinWallet(0);
     setSolanaWallet(0);
-    setLog([`Click Advance Day to start this round. \n`]);
+    setLog([`Click Advance Day to start this round. \nYou have 30 days to make as much money as you can! 💎🙌\n`]);
+    addToLog('')
   }
 
   // GAME LOGIC ========================================
@@ -77,27 +86,21 @@ export default function Home() {
       alert(`This round has been completed. You amassed $${numberWithCommas(cash)}. Click to start a new game`);
       init();
     } else {
-      // currentDay === 0 ? addToLog(`======== Start of Game =========\n`) : addToLog(`========= End of Day ${currentDay} =========\n`);
       if(currentDay === 0) {
         addToLog(`======== Start of Game =========\n`);
-        setBitcoinPrice(randomizePrice(assets.bitcoin.max, assets.bitcoin.min));
-        setEthereumPrice(randomizePrice(assets.ethereum.max, assets.ethereum.min));
-        setLitecoinPrice(randomizePrice(assets.litecoin.max, assets.litecoin.min));
-        setSolanaPrice(randomizePrice(assets.solana.max, assets.solana.min));
+        setBitcoinPrice(randomizePrice(assets.bitcoin.range.mid[0], assets.bitcoin.range.mid[1]));
+        setEthereumPrice(randomizePrice(assets.ethereum.range.mid[0], assets.ethereum.range.mid[1]));
+        setLitecoinPrice(randomizePrice(assets.litecoin.range.mid[0], assets.litecoin.range.mid[1]));
+        setSolanaPrice(randomizePrice(assets.solana.range.mid[0], assets.solana.range.mid[1]));
       } else {
-        randomizePriceVariance(bitcoinPrice, "bitcoin");
-        randomizePriceVariance(ethereumPrice, "ethereum");
-        randomizePriceVariance(litecoinPrice, "litecoin");
-        randomizePriceVariance(solanaPrice, "solana");
         addToLog(`========= End of Day ${currentDay} =========\n`)
+        randomizePriceVariance("BTC");
+        randomizePriceVariance("ETH");
+        randomizePriceVariance("LTC");
+        randomizePriceVariance("SOL");
       }
       
       setCurrentDay(currentDay + 1);
-      // setBitcoinPrice(randomizePrice(assets.bitcoin.max, assets.bitcoin.min));
-      // setEthereumPrice(randomizePrice(assets.ethereum.max, assets.ethereum.min));
-      // setLitecoinPrice(randomizePrice(assets.litecoin.max, assets.litecoin.min));
-      // setSolanaPrice(randomizePrice(assets.solana.max, assets.solana.min));
-
     }
   }
 
@@ -110,39 +113,58 @@ export default function Home() {
     return Math.floor(Math.random() * (max - min) + min);
   }
 
-  const randomizePriceVariance = (assetPrice, asset) => {
-    console.log('this gets called');
-    let maxPriceMovement = 25;
-    let minPriceMovement = 5;
-    //x chance of going up or down
-    let coinFlip = Math.floor(Math.random() * 10);
-    let randPercent = Math.floor(Math.random() * (maxPriceMovement - minPriceMovement) + minPriceMovement)/100;
-    console.log(`${asset} %`, randPercent);
-    let assetCall;
-    let priceChangeStr;
+  const randomizePriceVariance = (asset) => {
     switch(asset){
-      case "bitcoin":
-        assetCall = setBitcoinPrice;
-        priceChangeStr = setBitcoinPriceIncrease;
+      case "BTC":
+        let coinFlipBTC = Math.floor(Math.random() * 100);
+        if(coinFlipBTC < 2) {
+          setBitcoinPrice(randomizePrice(assets.bitcoin.range.low[0], assets.bitcoin.range.low[1]))
+          addToLog("🐋 A whale has dumped Bitcoin and the price has plummeted! 🐋\n")
+        } else if (coinFlipBTC >=2 && coinFlipBTC <97) {
+          setBitcoinPrice(randomizePrice(assets.bitcoin.range.mid[0], assets.bitcoin.range.mid[1]))
+        } else {
+          setBitcoinPrice(randomizePrice(assets.bitcoin.range.high[0], assets.bitcoin.range.high[1]))
+          addToLog("🚀🌕 Bitcoin is going to the moon!\n")
+        }
         break;
-      case "ethereum":
-        assetCall = setEthereumPrice;
-        priceChangeStr = setEthereumPriceIncrease;
+      case "ETH":
+        let coinFlipETH = Math.floor(Math.random() * 100);
+        if(coinFlipETH < 2) {
+          setEthereumPrice(randomizePrice(assets.ethereum.range.low[0], assets.ethereum.range.low[1]))
+          addToLog("🐋 A whale has dumped Ethereum and the price has plummeted! 🐋\n")
+        } else if (coinFlipETH >= 2 && coinFlipETH <97) {
+          setEthereumPrice(randomizePrice(assets.ethereum.range.mid[0], assets.ethereum.range.mid[1]))
+        } else {
+          setEthereumPrice(randomizePrice(assets.ethereum.range.high[0], assets.ethereum.range.high[1]))
+          addToLog("🚀🌕 Ethereum is going to the moon!\n")
+        }
         break;
-      case "litecoin":
-        assetCall = setLitecoinPrice;
-        priceChangeStr = setLitecoinPriceIncrease;
+      case "LTC":
+        let coinFlipLTC = Math.floor(Math.random() * 100);
+        if(coinFlipLTC < 2) {
+          setLitecoinPrice(randomizePrice(assets.litecoin.range.low[0], assets.litecoin.range.low[1]))
+          addToLog("🐋 A whale has dumped Litecoin and the price has plummeted! 🐋\n")
+        } else if (coinFlipLTC >=2 && coinFlipLTC <97) {
+          setLitecoinPrice(randomizePrice(assets.litecoin.range.mid[0], assets.litecoin.range.mid[1]))
+        } else {
+          setLitecoinPrice(randomizePrice(assets.litecoin.range.high[0], assets.litecoin.range.high[1]))
+          addToLog("🚀🌕 Litecoin is going to the moon!\n")
+        }
         break;
-      case "solana":
-        assetCall = setSolanaPrice;
-        priceChangeStr = setSolanaPriceIncrease;
+      case "SOL":
+        let coinFlipSOL = Math.floor(Math.random() * 100);
+        if(coinFlipSOL < 20) {
+          setSolanaPrice(randomizePrice(assets.solana.range.low[0], assets.solana.range.low[1]))
+        } else if (coinFlipSOL >=20 && coinFlipSOL <97) {
+          setSolanaPrice(randomizePrice(assets.solana.range.mid[0], assets.solana.range.mid[1]))
+        } else {
+          setSolanaPrice(randomizePrice(assets.solana.range.high[0], assets.solana.range.high[1]))
+          addToLog("🚀🌕 Solana is going to the moon!")
+        }
         break;
       default:
         alert('you\'re changing the price of something that doesn\'t exist');
     }
-    
-    coinFlip > 3 ? assetCall(Math.floor(assetPrice += (assetPrice * randPercent))) : assetCall(Math.floor(assetPrice -= (assetPrice * randPercent)));
-    coinFlip > 3 ? priceChangeStr(`${Math.floor(randPercent * 100)}`) : priceChangeStr(`-${Math.floor(randPercent * 100)}`);
   }
   
   const calculateMaxShares = (assetPrice, walletAmount, walletCapacity, cash) => {
@@ -319,71 +341,69 @@ export default function Home() {
   return (
     <div className="container mx-auto mt-10">
       <Head>
-        <title>Crypto Wars</title>
+        <title>Crypto Frenzy</title>
         <meta name="description" content="Generated by create next app" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon1.ico" />
       </Head>
 
       <main className="prose px-10">
-        <h1>Crypto Wars</h1>
+        <h1>Crypto Frenzy</h1>
 
-        <p className='mt-5'>Day: {currentDay}</p>
+        <p className='mt-5'>Day: {currentDay}/30</p>
         <p>Cash: ${numberWithCommas(cash)}</p>
         <p>Wallet: {walletAmount}/{walletCapacity} </p>
 
-        <table className='table-auto mt-5'> 
-          <thead>
-            <tr>
-              <th>Asset</th>
-              <th>Price</th>
-              <th>% Change</th>
-              <th>Action</th>
-              <th>Wallet</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{assets.bitcoin.assetName}</td>
-              <td>${numberWithCommas(bitcoinPrice)}</td>
-              <td>{bitcoinPriceIncrease}%</td>
-              <td>
-                <button className="rounded-full bg-blue-700 px-3 py-1" onClick={handleBuy} id="bitcoinBuy">Buy</button>
-                <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="bitcoinSell">Sell</button>
-              </td>
-              <td>{bitcoinWallet}</td>
-            </tr>
-            <tr>
-              <td>{assets.ethereum.assetName}</td>
-              <td>${numberWithCommas(ethereumPrice)}</td>
-              <td>{ethereumPriceIncrease}%</td>
-              <td>
-                <button className="rounded-full bg-blue-700 px-3 py-1" onClick={handleBuy} id="ethereumBuy">Buy</button>
-                <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="ethereumSell">Sell</button>
-              </td>
-              <td>{ethereumWallet}</td>
-            </tr>
-            <tr>
-              <td>{assets.litecoin.assetName}</td>
-              <td>${numberWithCommas(litecoinPrice)}</td>
-              <td>{litecoinPriceIncrease}%</td>
-              <td>
-                <button className="rounded-full bg-blue-700 px-3 py-1" onClick={handleBuy} id="litecoinBuy">Buy</button>
-                <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="litecoinSell">Sell</button>
-              </td>
-              <td>{litecoinWallet}</td>
-            </tr>
-            <tr>
-              <td>{assets.solana.assetName}</td>
-              <td>${numberWithCommas(solanaPrice)}</td>
-              <td>{solanaPriceIncrease}%</td>
-              <td>
-                <button className="rounded-full bg-blue-700 px-3 py-1" onClick={handleBuy} id="solanaBuy">Buy</button>
-                <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="solanaSell">Sell</button>
-              </td>
-              <td>{solanaWallet}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div className='w-96'>
+          <table className='mt-5 w-full table-auto border-collapse'> 
+            <thead>
+              <tr>
+                <th>Asset</th>
+                <th>Price</th>
+                <th>Action</th>
+                <th>Wallet</th>
+              </tr>
+            </thead>
+            <tbody className='bg-slate-800'>
+              <tr>
+                <td>{assets.bitcoin.assetName}</td>
+                <td>${numberWithCommas(bitcoinPrice)}</td>
+                <td>
+                  <button className="rounded-full bg-blue-700 px-3 py-1" onClick={handleBuy} id="bitcoinBuy">Buy</button>
+                  <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="bitcoinSell">Sell</button>
+                </td>
+                <td>{bitcoinWallet}</td>
+              </tr>
+              <tr>
+                <td>{assets.ethereum.assetName}</td>
+                <td>${numberWithCommas(ethereumPrice)}</td>
+                <td>
+                  <button className="rounded-full bg-blue-700 px-3 py-1" onClick={handleBuy} id="ethereumBuy">Buy</button>
+                  <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="ethereumSell">Sell</button>
+                </td>
+                <td>{ethereumWallet}</td>
+              </tr>
+              <tr>
+                <td>{assets.litecoin.assetName}</td>
+                <td>${numberWithCommas(litecoinPrice)}</td>
+                <td>
+                  <button className="rounded-full bg-blue-700 px-3 py-1" onClick={handleBuy} id="litecoinBuy">Buy</button>
+                  <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="litecoinSell">Sell</button>
+                </td>
+                <td>{litecoinWallet}</td>
+              </tr>
+              <tr>
+                <td>{assets.solana.assetName}</td>
+                <td>${numberWithCommas(solanaPrice)}</td>
+                <td>
+                  <button className="rounded-full bg-blue-700 px-3 py-1" onClick={handleBuy} id="solanaBuy">Buy</button>
+                  <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="solanaSell">Sell</button>
+                </td>
+                <td>{solanaWallet}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
 
         <div className='mt-5 flex items-center'>
           <p className='mr-5'>Wallet Size (+100): $100,000</p>
