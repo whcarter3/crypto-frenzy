@@ -16,7 +16,7 @@ export default function Home() {
   const [ethereumWallet, setEthereumWallet] = React.useState(0);
   const [litecoinWallet, setLitecoinWallet] = React.useState(0);
   const [solanaWallet, setSolanaWallet]     = React.useState(0);
-  const [log, setLog]                       = React.useState([`Click Advance Day to start this round. \nYou have 30 days to make as much money as you can! 💎🙌\n`]);
+  const [log, setLog]                       = React.useState([`- You borrowed $1,500 at 20% daily interest\n- Click Advance Day to start.\n- You have 30 days to make as much money as you can! 💎🙌\n`]);
   const [highScore, setHighScore]           = React.useState(0);
   const [walletExpansionCost, setWalletExpansionCost] = React.useState(100000);
   const [debt, setDebt]                     = React.useState(2500);
