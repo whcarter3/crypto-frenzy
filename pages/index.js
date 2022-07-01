@@ -3,10 +3,11 @@ import Head from 'next/head';
 import config from '../config/config';
 import { needCash, needAsset, needStartGame, needWalletSpace } from '../helpers/errors';
 import { calculateMaxShares, numberWithCommas, walletTotal, randomizePrice, addToLog, currentTime } from '../helpers/utils';
+import Table from '../components/Table';
 
 export default function Home() {
 
-  let startingLogMsg = `- Click Advance Day to start.\n- You borrowed ${config.cash} at ${config.interestRate * 100}% daily interest\n- You have ${config.days} days to make as much money as you can! 💎🙌\n`;
+  let startingLogMsg = `- Click Advance Day to start.\n- You borrowed $${numberWithCommas(config.cash)} at ${config.interestRate * 100}% daily interest\n- You have ${config.days} days to make as much money as you can! 💎🙌\n`;
 
   //GAME STATE ================================================
   const [bitcoinPrice, setBitcoinPrice]     = React.useState(0);
@@ -345,56 +346,18 @@ export default function Home() {
         <p><span className='font-bold'>Debt:</span> ${numberWithCommas(debt)}</p>
         <p><span className='font-bold'>Wallet:</span> {walletAmount}/{walletCapacity} </p>
 
-        <div className='max-w-md'>
-          <table className='mt-5 w-full table-auto border-collapse'> 
-            <thead>
-              <tr>
-                <th>Asset</th>
-                <th>Price</th>
-                <th>Action</th>
-                <th>Wallet</th>
-              </tr>
-            </thead>
-            <tbody className='bg-slate-800'>
-              <tr>
-                <td>{config.assets.bitcoin.assetName}</td>
-                <td>${numberWithCommas(bitcoinPrice)}</td>
-                <td>
-                  <button className="rounded-full bg-blue-700 px-3 py-1 mr-4" onClick={handleBuy} id="bitcoinBuy">Buy</button>
-                  <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="bitcoinSell">Sell</button>
-                </td>
-                <td>{bitcoinWallet}</td>
-              </tr>
-              <tr>
-                <td>{config.assets.ethereum.assetName}</td>
-                <td>${numberWithCommas(ethereumPrice)}</td>
-                <td>
-                  <button className="rounded-full bg-blue-700 px-3 py-1 mr-5" onClick={handleBuy} id="ethereumBuy">Buy</button>
-                  <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="ethereumSell">Sell</button>
-                </td>
-                <td>{ethereumWallet}</td>
-              </tr>
-              <tr>
-                <td>{config.assets.litecoin.assetName}</td>
-                <td>${numberWithCommas(litecoinPrice)}</td>
-                <td>
-                  <button className="rounded-full bg-blue-700 px-3 py-1 mr-5" onClick={handleBuy} id="litecoinBuy">Buy</button>
-                  <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="litecoinSell">Sell</button>
-                </td>
-                <td>{litecoinWallet}</td>
-              </tr>
-              <tr>
-                <td>{config.assets.solana.assetName}</td>
-                <td>${numberWithCommas(solanaPrice)}</td>
-                <td>
-                  <button className="rounded-full bg-blue-700 px-3 py-1 mr-5" onClick={handleBuy} id="solanaBuy">Buy</button>
-                  <button className="rounded-full bg-green-500 px-3 py-1" onClick={handleSell} id="solanaSell">Sell</button>
-                </td>
-                <td>{solanaWallet}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <Table 
+          handleBuy={handleBuy} 
+          handleSell={handleSell}
+          bitcoinPrice={bitcoinPrice}
+          bitcoinWallet={bitcoinWallet}
+          ethereumPrice={ethereumPrice}
+          ethereumWallet={ethereumWallet}
+          litecoinPrice={litecoinPrice}
+          litecoinWallet={litecoinWallet}
+          solanaPrice={solanaPrice}
+          solanaWallet={solanaWallet}
+        />
         
 
         <div className='mt-5 flex flex-col max-w-xs'>
