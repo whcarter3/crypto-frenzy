@@ -1,62 +1,12 @@
 import React from 'react';
 import Head from 'next/head';
+import config from '../config/config';
+import { needCash, needAsset, needStartGame, needWalletSpace } from '../helpers/errors';
+import { calculateMaxShares, numberWithCommas, walletTotal, randomizePrice, addToLog, currentTime } from '../helpers/utils';
 
 export default function Home() {
 
-  //CONFIG OBJECT ================================================
-  //low ranges are generally 1/2 of lowest mid, and high ranges are generally 2x the highest mid
-  const config = {
-    wallet: {
-      startingCapacity: 100,
-      increase: 100,
-      cost: 50000,
-      percentIncreace: .25
-    },
-    cash: 1500,
-    debt: 2500,
-    interestRate: .20,
-    days: 30,
-    assets: {
-      bitcoin: {
-        assetName: "Bitcoin",
-        symbol: "BTC",
-        range: {
-          low:[3500,4550],
-          mid: [9000,65000],
-          high:[105000, 125000]
-        }
-      },
-      ethereum: {
-        assetName: "Ethereum",
-        symbol: "ETH",
-        range: {
-          low:[175,350],
-          mid: [700,4800],
-          high:[10000, 12500]
-        }
-      },
-      litecoin: {
-        assetName: "Litecoin",
-        symbol: "LTC",
-        range: {
-          low:[20,45],
-          mid: [90,630],
-          high:[1200, 1500]
-        }
-      },
-      solana: {
-        assetName: "Solana",
-        symbol: "SOL",
-        range: {
-          low:[1,10],
-          mid: [11,110],
-          high:[200, 300]
-        }
-      }
-    },
-  }
-
-  let startingLogMsg = `- You borrowed ${config.cash} at ${config.interestRate * 100}% daily interest\n- Click Advance Day to start.\n- You have ${config.days} days to make as much money as you can! 💎🙌\n`;
+  let startingLogMsg = `- Click Advance Day to start.\n- You borrowed ${config.cash} at ${config.interestRate * 100}% daily interest\n- You have ${config.days} days to make as much money as you can! 💎🙌\n`;
 
   //GAME STATE ================================================
   const [bitcoinPrice, setBitcoinPrice]     = React.useState(0);
@@ -76,7 +26,7 @@ export default function Home() {
   const [walletExpansionCost, setWalletExpansionCost] = React.useState(config.wallet.cost);
   const [debt, setDebt]                     = React.useState(config.debt);
 
-  //INIT FUNCTION =====================================
+  //NEW GAME INIT FUNCTION =====================================
   function init () {
     setCurrentDay(0);
     setBitcoinPrice(0);
@@ -90,61 +40,28 @@ export default function Home() {
     setEthereumWallet(0);
     setLitecoinWallet(0);
     setSolanaWallet(0);
-    setWalletExpansionCost(config.wallet.increase);
+    setWalletExpansionCost(config.wallet.cost);
     setDebt(config.debt);
     setLog([startingLogMsg]);
   }
 
-    //ERROR HANDLING  ===================================
-    const needCash = () => {
-      alert("You do not have enough cash to purchase this asset");
-    }
-  
-    const needAsset = () => {
-      alert("You do not have any of this asset to sell");
-    }
-  
-    const needStartGame = () => {
-      alert("Please click Advance Day to start the game");
-    }
-  
-    const needWalletSpace = () => {
-      alert("You do not have enough wallet space to purchase this asset");
-    }
-
-  //UTIL FUNCTIONS =====================================
-  const calculateMaxShares = (assetPrice, walletAmount, walletCapacity, cash) => {
-    let shares = Math.floor( cash / assetPrice );
-    //ensure shares don't exceed wallet capacity, else return max shares
-    return shares + walletAmount >= walletCapacity ? walletCapacity - walletAmount : shares;
+  // HELPER FUNCTIONS ===================================
+  const addToLog = (str) => {
+    setLog(arr => [str, ...arr]);
   }
-
-  const numberWithCommas = (str) => {
-    return str.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-
+  
   const walletTotal = () => {
     let amount = bitcoinWallet + ethereumWallet + litecoinWallet + solanaWallet;
     setWalletAmount(amount);
   }
 
-  const randomizePrice = (max, min) => {
-    return Math.floor(Math.random() * (max - min) + min);
-  }
-
-  const addToLog = (str) => {
-    setLog(arr => [str, ...arr]);
-  }
-
-  const currentTime = () => {
-    return new Date().toLocaleTimeString();
-  }
-
-  // GAME LOGIC ========================================
+  //ADVANCE DAY LOGIC ===================================
   const advanceDay = () => {
+    //warning before last day
     if(currentDay === (config.days - 1)) {
       alert("Today is your last day! Better sell all your assets!")
     }
+    //end of game -- alert score -- set high score -- restart
     if(currentDay >= config.days) {
       alert(`This round has been completed. You amassed $${numberWithCommas(cash - debt)}! Click to start a new game.`);
       if(cash > highScore){
@@ -153,25 +70,29 @@ export default function Home() {
       init();
     } else {
       if(currentDay === 0) {
+        //sets initial prices to randomized value from mid range
         addToLog(`======== Start of Game =========\n`);
         setBitcoinPrice(randomizePrice(config.assets.bitcoin.range.mid[0], config.assets.bitcoin.range.mid[1]));
         setEthereumPrice(randomizePrice(config.assets.ethereum.range.mid[0], config.assets.ethereum.range.mid[1]));
         setLitecoinPrice(randomizePrice(config.assets.litecoin.range.mid[0], config.assets.litecoin.range.mid[1]));
         setSolanaPrice(randomizePrice(config.assets.solana.range.mid[0], config.assets.solana.range.mid[1]));
       } else {
+        //randomizes prices with chance to hit high/low range
         addToLog(`========= End of Day ${currentDay} =========\n`)
         randomizePriceVariance("BTC");
         randomizePriceVariance("ETH");
         randomizePriceVariance("LTC");
         randomizePriceVariance("SOL");
+        //increase date based on daily %
         setDebt(Math.floor(debt += (debt * config.interestRate)));
       }
-      
+      //increase day
       setCurrentDay(currentDay += 1);
     }
   }
 
-  //Randomize each coin's price with a low% chance to be in the high or low range, and high% chance to be in mid range
+  //RANDOMIZE PRICE LOGIC =====================================
+  //bell curve chance to hit low/mid/high range
   const randomizePriceVariance = (asset) => {
     switch(asset){
       case "BTC":
@@ -241,6 +162,7 @@ export default function Home() {
 
   //WALLET EXPANSION LOGIC ====================
   const increaseWalletCapacity = () => {
+    //error checks =====
     if(currentDay == 0) {
       needStartGame();
       return;
@@ -248,16 +170,18 @@ export default function Home() {
     if(cash < walletExpansionCost){
       alert("You do not have enough cash to expand your wallet");
       return;
-    } 
+    }
+    // =================
     setWalletCapacity(walletCapacity += config.wallet.increase);
     setCash(cash -= walletExpansionCost);
     //increase wallet expansion cost by 25% after each purchase
-    setWalletExpansionCost(walletExpansionCost += (walletExpansionCost * config.wallet.percentIncreace))
+    setWalletExpansionCost(Math.floor(walletExpansionCost += (walletExpansionCost * config.wallet.percentIncreace)));
     addToLog(`${currentTime()} - You have increased your wallet capacity to ${walletCapacity}\n`);
     addToLog(`${currentTime()} - Wallet Expansion cost has increased in price by 25% to ${walletExpansionCost}\n`);
   }
 
   const payDebt = () => {
+    //error checks =====
     if(currentDay == 0) {
       needStartGame();
       return;
@@ -270,6 +194,7 @@ export default function Home() {
       alert("You do not have enough cash to pay off your debt")
       return;
     }
+    // =================
     addToLog(`${currentTime()} - You have paid off your $${numberWithCommas(debt)} debt! 🙌\n`)
     setCash(cash -= debt);
     setDebt(0);
@@ -277,6 +202,7 @@ export default function Home() {
 
   //BUY LOGIC ===============================
   const handleBuy = (e) => {
+    //error checks =====
     if(currentDay === 0){
       needStartGame();
       return;
@@ -285,6 +211,7 @@ export default function Home() {
       needWalletSpace();
       return;
     }
+    // =================
     switch(e.target.id){
       case "bitcoinBuy":
         if(bitcoinPrice > cash) {
