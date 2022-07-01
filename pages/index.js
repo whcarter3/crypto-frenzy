@@ -383,7 +383,7 @@ export default function Home() {
         <p><span className='font-bold'>Debt:</span> ${numberWithCommas(debt)}</p>
         <p><span className='font-bold'>Wallet:</span> {walletAmount}/{walletCapacity} </p>
 
-        <div className='w-96'>
+        <div className='max-w-md'>
           <table className='mt-5 w-full table-auto border-collapse'> 
             <thead>
               <tr>
@@ -450,13 +450,13 @@ export default function Home() {
         <button className='bg-blue-700 px-6 py-4 rounded-full mt-8 mr-5' onClick={advanceDay}>Advance Day</button>
         <button className='bg-red-700 px-6 py-4 rounded-full' onClick={init}>New Game</button>
 
-        <div className='max-w-sm'>
-          <ul className='border border-sky-600 mt-8 max-h-56 w-auto p-4 overflow-auto inline-block text-xs'>
+        <div className='max-w-md'>
+          <ul className='border border-sky-600 mt-8 max-h-56 w-full p-4 overflow-auto inline-block text-xs'>
             <li>{log}</li>
           </ul>
         </div>
 
-        <h3 className='mt-5'>High Score (Session) ${numberWithCommas(highScore)}</h3>
+        <h3 className='mt-5'>High Score (Session): ${numberWithCommas(highScore)}</h3>
 
       </main>
     </div>
