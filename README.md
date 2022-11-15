@@ -1,6 +1,7 @@
-#Crypto Frenzy
+# Crypto Frenzy
 
 A small browser game where you try to beat your debt and make as much money as you can on the crypto market in 30 days!
+
 [Crypto Frenzy Game!](https://cryptofrenzy.live)
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
