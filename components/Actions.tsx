@@ -1,14 +1,18 @@
 import config from "../config/config"
 import { numberWithCommas } from "../helpers/utils"
+import { payDebt } from "../lib/game"
 
 const Actions = ({
   increaseWalletCapacity,
   walletExpansionCost,
-  payDebt,
   debt,
   advanceDay,
   init,
   currentDay,
+  cash,
+  setLog,
+  setDebt,
+  setCash,
 }) => {
   return (
     <>
@@ -28,7 +32,9 @@ const Actions = ({
         <div className="flex w-full items-center mt-3">
           <button
             className="bg-green-500 px-3 py-1 mr-5 rounded-full"
-            onClick={payDebt}
+            onClick={() =>
+              payDebt(currentDay, setLog, debt, setDebt, cash, setCash)
+            }
           >
             Pay
           </button>

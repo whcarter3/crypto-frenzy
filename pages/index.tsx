@@ -7,6 +7,7 @@ import {
   numberWithCommas,
   randomizePrice,
   currentTime,
+  addToLog,
 } from "../helpers/utils"
 import Table from "../components/Table"
 import Actions from "../components/Actions"
@@ -57,17 +58,6 @@ export default function Home() {
     setLog([startingLogMsg])
   }
 
-  // HELPER FUNCTIONS ===================================
-  const addToLog = (str) => {
-    setLog((arr) => [str, ...arr])
-  }
-
-  let walletTotal = () => {
-    let amount = bitcoinWallet + ethereumWallet + litecoinWallet + solanaWallet
-    console.log("amount", amount)
-    setWalletAmount(amount)
-  }
-
   //ADVANCE DAY LOGIC ===================================
   const advanceDay = () => {
     //warning before last day
@@ -88,14 +78,16 @@ export default function Home() {
     } else {
       if (currentDay === 0) {
         //sets initial prices to randomized value from mid range
-        addToLog(`======== Start of Game =========`)
+        addToLog(`======== Start of Game =========`, setLog)
         addToLog(
           `- You borrowed $${numberWithCommas(config.cash)} at ${
             config.interestRate * 100
-          }% daily interest`
+          }% daily interest`,
+          setLog
         )
         addToLog(
-          `- You have ${config.days} days to make as much money as you can! 💎🙌`
+          `- You have ${config.days} days to make as much money as you can! 💎🙌`,
+          setLog
         )
         setBitcoinPrice(
           randomizePrice(
@@ -123,7 +115,7 @@ export default function Home() {
         )
       } else {
         //randomizes prices with chance to hit high/low range
-        addToLog(`========= End of Day ${currentDay} =========`)
+        addToLog(`========= End of Day ${currentDay} =========`, setLog)
         randomizePriceVariance("BTC")
         randomizePriceVariance("ETH")
         randomizePriceVariance("LTC")
@@ -152,7 +144,8 @@ export default function Home() {
             )
           )
           addToLog(
-            `${currentTime()} - 🐋 A whale has dumped Bitcoin and the price has plummeted!`
+            `${currentTime()} - 🐋 A whale has dumped Bitcoin and the price has plummeted!`,
+            setLog
           )
           //mid range
         } else if (coinFlipBTC >= 2 && coinFlipBTC < 97) {
@@ -170,7 +163,10 @@ export default function Home() {
               config.assets.bitcoin.range.high[1]
             )
           )
-          addToLog(`${currentTime()} - 🚀🌕 Bitcoin is going to the moon`)
+          addToLog(
+            `${currentTime()} - 🚀🌕 Bitcoin is going to the moon`,
+            setLog
+          )
         }
         break
       case "ETH":
@@ -184,7 +180,8 @@ export default function Home() {
             )
           )
           addToLog(
-            `${currentTime()} - 🐋 A whale has dumped Ethereum and the price has plummeted`
+            `${currentTime()} - 🐋 A whale has dumped Ethereum and the price has plummeted`,
+            setLog
           )
           //mid range
         } else if (coinFlipETH >= 2 && coinFlipETH < 97) {
@@ -202,7 +199,10 @@ export default function Home() {
               config.assets.ethereum.range.high[1]
             )
           )
-          addToLog(`${currentTime()} - 🚀🌕 Ethereum is going to the moon!`)
+          addToLog(
+            `${currentTime()} - 🚀🌕 Ethereum is going to the moon!`,
+            setLog
+          )
         }
         break
       case "LTC":
@@ -216,7 +216,8 @@ export default function Home() {
             )
           )
           addToLog(
-            `${currentTime()} - 🐋 A whale has dumped Litecoin and the price has plummeted!`
+            `${currentTime()} - 🐋 A whale has dumped Litecoin and the price has plummeted!`,
+            setLog
           )
           //mid range
         } else if (coinFlipLTC >= 2 && coinFlipLTC < 97) {
@@ -234,7 +235,10 @@ export default function Home() {
               config.assets.litecoin.range.high[1]
             )
           )
-          addToLog(`${currentTime()} - 🚀🌕 Litecoin is going to the moon!`)
+          addToLog(
+            `${currentTime()} - 🚀🌕 Litecoin is going to the moon!`,
+            setLog
+          )
         }
         break
       case "SOL":
@@ -263,7 +267,10 @@ export default function Home() {
               config.assets.solana.range.high[1]
             )
           )
-          addToLog(`${currentTime()} - 🚀🌕 Solana is going to the moon!`)
+          addToLog(
+            `${currentTime()} - 🚀🌕 Solana is going to the moon!`,
+            setLog
+          )
         }
         break
       default:
@@ -293,35 +300,13 @@ export default function Home() {
       )
     )
     addToLog(
-      `${currentTime()} - You have increased your wallet capacity to ${walletCapacity}`
+      `${currentTime()} - You have increased your wallet capacity to ${walletCapacity}`,
+      setLog
     )
     addToLog(
-      `${currentTime()} - Wallet Expansion cost has increased in price by 25% to ${walletExpansionCost}`
+      `${currentTime()} - Wallet Expansion cost has increased in price by 25% to ${walletExpansionCost}`,
+      setLog
     )
-  }
-
-  const payDebt = () => {
-    //error checks =====
-    if (currentDay == 0) {
-      showAlert(AlertMessages.NEED_START)
-      return
-    }
-    if (debt === 0) {
-      showAlert(AlertMessages.NEED_DEBT)
-      return
-    }
-    if (cash < debt) {
-      showAlert(AlertMessages.NEED_DEBT_CASH)
-      return
-    }
-    // =================
-    addToLog(
-      `${currentTime()} - You have paid off your $${numberWithCommas(
-        debt
-      )} debt! 🙌`
-    )
-    setCash(cash - debt)
-    setDebt(0)
   }
 
   //BUY LOGIC ===============================
@@ -385,7 +370,7 @@ export default function Home() {
       setCash(cash - amt * assetPrice)
       updateAssetWallet((assetWallet += amt))
       setWalletAmount(walletAmount + amt)
-      addToLog(logMsg)
+      addToLog(logMsg, setLog)
     }
   }
 
@@ -445,7 +430,7 @@ export default function Home() {
       setCash(cash + salePrice)
       setWalletAmount(walletAmount - assetWallet)
       updateAssetWallet((assetWallet -= assetWallet))
-      addToLog(logMsg)
+      addToLog(logMsg, setLog)
     }
   }
 
@@ -483,11 +468,14 @@ export default function Home() {
         <Actions
           increaseWalletCapacity={increaseWalletCapacity}
           walletExpansionCost={walletExpansionCost}
-          payDebt={payDebt}
           debt={debt}
           advanceDay={advanceDay}
           init={init}
           currentDay={currentDay}
+          setLog={setLog}
+          setDebt={setDebt}
+          cash={cash}
+          setCash={setCash}
         />
 
         <Log log={log} />
