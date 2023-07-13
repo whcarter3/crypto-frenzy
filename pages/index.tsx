@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React from "react"
 import Head from "next/head"
 import config from "../config/config"
 import { AlertMessages, showAlert } from "../helpers/alerts"
@@ -7,10 +7,7 @@ import {
   numberWithCommas,
   randomizePrice,
   currentTime,
-  addToLog,
 } from "../helpers/utils"
-import { needAsset } from "../helpers/stateCheck"
-import type { Wallet } from "../lib/types"
 import Table from "../components/Table"
 import Actions from "../components/Actions"
 import Header from "../components/Header"
@@ -20,24 +17,26 @@ export default function Home() {
   let startingLogMsg = `- Click Advance Day to start.`
 
   //GAME STATE ================================================
-  const [bitcoinPrice, setBitcoinPrice] = useState(0)
-  const [ethereumPrice, setEthereumPrice] = useState(0)
-  const [litecoinPrice, setLitecoinPrice] = useState(0)
-  const [solanaPrice, setSolanaPrice] = useState(0)
-  const [currentDay, setCurrentDay] = useState(0)
-  const [cash, setCash] = useState(config.cash)
-  const [log, setLog] = useState([startingLogMsg])
-  const [highScore, setHighScore] = useState(0)
-  const [wallet, setWallet] = useState<Wallet>({
-    capacity: config.wallet.startingCapacity,
-    amount: 0,
-    bitcoin: 0,
-    ethereum: 0,
-    litecoin: 0,
-    solana: 0,
-    expansionCost: config.wallet.cost,
-  })
-  const [debt, setDebt] = useState(config.debt)
+  const [bitcoinPrice, setBitcoinPrice] = React.useState(0)
+  const [ethereumPrice, setEthereumPrice] = React.useState(0)
+  const [litecoinPrice, setLitecoinPrice] = React.useState(0)
+  const [solanaPrice, setSolanaPrice] = React.useState(0)
+  const [currentDay, setCurrentDay] = React.useState(0)
+  const [cash, setCash] = React.useState(config.cash)
+  const [walletCapacity, setWalletCapacity] = React.useState(
+    config.wallet.startingCapacity
+  )
+  const [walletAmount, setWalletAmount] = React.useState(0)
+  const [bitcoinWallet, setBitcoinWallet] = React.useState(0)
+  const [ethereumWallet, setEthereumWallet] = React.useState(0)
+  const [litecoinWallet, setLitecoinWallet] = React.useState(0)
+  const [solanaWallet, setSolanaWallet] = React.useState(0)
+  const [log, setLog] = React.useState([startingLogMsg])
+  const [highScore, setHighScore] = React.useState(0)
+  const [walletExpansionCost, setWalletExpansionCost] = React.useState(
+    config.wallet.cost
+  )
+  const [debt, setDebt] = React.useState(config.debt)
 
   //NEW GAME INIT FUNCTION =====================================
   function init() {
@@ -46,18 +45,27 @@ export default function Home() {
     setEthereumPrice(0)
     setLitecoinPrice(0)
     setSolanaPrice(0)
+    setWalletAmount(0)
+    setWalletCapacity(config.wallet.startingCapacity)
     setCash(config.cash)
-    setWallet({
-      capacity: config.wallet.startingCapacity,
-      amount: 0,
-      bitcoin: 0,
-      ethereum: 0,
-      litecoin: 0,
-      solana: 0,
-      expansionCost: config.wallet.cost,
-    })
+    setBitcoinWallet(0)
+    setEthereumWallet(0)
+    setLitecoinWallet(0)
+    setSolanaWallet(0)
+    setWalletExpansionCost(config.wallet.cost)
     setDebt(config.debt)
     setLog([startingLogMsg])
+  }
+
+  // HELPER FUNCTIONS ===================================
+  const addToLog = (str) => {
+    setLog((arr) => [str, ...arr])
+  }
+
+  let walletTotal = () => {
+    let amount = bitcoinWallet + ethereumWallet + litecoinWallet + solanaWallet
+    console.log("amount", amount)
+    setWalletAmount(amount)
   }
 
   //ADVANCE DAY LOGIC ===================================
@@ -80,16 +88,14 @@ export default function Home() {
     } else {
       if (currentDay === 0) {
         //sets initial prices to randomized value from mid range
-        addToLog(`======== Start of Game =========`, setLog)
+        addToLog(`======== Start of Game =========`)
         addToLog(
           `- You borrowed $${numberWithCommas(config.cash)} at ${
             config.interestRate * 100
-          }% daily interest`,
-          setLog
+          }% daily interest`
         )
         addToLog(
-          `- You have ${config.days} days to make as much money as you can! 💎🙌`,
-          setLog
+          `- You have ${config.days} days to make as much money as you can! 💎🙌`
         )
         setBitcoinPrice(
           randomizePrice(
@@ -117,7 +123,7 @@ export default function Home() {
         )
       } else {
         //randomizes prices with chance to hit high/low range
-        addToLog(`========= End of Day ${currentDay} =========`, setLog)
+        addToLog(`========= End of Day ${currentDay} =========`)
         randomizePriceVariance("BTC")
         randomizePriceVariance("ETH")
         randomizePriceVariance("LTC")
@@ -146,8 +152,7 @@ export default function Home() {
             )
           )
           addToLog(
-            `${currentTime()} - 🐋 A whale has dumped Bitcoin and the price has plummeted!`,
-            setLog
+            `${currentTime()} - 🐋 A whale has dumped Bitcoin and the price has plummeted!`
           )
           //mid range
         } else if (coinFlipBTC >= 2 && coinFlipBTC < 97) {
@@ -165,10 +170,7 @@ export default function Home() {
               config.assets.bitcoin.range.high[1]
             )
           )
-          addToLog(
-            `${currentTime()} - 🚀🌕 Bitcoin is going to the moon`,
-            setLog
-          )
+          addToLog(`${currentTime()} - 🚀🌕 Bitcoin is going to the moon`)
         }
         break
       case "ETH":
@@ -182,8 +184,7 @@ export default function Home() {
             )
           )
           addToLog(
-            `${currentTime()} - 🐋 A whale has dumped Ethereum and the price has plummeted`,
-            setLog
+            `${currentTime()} - 🐋 A whale has dumped Ethereum and the price has plummeted`
           )
           //mid range
         } else if (coinFlipETH >= 2 && coinFlipETH < 97) {
@@ -201,10 +202,7 @@ export default function Home() {
               config.assets.ethereum.range.high[1]
             )
           )
-          addToLog(
-            `${currentTime()} - 🚀🌕 Ethereum is going to the moon!`,
-            setLog
-          )
+          addToLog(`${currentTime()} - 🚀🌕 Ethereum is going to the moon!`)
         }
         break
       case "LTC":
@@ -218,8 +216,7 @@ export default function Home() {
             )
           )
           addToLog(
-            `${currentTime()} - 🐋 A whale has dumped Litecoin and the price has plummeted!`,
-            setLog
+            `${currentTime()} - 🐋 A whale has dumped Litecoin and the price has plummeted!`
           )
           //mid range
         } else if (coinFlipLTC >= 2 && coinFlipLTC < 97) {
@@ -237,10 +234,7 @@ export default function Home() {
               config.assets.litecoin.range.high[1]
             )
           )
-          addToLog(
-            `${currentTime()} - 🚀🌕 Litecoin is going to the moon!`,
-            setLog
-          )
+          addToLog(`${currentTime()} - 🚀🌕 Litecoin is going to the moon!`)
         }
         break
       case "SOL":
@@ -269,10 +263,7 @@ export default function Home() {
               config.assets.solana.range.high[1]
             )
           )
-          addToLog(
-            `${currentTime()} - 🚀🌕 Solana is going to the moon!`,
-            setLog
-          )
+          addToLog(`${currentTime()} - 🚀🌕 Solana is going to the moon!`)
         }
         break
       default:
@@ -287,47 +278,50 @@ export default function Home() {
       showAlert(AlertMessages.NEED_START)
       return
     }
-    if (cash < wallet.expansionCost) {
+    if (cash < walletExpansionCost) {
       alert("You do not have enough cash to expand your wallet")
       return
     }
     // =================
-    setWallet((prevWallet) => ({
-      ...prevWallet,
-      capacity: prevWallet.capacity + config.wallet.increase,
-    }))
-    setCash(cash - wallet.expansionCost)
+    setWalletCapacity(walletCapacity + config.wallet.increase)
+    setCash(cash - walletExpansionCost)
     //increase wallet expansion cost by 25% after each purchase
-    setWallet((prevWallet) => ({
-      ...prevWallet,
-      expansionCost: Math.floor(
-        prevWallet.expansionCost +
-          prevWallet.expansionCost * config.wallet.percentIncreace
-      ),
-    }))
-    addToLog(
-      `${currentTime()} - You have increased your wallet capacity to ${
-        wallet.capacity
-      }`,
-      setLog
+    setWalletExpansionCost(
+      Math.floor(
+        walletExpansionCost +
+          walletExpansionCost * config.wallet.percentIncreace
+      )
     )
     addToLog(
-      `${currentTime()} - Wallet Expansion cost has increased in price by 25% to $${numberWithCommas(
-        wallet.expansionCost
-      )}`,
-      setLog
+      `${currentTime()} - You have increased your wallet capacity to ${walletCapacity}`
+    )
+    addToLog(
+      `${currentTime()} - Wallet Expansion cost has increased in price by 25% to ${walletExpansionCost}`
     )
   }
 
-  const needCashCheck = (price) => {
-    if (price > cash) {
-      showAlert(AlertMessages.NEED_CASH)
+  const payDebt = () => {
+    //error checks =====
+    if (currentDay == 0) {
+      showAlert(AlertMessages.NEED_START)
       return
     }
-  }
-
-  const makePurchase = (amt, assetPrice) => {
-    setCash(cash - amt * assetPrice)
+    if (debt === 0) {
+      showAlert(AlertMessages.NEED_DEBT)
+      return
+    }
+    if (cash < debt) {
+      showAlert(AlertMessages.NEED_DEBT_CASH)
+      return
+    }
+    // =================
+    addToLog(
+      `${currentTime()} - You have paid off your $${numberWithCommas(
+        debt
+      )} debt! 🙌`
+    )
+    setCash(cash - debt)
+    setDebt(0)
   }
 
   //BUY LOGIC ===============================
@@ -337,100 +331,61 @@ export default function Home() {
       showAlert(AlertMessages.NEED_START)
       return
     }
-    if (wallet.amount >= wallet.capacity) {
+    if (walletAmount >= walletCapacity) {
       showAlert(AlertMessages.NEED_WALLET)
       return
     }
     // =================
-    let amt: number
+    let amt, logMsg, assetPrice, assetWallet, updateAssetWallet
     switch (e.target.id) {
       case "bitcoinBuy":
-        needCashCheck(bitcoinPrice)
-        amt = calculateMaxShares(
-          bitcoinPrice,
-          wallet.amount,
-          wallet.capacity,
-          cash
-        )
-        setWallet((prevWallet) => ({
-          ...prevWallet,
-          bitcoin: prevWallet.bitcoin + amt,
-          amount: prevWallet.amount + amt,
-        }))
-        makePurchase(amt, bitcoinPrice)
-        addToLog(
-          `${currentTime()} - You have bought ${amt} Bitcoin at $${numberWithCommas(
-            bitcoinPrice
-          )} for $${numberWithCommas(amt * bitcoinPrice)}`,
-          setLog
-        )
+        assetPrice = bitcoinPrice
+        assetWallet = bitcoinWallet
+        updateAssetWallet = setBitcoinWallet
+        amt = calculateMaxShares(assetPrice, walletAmount, walletCapacity, cash)
+        logMsg = `${currentTime()} - You have bought ${amt} Bitcoin at $${numberWithCommas(
+          assetPrice
+        )} for $${numberWithCommas(amt * assetPrice)}`
         break
       case "ethereumBuy":
-        needCashCheck(ethereumPrice)
-        amt = calculateMaxShares(
-          ethereumPrice,
-          wallet.amount,
-          wallet.capacity,
-          cash
-        )
-        setWallet((prevWallet) => ({
-          ...prevWallet,
-          ethereum: prevWallet.ethereum + amt,
-          amount: prevWallet.amount + amt,
-        }))
-        makePurchase(amt, ethereumPrice)
-        addToLog(
-          `${currentTime()} - You have bought ${amt} Ethereum at $${numberWithCommas(
-            ethereumPrice
-          )} for $${numberWithCommas(amt * ethereumPrice)}`,
-          setLog
-        )
+        assetPrice = ethereumPrice
+        assetWallet = ethereumWallet
+        updateAssetWallet = setEthereumWallet
+        amt = calculateMaxShares(assetPrice, walletAmount, walletCapacity, cash)
+        logMsg = `${currentTime()} - You have bought ${amt} Ethereum at $${numberWithCommas(
+          assetPrice
+        )} for $${numberWithCommas(amt * assetPrice)}`
         break
       case "litecoinBuy":
-        needCashCheck(litecoinPrice)
-        amt = calculateMaxShares(
-          litecoinPrice,
-          wallet.amount,
-          wallet.capacity,
-          cash
-        )
-        setWallet((prevWallet) => ({
-          ...prevWallet,
-          litecoin: prevWallet.litecoin + amt,
-          amount: prevWallet.amount + amt,
-        }))
-        makePurchase(amt, litecoinPrice)
-        addToLog(
-          `${currentTime()} - You have bought ${amt} Litecoin at $${numberWithCommas(
-            litecoinPrice
-          )} for $${numberWithCommas(amt * litecoinPrice)}`,
-          setLog
-        )
+        assetPrice = litecoinPrice
+        assetWallet = litecoinWallet
+        updateAssetWallet = setLitecoinWallet
+        amt = calculateMaxShares(assetPrice, walletAmount, walletCapacity, cash)
+        logMsg = `${currentTime()} - You have bought ${amt} Litecoin at $${numberWithCommas(
+          assetPrice
+        )} for $${numberWithCommas(amt * assetPrice)}`
         break
       case "solanaBuy":
-        needCashCheck(solanaPrice)
-        amt = calculateMaxShares(
-          solanaPrice,
-          wallet.amount,
-          wallet.capacity,
-          cash
-        )
-        setWallet((prevWallet) => ({
-          ...prevWallet,
-          solana: prevWallet.solana + amt,
-          amount: prevWallet.amount + amt,
-        }))
-        makePurchase(amt, solanaPrice)
-        addToLog(
-          `${currentTime()} - You have bought ${amt} Solana at $${numberWithCommas(
-            solanaPrice
-          )} for $${numberWithCommas(amt * solanaPrice)}`,
-          setLog
-        )
+        assetPrice = solanaPrice
+        assetWallet = solanaWallet
+        updateAssetWallet = setSolanaWallet
+        amt = calculateMaxShares(assetPrice, walletAmount, walletCapacity, cash)
+        logMsg = `${currentTime()} - You have bought ${amt} Solana at $${numberWithCommas(
+          assetPrice
+        )} for $${numberWithCommas(amt * assetPrice)}`
         break
       default:
         alert("You have bought something you can't. What the heck?!")
         break
+    }
+
+    if (assetPrice > cash) {
+      showAlert(AlertMessages.NEED_CASH)
+    } else {
+      setCash(cash - amt * assetPrice)
+      updateAssetWallet((assetWallet += amt))
+      setWalletAmount(walletAmount + amt)
+      addToLog(logMsg)
     }
   }
 
@@ -441,83 +396,56 @@ export default function Home() {
       return
     }
 
-    let salePrice
+    let salePrice, logMsg, assetPrice, assetWallet, updateAssetWallet
     switch (e.target.id) {
       case "bitcoinSell":
-        needAsset(wallet, "bitcoin")
-        setWallet((prevWallet) => ({
-          ...prevWallet,
-          bitcoin: prevWallet.amount - prevWallet.bitcoin,
-          amount: prevWallet.amount - prevWallet.bitcoin,
-        }))
-        salePrice = bitcoinPrice * wallet.bitcoin
-        setCash(cash + salePrice)
-        addToLog(
-          `${currentTime()} - You have sold ${
-            wallet.bitcoin
-          } Bitcoin at $${numberWithCommas(
-            bitcoinPrice
-          )} for $${numberWithCommas(salePrice)}`,
-          setLog
-        )
+        assetPrice = bitcoinPrice
+        assetWallet = bitcoinWallet
+        updateAssetWallet = setBitcoinWallet
+        salePrice = bitcoinPrice * bitcoinWallet
+        logMsg = `${currentTime()} - You have sold ${bitcoinWallet} Bitcoin at $${numberWithCommas(
+          bitcoinPrice
+        )} for $${numberWithCommas(salePrice)}`
         break
       case "ethereumSell":
-        needAsset(wallet, "ethereum")
-        setWallet((prevWallet) => ({
-          ...prevWallet,
-          ethereum: prevWallet.amount - prevWallet.ethereum,
-          amount: prevWallet.amount - prevWallet.ethereum,
-        }))
-        salePrice = ethereumPrice * wallet.ethereum
-        setCash(cash + salePrice)
-        addToLog(
-          `${currentTime()} - You have sold ${
-            wallet.ethereum
-          } Ethereum at $${numberWithCommas(
-            ethereumPrice
-          )} for $${numberWithCommas(salePrice)}`,
-          setLog
-        )
+        assetPrice = ethereumPrice
+        assetWallet = ethereumWallet
+        updateAssetWallet = setEthereumWallet
+        salePrice = ethereumPrice * ethereumWallet
+        logMsg = `${currentTime()} - You have sold ${ethereumWallet} Ethereum at $${numberWithCommas(
+          ethereumPrice
+        )} for $${numberWithCommas(salePrice)}`
         break
       case "litecoinSell":
-        needAsset(wallet, "litecoin")
-        setWallet((prevWallet) => ({
-          ...prevWallet,
-          litecoin: prevWallet.amount - prevWallet.litecoin,
-          amount: prevWallet.amount - prevWallet.litecoin,
-        }))
-        salePrice = litecoinPrice * wallet.litecoin
-        setCash(cash + salePrice)
-        addToLog(
-          `${currentTime()} - You have sold ${
-            wallet.litecoin
-          } Litecoin at $${numberWithCommas(
-            litecoinPrice
-          )} for $${numberWithCommas(salePrice)}`,
-          setLog
-        )
+        assetPrice = litecoinPrice
+        assetWallet = litecoinWallet
+        updateAssetWallet = setLitecoinWallet
+        salePrice = litecoinPrice * litecoinWallet
+        logMsg = `${currentTime()} - You have sold ${litecoinWallet} Litecoin at $${numberWithCommas(
+          litecoinPrice
+        )} for $${numberWithCommas(salePrice)}`
         break
       case "solanaSell":
-        needAsset(wallet, "solana")
-        setWallet((prevWallet) => ({
-          ...prevWallet,
-          solana: prevWallet.amount - prevWallet.solana,
-          amount: prevWallet.amount - prevWallet.solana,
-        }))
-        salePrice = solanaPrice * wallet.solana
-        setCash(cash + salePrice)
-        addToLog(
-          `${currentTime()} - You have sold ${
-            wallet.solana
-          } Solana at $${numberWithCommas(solanaPrice)} for $${numberWithCommas(
-            salePrice
-          )}`,
-          setLog
-        )
+        assetPrice = solanaPrice
+        assetWallet = solanaWallet
+        updateAssetWallet = setSolanaWallet
+        salePrice = solanaPrice * solanaWallet
+        logMsg = `${currentTime()} - You have sold ${solanaWallet} Solana at $${numberWithCommas(
+          solanaPrice
+        )} for $${numberWithCommas(salePrice)}`
         break
       default:
         alert("somehow you sold something you don't have")
         break
+    }
+
+    if (assetWallet === 0) {
+      showAlert(AlertMessages.NEED_ASSET)
+    } else {
+      setCash(cash + salePrice)
+      setWalletAmount(walletAmount - assetWallet)
+      updateAssetWallet((assetWallet -= assetWallet))
+      addToLog(logMsg)
     }
   }
 
@@ -535,33 +463,33 @@ export default function Home() {
           currentDay={currentDay}
           cash={cash}
           debt={debt}
-          walletAmount={wallet.amount}
-          walletCapacity={wallet.capacity}
+          walletAmount={walletAmount}
+          walletCapacity={walletCapacity}
         />
 
         <Table
           handleBuy={handleBuy}
           handleSell={handleSell}
           bitcoinPrice={bitcoinPrice}
-          bitcoinWallet={wallet.bitcoin}
+          bitcoinWallet={bitcoinWallet}
           ethereumPrice={ethereumPrice}
-          ethereumWallet={wallet.ethereum}
+          ethereumWallet={ethereumWallet}
           litecoinPrice={litecoinPrice}
-          litecoinWallet={wallet.litecoin}
+          litecoinWallet={litecoinWallet}
           solanaPrice={solanaPrice}
-          solanaWallet={wallet.solana}
+          solanaWallet={solanaWallet}
         />
 
         <Actions
           increaseWalletCapacity={increaseWalletCapacity}
-          walletExpansionCost={wallet.expansionCost}
+          walletExpansionCost={walletExpansionCost}
           debt={debt}
           advanceDay={advanceDay}
           init={init}
           currentDay={currentDay}
+          cash={cash}
           setLog={setLog}
           setDebt={setDebt}
-          cash={cash}
           setCash={setCash}
         />
 
