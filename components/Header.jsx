@@ -26,7 +26,8 @@ const Header = ({
         {walletCapacity}
       </p>
       <p>
-        <span className="font-bold">Session High Score:</span> {highScore}
+        <span className="font-bold">Session High Score:</span> $
+        {numberWithCommas(highScore)}
       </p>
     </>
   )
