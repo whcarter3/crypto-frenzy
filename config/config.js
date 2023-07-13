@@ -4,11 +4,11 @@ export let config = {
   wallet: {
     startingCapacity: 100,
     increase: 100,
-    cost: 1500,
+    cost: 50000,
     percentIncreace: 0.25,
   },
-  cash: 50000,
-  debt: 2500,
+  cash: 2000,
+  debt: 2000,
   interestRate: 0.2,
   days: 30,
   assets: {

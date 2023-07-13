@@ -1,4 +1,4 @@
-import React from "react"
+import { useReducer } from "react"
 import Head from "next/head"
 import config from "../config/config"
 import { AlertMessages, showAlert } from "../helpers/alerts"
@@ -7,370 +7,348 @@ import {
   numberWithCommas,
   randomizePrice,
   currentTime,
+  addToLog,
 } from "../helpers/utils"
 import Table from "../components/Table"
 import Actions from "../components/Actions"
 import Header from "../components/Header"
 import Log from "../components/Log"
 
+interface State {
+  bitcoinPrice: number
+  ethereumPrice: number
+  litecoinPrice: number
+  solanaPrice: number
+  currentDay: number
+  cash: number
+  walletCapacity: number
+  walletAmount: number
+  bitcoinWallet: number
+  ethereumWallet: number
+  litecoinWallet: number
+  solanaWallet: number
+  log: string[]
+  highScore: number
+  walletExpansionCost: number
+  debt: number
+}
+
 export default function Home() {
-  let startingLogMsg = `- Click Advance Day to start.`
-
-  //GAME STATE ================================================
-  const [bitcoinPrice, setBitcoinPrice] = React.useState(0)
-  const [ethereumPrice, setEthereumPrice] = React.useState(0)
-  const [litecoinPrice, setLitecoinPrice] = React.useState(0)
-  const [solanaPrice, setSolanaPrice] = React.useState(0)
-  const [currentDay, setCurrentDay] = React.useState(0)
-  const [cash, setCash] = React.useState(config.cash)
-  const [walletCapacity, setWalletCapacity] = React.useState(
-    config.wallet.startingCapacity
-  )
-  const [walletAmount, setWalletAmount] = React.useState(0)
-  const [bitcoinWallet, setBitcoinWallet] = React.useState(0)
-  const [ethereumWallet, setEthereumWallet] = React.useState(0)
-  const [litecoinWallet, setLitecoinWallet] = React.useState(0)
-  const [solanaWallet, setSolanaWallet] = React.useState(0)
-  const [log, setLog] = React.useState([startingLogMsg])
-  const [highScore, setHighScore] = React.useState(0)
-  const [walletExpansionCost, setWalletExpansionCost] = React.useState(
-    config.wallet.cost
-  )
-  const [debt, setDebt] = React.useState(config.debt)
-
-  //NEW GAME INIT FUNCTION =====================================
-  function init() {
-    setCurrentDay(0)
-    setBitcoinPrice(0)
-    setEthereumPrice(0)
-    setLitecoinPrice(0)
-    setSolanaPrice(0)
-    setWalletAmount(0)
-    setWalletCapacity(config.wallet.startingCapacity)
-    setCash(config.cash)
-    setBitcoinWallet(0)
-    setEthereumWallet(0)
-    setLitecoinWallet(0)
-    setSolanaWallet(0)
-    setWalletExpansionCost(config.wallet.cost)
-    setDebt(config.debt)
-    setLog([startingLogMsg])
+  const initialState: State = {
+    bitcoinPrice: 0,
+    ethereumPrice: 0,
+    litecoinPrice: 0,
+    solanaPrice: 0,
+    currentDay: 0,
+    cash: config.cash,
+    walletCapacity: config.wallet.startingCapacity,
+    walletAmount: 0,
+    bitcoinWallet: 0,
+    ethereumWallet: 0,
+    litecoinWallet: 0,
+    solanaWallet: 0,
+    log: ["- Click Advance Day to start."],
+    highScore: 0,
+    walletExpansionCost: config.wallet.cost,
+    debt: config.debt,
   }
 
-  // HELPER FUNCTIONS ===================================
-  const addToLog = (str) => {
-    setLog((arr) => [str, ...arr])
+  const reducer = (state: State, action) => {
+    switch (action.type) {
+      case "INIT":
+        return initialState
+      case "ADVANCE_DAY":
+        return { ...state, currentDay: state.currentDay + 1 }
+      case "RANDOMIZE_INITIAL_PRICES":
+        return {
+          ...state,
+          bitcoinPrice: randomizePrice(
+            config.assets.bitcoin.range.mid[0],
+            config.assets.bitcoin.range.mid[1]
+          ),
+          ethereumPrice: randomizePrice(
+            config.assets.ethereum.range.mid[0],
+            config.assets.ethereum.range.mid[1]
+          ),
+          litecoinPrice: randomizePrice(
+            config.assets.litecoin.range.mid[0],
+            config.assets.litecoin.range.mid[1]
+          ),
+          solanaPrice: randomizePrice(
+            config.assets.solana.range.mid[0],
+            config.assets.solana.range.mid[1]
+          ),
+        }
+      case "SET_BITCOIN_PRICE":
+        return { ...state, bitcoinPrice: action.payload }
+      case "SET_ETHEREUM_PRICE":
+        return { ...state, ethereumPrice: action.payload }
+      case "SET_LITECOIN_PRICE":
+        return { ...state, litecoinPrice: action.payload }
+      case "SET_SOLANA_PRICE":
+        return { ...state, solanaPrice: action.payload }
+      case "SET_CASH":
+        return { ...state, cash: action.payload }
+      case "SET_WALLET_CAPACITY":
+        return { ...state, walletCapacity: action.payload }
+      case "SET_WALLET_AMOUNT":
+        return { ...state, walletAmount: action.payload }
+      case "SET_BITCOIN_WALLET":
+        return { ...state, bitcoinWallet: action.payload }
+      case "SET_ETHEREUM_WALLET":
+        return { ...state, ethereumWallet: action.payload }
+      case "SET_LITECOIN_WALLET":
+        return { ...state, litecoinWallet: action.payload }
+      case "SET_SOLANA_WALLET":
+        return { ...state, solanaWallet: action.payload }
+      case "SET_LOG":
+        return { ...state, log: [addToLog(action.payload), ...state.log] }
+      case "SET_HIGH_SCORE":
+        return { ...state, highScore: action.payload }
+      case "SET_WALLET_EXPANSION_COST":
+        return { ...state, walletExpansionCost: action.payload }
+      case "PAY_DEBT":
+        return { ...state, debt: 0 }
+      case "INCREASE_DEBT":
+        return {
+          ...state,
+          debt: Math.floor(state.debt + state.debt * config.interestRate),
+        }
+      default:
+        return state
+    }
   }
 
-  let walletTotal = () => {
-    let amount = bitcoinWallet + ethereumWallet + litecoinWallet + solanaWallet
-    console.log("amount", amount)
-    setWalletAmount(amount)
-  }
+  const [state, dispatch] = useReducer(reducer, initialState)
 
   //ADVANCE DAY LOGIC ===================================
   const advanceDay = () => {
     //warning before last day
-    if (currentDay === config.days - 1) {
+    if (state.currentDay === config.days - 1) {
       showAlert(AlertMessages.LAST_DAY)
     }
     //end of game -- alert score -- set high score -- restart
-    if (currentDay >= config.days) {
+    if (state.currentDay >= config.days) {
       alert(
         `This round has been completed. You amassed $${numberWithCommas(
-          cash - debt
+          state.cash - state.debt
         )}! Click to start a new game.`
       )
-      if (cash > highScore) {
-        setHighScore(cash)
+      if (state.cash > state.highScore) {
+        dispatch({ type: "SET_HIGH_SCORE", payload: state.cash })
       }
-      init()
+      dispatch({ type: "INIT" })
     } else {
-      if (currentDay === 0) {
+      if (state.currentDay === 0) {
         //sets initial prices to randomized value from mid range
-        addToLog(`======== Start of Game =========`)
-        addToLog(
-          `- You borrowed $${numberWithCommas(config.cash)} at ${
-            config.interestRate * 100
-          }% daily interest`
-        )
-        addToLog(
-          `- You have ${config.days} days to make as much money as you can! 💎🙌`
-        )
-        setBitcoinPrice(
-          randomizePrice(
-            config.assets.bitcoin.range.mid[0],
-            config.assets.bitcoin.range.mid[1]
-          )
-        )
-        setEthereumPrice(
-          randomizePrice(
-            config.assets.ethereum.range.mid[0],
-            config.assets.ethereum.range.mid[1]
-          )
-        )
-        setLitecoinPrice(
-          randomizePrice(
-            config.assets.litecoin.range.mid[0],
-            config.assets.litecoin.range.mid[1]
-          )
-        )
-        setSolanaPrice(
-          randomizePrice(
-            config.assets.solana.range.mid[0],
-            config.assets.solana.range.mid[1]
-          )
-        )
+        dispatch({
+          type: "SET_LOG",
+          payload: addToLog(`======== Start of Game =========`),
+        })
+        dispatch({
+          type: "SET_LOG",
+          payload: addToLog(
+            `- You borrowed $${numberWithCommas(config.cash)} at ${
+              config.interestRate * 100
+            }% daily interest`
+          ),
+        })
+        dispatch({
+          type: "SET_LOG",
+          payload: `- You have ${config.days} days to make as much money as you can! 💎🙌`,
+        })
+        dispatch({ type: "RANDOMIZE_INITIAL_PRICES" })
       } else {
         //randomizes prices with chance to hit high/low range
-        addToLog(`========= End of Day ${currentDay} =========`)
-        randomizePriceVariance("BTC")
-        randomizePriceVariance("ETH")
-        randomizePriceVariance("LTC")
-        randomizePriceVariance("SOL")
+        dispatch({
+          type: "SET_LOG",
+          payload: `========= End of Day ${state.currentDay} =========`,
+        })
+        for (const assetKey in config.assets) {
+          const asset = config.assets[assetKey]
+          if (asset.assetName === "Solana") {
+            randomizeAssetPrice(asset, 10, 97)
+          }
+          randomizeAssetPrice(asset, 2, 97)
+        }
         //increase date based on daily %
-        setDebt(Math.floor(debt + debt * config.interestRate))
+        dispatch({
+          type: "INCREASE_DEBT",
+        })
       }
       //increase day
-      setCurrentDay(currentDay + 1)
+      dispatch({ type: "ADVANCE_DAY" })
     }
   }
 
   //RANDOMIZE PRICE LOGIC =====================================
   //bell curve chance to hit low/mid/high range
-  const randomizePriceVariance = (asset) => {
-    switch (asset) {
-      case "BTC":
-        //rand # between 0 - 99 which allows whole # %s for price ranges
-        let coinFlipBTC = Math.floor(Math.random() * 100)
-        //low range
-        if (coinFlipBTC < 2) {
-          setBitcoinPrice(
-            randomizePrice(
-              config.assets.bitcoin.range.low[0],
-              config.assets.bitcoin.range.low[1]
-            )
-          )
-          addToLog(
-            `${currentTime()} - 🐋 A whale has dumped Bitcoin and the price has plummeted!`
-          )
-          //mid range
-        } else if (coinFlipBTC >= 2 && coinFlipBTC < 97) {
-          setBitcoinPrice(
-            randomizePrice(
-              config.assets.bitcoin.range.mid[0],
-              config.assets.bitcoin.range.mid[1]
-            )
-          )
-          //high range
-        } else {
-          setBitcoinPrice(
-            randomizePrice(
-              config.assets.bitcoin.range.high[0],
-              config.assets.bitcoin.range.high[1]
-            )
-          )
-          addToLog(`${currentTime()} - 🚀🌕 Bitcoin is going to the moon`)
-        }
-        break
-      case "ETH":
-        let coinFlipETH = Math.floor(Math.random() * 100)
-        //low range
-        if (coinFlipETH < 2) {
-          setEthereumPrice(
-            randomizePrice(
-              config.assets.ethereum.range.low[0],
-              config.assets.ethereum.range.low[1]
-            )
-          )
-          addToLog(
-            `${currentTime()} - 🐋 A whale has dumped Ethereum and the price has plummeted`
-          )
-          //mid range
-        } else if (coinFlipETH >= 2 && coinFlipETH < 97) {
-          setEthereumPrice(
-            randomizePrice(
-              config.assets.ethereum.range.mid[0],
-              config.assets.ethereum.range.mid[1]
-            )
-          )
-          //high range
-        } else {
-          setEthereumPrice(
-            randomizePrice(
-              config.assets.ethereum.range.high[0],
-              config.assets.ethereum.range.high[1]
-            )
-          )
-          addToLog(`${currentTime()} - 🚀🌕 Ethereum is going to the moon!`)
-        }
-        break
-      case "LTC":
-        let coinFlipLTC = Math.floor(Math.random() * 100)
-        //low range
-        if (coinFlipLTC < 2) {
-          setLitecoinPrice(
-            randomizePrice(
-              config.assets.litecoin.range.low[0],
-              config.assets.litecoin.range.low[1]
-            )
-          )
-          addToLog(
-            `${currentTime()} - 🐋 A whale has dumped Litecoin and the price has plummeted!`
-          )
-          //mid range
-        } else if (coinFlipLTC >= 2 && coinFlipLTC < 97) {
-          setLitecoinPrice(
-            randomizePrice(
-              config.assets.litecoin.range.mid[0],
-              config.assets.litecoin.range.mid[1]
-            )
-          )
-          //high range
-        } else {
-          setLitecoinPrice(
-            randomizePrice(
-              config.assets.litecoin.range.high[0],
-              config.assets.litecoin.range.high[1]
-            )
-          )
-          addToLog(`${currentTime()} - 🚀🌕 Litecoin is going to the moon!`)
-        }
-        break
-      case "SOL":
-        let coinFlipSOL = Math.floor(Math.random() * 100)
-        //low range
-        if (coinFlipSOL < 10) {
-          setSolanaPrice(
-            randomizePrice(
-              config.assets.solana.range.low[0],
-              config.assets.solana.range.low[1]
-            )
-          )
-          //mid range
-        } else if (coinFlipSOL >= 10 && coinFlipSOL < 97) {
-          setSolanaPrice(
-            randomizePrice(
-              config.assets.solana.range.mid[0],
-              config.assets.solana.range.mid[1]
-            )
-          )
-          //high range
-        } else {
-          setSolanaPrice(
-            randomizePrice(
-              config.assets.solana.range.high[0],
-              config.assets.solana.range.high[1]
-            )
-          )
-          addToLog(`${currentTime()} - 🚀🌕 Solana is going to the moon!`)
-        }
-        break
-      default:
-        alert("you're changing the price of something that doesn't exist")
+  const randomizeAssetPrice = (
+    asset,
+    lowRangeThreshHold,
+    highRangeThreshHold
+  ) => {
+    let coinFlip = Math.floor(Math.random() * 100)
+
+    if (coinFlip < lowRangeThreshHold) {
+      dispatch({
+        type: "SET_LOG",
+        payload: `🐋 A whale has dumped ${asset.assetName} and the price has plummeted!`,
+      })
+      dispatch({
+        type: `SET_${asset.assetName.toUpperCase()}_PRICE`,
+        payload: randomizePrice(asset.range.low[0], asset.range.low[1]),
+      })
+    } else if (
+      coinFlip >= lowRangeThreshHold &&
+      coinFlip < highRangeThreshHold
+    ) {
+      dispatch({
+        type: `SET_${asset.assetName.toUpperCase()}_PRICE`,
+        payload: randomizePrice(asset.range.mid[0], asset.range.mid[1]),
+      })
+    } else {
+      dispatch({
+        type: "SET_LOG",
+        payload: `🚀🌕 ${asset.assetName} is going to the moon!`,
+      })
+      dispatch({
+        type: `SET_${asset.assetName.toUpperCase()}_PRICE`,
+        payload: randomizePrice(asset.range.high[0], asset.range.high[1]),
+      })
     }
   }
 
   //WALLET EXPANSION LOGIC ====================
   const increaseWalletCapacity = () => {
     //error checks =====
-    if (currentDay == 0) {
+    if (state.currentDay == 0) {
       showAlert(AlertMessages.NEED_START)
       return
     }
-    if (cash < walletExpansionCost) {
+    if (state.cash < state.walletExpansionCost) {
       alert("You do not have enough cash to expand your wallet")
       return
     }
     // =================
-    setWalletCapacity(walletCapacity + config.wallet.increase)
-    setCash(cash - walletExpansionCost)
+    dispatch({
+      type: "SET_WALLET_CAPACITY",
+      payload: state.walletCapacity + config.wallet.increase,
+    })
+    dispatch({
+      type: "SET_CASH",
+      payload: state.cash - state.walletExpansionCost,
+    })
     //increase wallet expansion cost by 25% after each purchase
-    setWalletExpansionCost(
-      Math.floor(
-        walletExpansionCost +
-          walletExpansionCost * config.wallet.percentIncreace
-      )
-    )
-    addToLog(
-      `${currentTime()} - You have increased your wallet capacity to ${walletCapacity}`
-    )
-    addToLog(
-      `${currentTime()} - Wallet Expansion cost has increased in price by 25% to ${walletExpansionCost}`
-    )
+    dispatch({
+      type: "SET_WALLET_EXPANSION_COST",
+      payload: Math.floor(
+        state.walletExpansionCost +
+          state.walletExpansionCost * config.wallet.percentIncreace
+      ),
+    })
+    dispatch({
+      type: "SET_LOG",
+      payload: `You have increased your wallet capacity to ${state.walletCapacity}`,
+    })
+    dispatch({
+      type: "SET_LOG",
+      payload: `Wallet Expansion cost has increased in price by 25% to ${state.walletExpansionCost}`,
+    })
   }
 
   const payDebt = () => {
     //error checks =====
-    if (currentDay == 0) {
+    if (state.currentDay == 0) {
       showAlert(AlertMessages.NEED_START)
       return
     }
-    if (debt === 0) {
+    if (state.debt === 0) {
       showAlert(AlertMessages.NEED_DEBT)
       return
     }
-    if (cash < debt) {
+    if (state.cash < state.debt) {
       showAlert(AlertMessages.NEED_DEBT_CASH)
       return
     }
     // =================
-    addToLog(
-      `${currentTime()} - You have paid off your $${numberWithCommas(
-        debt
-      )} debt! 🙌`
-    )
-    setCash(cash - debt)
-    setDebt(0)
+    dispatch({
+      type: "SET_LOG",
+      payload: `You have paid off your $${numberWithCommas(
+        state.debt
+      )} debt! 🙌`,
+    })
+    dispatch({ type: "SET_CASH", payload: state.cash - state.debt })
+    dispatch({ type: "PAY_DEBT" })
   }
 
   //BUY LOGIC ===============================
   const handleBuy = (e) => {
     //error checks =====
-    if (currentDay === 0) {
+    if (state.currentDay === 0) {
       showAlert(AlertMessages.NEED_START)
       return
     }
-    if (walletAmount >= walletCapacity) {
+    if (state.walletAmount >= state.walletCapacity) {
       showAlert(AlertMessages.NEED_WALLET)
       return
     }
     // =================
-    let amt, logMsg, assetPrice, assetWallet, updateAssetWallet
+    let amt, logMsg, assetPrice, assetWallet, walletActionType
     switch (e.target.id) {
       case "bitcoinBuy":
-        assetPrice = bitcoinPrice
-        assetWallet = bitcoinWallet
-        updateAssetWallet = setBitcoinWallet
-        amt = calculateMaxShares(assetPrice, walletAmount, walletCapacity, cash)
-        logMsg = `${currentTime()} - You have bought ${amt} Bitcoin at $${numberWithCommas(
+        assetPrice = state.bitcoinPrice
+        assetWallet = state.bitcoinWallet
+        walletActionType = "SET_BITCOIN_WALLET"
+        amt = calculateMaxShares(
+          assetPrice,
+          state.walletAmount,
+          state.walletCapacity,
+          state.cash
+        )
+        logMsg = `You have bought ${amt} Bitcoin at $${numberWithCommas(
           assetPrice
         )} for $${numberWithCommas(amt * assetPrice)}`
         break
       case "ethereumBuy":
-        assetPrice = ethereumPrice
-        assetWallet = ethereumWallet
-        updateAssetWallet = setEthereumWallet
-        amt = calculateMaxShares(assetPrice, walletAmount, walletCapacity, cash)
-        logMsg = `${currentTime()} - You have bought ${amt} Ethereum at $${numberWithCommas(
+        assetPrice = state.ethereumPrice
+        assetWallet = state.ethereumWallet
+        walletActionType = "SET_ETHEREUM_WALLET"
+        amt = calculateMaxShares(
+          assetPrice,
+          state.walletAmount,
+          state.walletCapacity,
+          state.cash
+        )
+        logMsg = `You have bought ${amt} Ethereum at $${numberWithCommas(
           assetPrice
         )} for $${numberWithCommas(amt * assetPrice)}`
         break
       case "litecoinBuy":
-        assetPrice = litecoinPrice
-        assetWallet = litecoinWallet
-        updateAssetWallet = setLitecoinWallet
-        amt = calculateMaxShares(assetPrice, walletAmount, walletCapacity, cash)
-        logMsg = `${currentTime()} - You have bought ${amt} Litecoin at $${numberWithCommas(
+        assetPrice = state.litecoinPrice
+        assetWallet = state.litecoinWallet
+        walletActionType = "SET_LITECOIN_WALLET"
+        amt = calculateMaxShares(
+          assetPrice,
+          state.walletAmount,
+          state.walletCapacity,
+          state.cash
+        )
+        logMsg = ` You have bought ${amt} Litecoin at $${numberWithCommas(
           assetPrice
         )} for $${numberWithCommas(amt * assetPrice)}`
         break
       case "solanaBuy":
-        assetPrice = solanaPrice
-        assetWallet = solanaWallet
-        updateAssetWallet = setSolanaWallet
-        amt = calculateMaxShares(assetPrice, walletAmount, walletCapacity, cash)
-        logMsg = `${currentTime()} - You have bought ${amt} Solana at $${numberWithCommas(
+        assetPrice = state.solanaPrice
+        assetWallet = state.solanaWallet
+        walletActionType = "SET_SOLANA_WALLET"
+        amt = calculateMaxShares(
+          assetPrice,
+          state.walletAmount,
+          state.walletCapacity,
+          state.cash
+        )
+        logMsg = `You have bought ${amt} Solana at $${numberWithCommas(
           assetPrice
         )} for $${numberWithCommas(amt * assetPrice)}`
         break
@@ -379,59 +357,70 @@ export default function Home() {
         break
     }
 
-    if (assetPrice > cash) {
+    if (assetPrice > state.cash) {
       showAlert(AlertMessages.NEED_CASH)
     } else {
-      setCash(cash - amt * assetPrice)
-      updateAssetWallet((assetWallet += amt))
-      setWalletAmount(walletAmount + amt)
-      addToLog(logMsg)
+      dispatch({ type: "SET_CASH", payload: state.cash - amt * assetPrice })
+      dispatch({ type: walletActionType, payload: assetWallet + amt })
+      dispatch({
+        type: "SET_WALLET_AMOUNT",
+        payload: state.walletAmount + amt,
+      })
+      dispatch({ type: "SET_LOG", payload: logMsg })
     }
   }
 
   //SELL LOGIC ========================================================
   const handleSell = (e) => {
-    if (currentDay === 0) {
+    if (state.currentDay === 0) {
       showAlert(AlertMessages.NEED_START)
       return
     }
 
-    let salePrice, logMsg, assetPrice, assetWallet, updateAssetWallet
+    let salePrice, logMsg, assetPrice, assetWallet, walletActionType
     switch (e.target.id) {
       case "bitcoinSell":
-        assetPrice = bitcoinPrice
-        assetWallet = bitcoinWallet
-        updateAssetWallet = setBitcoinWallet
-        salePrice = bitcoinPrice * bitcoinWallet
-        logMsg = `${currentTime()} - You have sold ${bitcoinWallet} Bitcoin at $${numberWithCommas(
-          bitcoinPrice
+        assetPrice = state.bitcoinPrice
+        assetWallet = state.bitcoinWallet
+        walletActionType = "SET_BITCOIN_WALLET"
+        salePrice = state.bitcoinPrice * state.bitcoinWallet
+        logMsg = `You have sold ${
+          state.bitcoinWallet
+        } Bitcoin at $${numberWithCommas(
+          state.bitcoinPrice
         )} for $${numberWithCommas(salePrice)}`
         break
       case "ethereumSell":
-        assetPrice = ethereumPrice
-        assetWallet = ethereumWallet
-        updateAssetWallet = setEthereumWallet
-        salePrice = ethereumPrice * ethereumWallet
-        logMsg = `${currentTime()} - You have sold ${ethereumWallet} Ethereum at $${numberWithCommas(
-          ethereumPrice
+        assetPrice = state.ethereumPrice
+        assetWallet = state.ethereumWallet
+        walletActionType = "SET_ETHEREUM_WALLET"
+        salePrice = state.ethereumPrice * state.ethereumWallet
+        logMsg = `You have sold ${
+          state.ethereumWallet
+        } Ethereum at $${numberWithCommas(
+          state.ethereumPrice
         )} for $${numberWithCommas(salePrice)}`
         break
       case "litecoinSell":
-        assetPrice = litecoinPrice
-        assetWallet = litecoinWallet
-        updateAssetWallet = setLitecoinWallet
-        salePrice = litecoinPrice * litecoinWallet
-        logMsg = `${currentTime()} - You have sold ${litecoinWallet} Litecoin at $${numberWithCommas(
-          litecoinPrice
+        assetPrice = state.litecoinPrice
+        assetWallet = state.litecoinWallet
+        walletActionType = "SET_LITECOIN_WALLET"
+        salePrice = state.litecoinPrice * state.litecoinWallet
+        logMsg = `You have sold ${
+          state.litecoinWallet
+        } Litecoin at $${numberWithCommas(
+          state.litecoinPrice
         )} for $${numberWithCommas(salePrice)}`
         break
       case "solanaSell":
-        assetPrice = solanaPrice
-        assetWallet = solanaWallet
-        updateAssetWallet = setSolanaWallet
-        salePrice = solanaPrice * solanaWallet
-        logMsg = `${currentTime()} - You have sold ${solanaWallet} Solana at $${numberWithCommas(
-          solanaPrice
+        assetPrice = state.solanaPrice
+        assetWallet = state.solanaWallet
+        walletActionType = "SET_SOLANA_WALLET"
+        salePrice = state.solanaPrice * state.solanaWallet
+        logMsg = `You have sold ${
+          state.solanaWallet
+        } Solana at $${numberWithCommas(
+          state.solanaPrice
         )} for $${numberWithCommas(salePrice)}`
         break
       default:
@@ -442,10 +431,13 @@ export default function Home() {
     if (assetWallet === 0) {
       showAlert(AlertMessages.NEED_ASSET)
     } else {
-      setCash(cash + salePrice)
-      setWalletAmount(walletAmount - assetWallet)
-      updateAssetWallet((assetWallet -= assetWallet))
-      addToLog(logMsg)
+      dispatch({ type: "SET_CASH", payload: state.cash + salePrice })
+      dispatch({
+        type: "SET_WALLET_AMOUNT",
+        payload: state.walletAmount - assetWallet,
+      })
+      dispatch({ type: walletActionType, payload: 0 })
+      dispatch(logMsg)
     }
   }
 
@@ -460,40 +452,40 @@ export default function Home() {
 
       <main className="prose px-5">
         <Header
-          currentDay={currentDay}
-          cash={cash}
-          debt={debt}
-          walletAmount={walletAmount}
-          walletCapacity={walletCapacity}
+          currentDay={state.currentDay}
+          cash={state.cash}
+          debt={state.debt}
+          walletAmount={state.walletAmount}
+          walletCapacity={state.walletCapacity}
+          highScore={state.highScore}
         />
 
         <Table
           handleBuy={handleBuy}
           handleSell={handleSell}
-          bitcoinPrice={bitcoinPrice}
-          bitcoinWallet={bitcoinWallet}
-          ethereumPrice={ethereumPrice}
-          ethereumWallet={ethereumWallet}
-          litecoinPrice={litecoinPrice}
-          litecoinWallet={litecoinWallet}
-          solanaPrice={solanaPrice}
-          solanaWallet={solanaWallet}
+          bitcoinPrice={state.bitcoinPrice}
+          bitcoinWallet={state.bitcoinWallet}
+          ethereumPrice={state.ethereumPrice}
+          ethereumWallet={state.ethereumWallet}
+          litecoinPrice={state.litecoinPrice}
+          litecoinWallet={state.litecoinWallet}
+          solanaPrice={state.solanaPrice}
+          solanaWallet={state.solanaWallet}
+          cash={state.cash}
         />
 
         <Actions
           increaseWalletCapacity={increaseWalletCapacity}
-          walletExpansionCost={walletExpansionCost}
-          debt={debt}
+          walletExpansionCost={state.walletExpansionCost}
+          debt={state.debt}
           advanceDay={advanceDay}
-          init={init}
-          currentDay={currentDay}
-          cash={cash}
-          setLog={setLog}
-          setDebt={setDebt}
-          setCash={setCash}
+          init={() => dispatch({ type: "INIT" })}
+          currentDay={state.currentDay}
+          payDebt={payDebt}
+          cash={state.cash}
         />
 
-        <Log log={log} />
+        <Log log={state.log} />
       </main>
     </div>
   )

@@ -25,9 +25,5 @@ export const currentTime = () => {
 }
 
 // HELPER FUNCTIONS ===================================
-export const addToLog = (
-  str: string,
-  setLog: React.Dispatch<React.SetStateAction<string[]>>
-): void => {
-  setLog((arr) => [str, ...arr])
-}
+export const addToLog = (message: string): string =>
+  `${currentTime()} - ${message}`
