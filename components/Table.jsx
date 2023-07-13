@@ -71,7 +71,7 @@ const Table = ({
                       wallet === 0
                         ? "bg-slate-700 text-slate-500"
                         : "bg-green-500"
-                    } rounded-full bg-green-500 px-3 py-1`}
+                    } rounded-full px-3 py-1`}
                     onClick={handleSell}
                     id={`${asset}Sell`}
                     disabled={wallet === 0}
