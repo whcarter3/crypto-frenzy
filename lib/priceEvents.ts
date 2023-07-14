@@ -41,7 +41,7 @@ export const priceMovementEvent = (
   ]
 
   const crashEvents = [
-    `Mark Zuckerberg has announced that they will purchase all ${asset} for Facebook! Prices plummet!`,
+    `Mark Zuckerberg has announced that he will purchase the rights to ${asset} for Facebook! Prices plummet!`,
     `A russian hacker has stolen 1 million ${asset} wallets! Prices plummet!`,
     `A popular exchange has been hacked! ${asset}'s value plummets!`,
     `The FTC has announced that they will be investigating ${asset} for fraud! Buy low!`,

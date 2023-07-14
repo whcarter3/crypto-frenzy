@@ -5,7 +5,7 @@ export let config = {
     startingCapacity: 100,
     increase: 100,
     cost: 50000,
-    percentIncreace: 0.25,
+    percentIncrease: 0.25,
   },
   cash: 2000,
   debt: 2000,

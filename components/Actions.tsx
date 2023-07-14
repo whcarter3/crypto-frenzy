@@ -1,18 +1,18 @@
 import config from "../config/config"
 import { numberWithCommas } from "../helpers/utils"
+import { payDebt } from "../lib/debt"
+import { increaseWalletCapacity } from "../lib/wallet"
 
 const Actions = ({
-  increaseWalletCapacity,
-  walletExpansionCost,
-  debt,
   advanceDay,
   init,
-  currentDay,
-  payDebt,
-  cash,
+  dispatch,
+  state,
 }) => {
-  const canPayDebt = cash <= debt || debt === 0
-  const cashLessThanWalletExpansionCost = cash <= walletExpansionCost
+  const canPayDebt = state.cash <= state.debt || state.debt === 0
+  const cashLessThanWalletExpansionCost =
+    state.cash <= state.walletExpansionCost
+
   return (
     <>
       <div className="mt-5 flex flex-col max-w-xs">
@@ -23,7 +23,7 @@ const Actions = ({
                 ? "bg-slate-700 text-slate-500"
                 : "bg-green-500"
             } px-3 py-1 mr-5 rounded-full`}
-            onClick={increaseWalletCapacity}
+            onClick={() => increaseWalletCapacity(dispatch, state)}
           >
             Buy
           </button>
@@ -31,7 +31,7 @@ const Actions = ({
             className={`${cashLessThanWalletExpansionCost && "text-slate-500"}`}
           >
             Wallet Capacity +{config.wallet.increase}: $
-            {numberWithCommas(walletExpansionCost)}
+            {numberWithCommas(state.walletExpansionCost)}
           </p>
         </div>
         <div className="flex w-full items-center mt-3">
@@ -39,13 +39,13 @@ const Actions = ({
             className={`${
               canPayDebt ? "bg-slate-700 text-slate-500" : "bg-green-500"
             } px-3 py-1 mr-5 rounded-full`}
-            onClick={payDebt}
+            onClick={() => payDebt(dispatch, state)}
             disabled={canPayDebt}
           >
             Pay
           </button>
           <p className={canPayDebt ? "text-slate-500" : ""}>
-            Pay debt: ${numberWithCommas(debt)}
+            Pay debt: ${numberWithCommas(state.debt)}
           </p>
         </div>
       </div>
@@ -54,7 +54,7 @@ const Actions = ({
         id="advDay"
         onClick={advanceDay}
       >
-        {currentDay === config.days ? "Finish Round" : "Advance Day"}
+        {state.currentDay === config.days ? "Finish Round" : "Advance Day"}
       </button>
       <button className="bg-red-700 px-6 py-4 rounded-full" onClick={init}>
         New Game

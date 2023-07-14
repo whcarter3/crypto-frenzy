@@ -5,34 +5,14 @@ import { AlertMessages, showAlert } from "../helpers/alerts"
 import {
   calculateMaxShares,
   numberWithCommas,
-  randomizePrice,
-  currentTime,
   addToLog,
 } from "../helpers/utils"
 import Table from "../components/Table"
 import Actions from "../components/Actions"
 import Header from "../components/Header"
 import Log from "../components/Log"
-import { priceMovementEvent } from "../lib/priceEvents"
-
-interface State {
-  bitcoinPrice: number
-  ethereumPrice: number
-  litecoinPrice: number
-  solanaPrice: number
-  currentDay: number
-  cash: number
-  walletCapacity: number
-  walletAmount: number
-  bitcoinWallet: number
-  ethereumWallet: number
-  litecoinWallet: number
-  solanaWallet: number
-  log: string[]
-  highScore: number
-  walletExpansionCost: number
-  debt: number
-}
+import { randomizePrices, randomizePrice } from "../lib/prices"
+import { State } from "../lib/types"
 
 export default function Home() {
   const initialState: State = {
@@ -48,10 +28,10 @@ export default function Home() {
     ethereumWallet: 0,
     litecoinWallet: 0,
     solanaWallet: 0,
-    highScore: 0,
     log: ["- Click Advance Day to start."],
     walletExpansionCost: config.wallet.cost,
     debt: config.debt,
+    highScore: null,
   }
 
   const reducer = (state: State, action) => {
@@ -60,7 +40,7 @@ export default function Home() {
         const savedHighScore = localStorage.getItem("highScore")
         return {
           ...initialState,
-          highScore: savedHighScore ? parseInt(savedHighScore) : 0,
+          highScore: savedHighScore ? parseInt(savedHighScore) : null,
         }
       case "ADVANCE_DAY":
         return { ...state, currentDay: state.currentDay + 1 }
@@ -84,6 +64,16 @@ export default function Home() {
             config.assets.solana.range.mid[1]
           ),
         }
+      case "EXPAND_WALLET":
+        return {
+          ...state,
+          walletCapacity: state.walletCapacity + config.wallet.increase,
+          cash: state.cash - state.walletExpansionCost,
+          walletExpansionCost: Math.floor(
+            state.walletExpansionCost +
+              state.walletExpansionCost * config.wallet.percentIncrease
+          ),
+        }
       case "SET_BITCOIN_PRICE":
         return { ...state, bitcoinPrice: action.payload }
       case "SET_ETHEREUM_PRICE":
@@ -94,8 +84,6 @@ export default function Home() {
         return { ...state, solanaPrice: action.payload }
       case "SET_CASH":
         return { ...state, cash: action.payload }
-      case "SET_WALLET_CAPACITY":
-        return { ...state, walletCapacity: action.payload }
       case "SET_WALLET_AMOUNT":
         return { ...state, walletAmount: action.payload }
       case "SET_BITCOIN_WALLET":
@@ -111,8 +99,6 @@ export default function Home() {
       case "SET_HIGH_SCORE":
         localStorage.setItem("highScore", state.cash.toString())
         return { ...state, highScore: action.payload }
-      case "SET_WALLET_EXPANSION_COST":
-        return { ...state, walletExpansionCost: action.payload }
       case "PAY_DEBT":
         return { ...state, debt: 0 }
       case "INCREASE_DEBT":
@@ -140,7 +126,7 @@ export default function Home() {
           state.cash - state.debt
         )}! Try again to beat your high score! 🤑`
       )
-      if (state.cash > state.highScore && state.cash !== 2000) {
+      if (state.cash > state.highScore || state.highScore === null) {
         dispatch({ type: "SET_HIGH_SCORE", payload: state.cash })
       }
       dispatch({ type: "INIT" })
@@ -163,18 +149,13 @@ export default function Home() {
         })
         dispatch({ type: "RANDOMIZE_INITIAL_PRICES" })
       } else {
-        //randomizes prices with chance to hit high/low range
         dispatch({
           type: "SET_LOG",
           payload: `========= End of Day ${state.currentDay} =========`,
         })
-        for (const assetKey in config.assets) {
-          const asset = config.assets[assetKey]
-          asset.assetName === "Solana"
-            ? randomizeAssetPrice(asset, 10, 95)
-            : randomizeAssetPrice(asset, 2, 95)
-        }
-        //increase date based on daily %
+
+        randomizePrices(dispatch)
+
         dispatch({
           type: "INCREASE_DEBT",
         })
@@ -182,119 +163,6 @@ export default function Home() {
       //increase day
       dispatch({ type: "ADVANCE_DAY" })
     }
-  }
-
-  //RANDOMIZE PRICE LOGIC =====================================
-  //bell curve chance to hit low/mid/high range
-  const randomizeAssetPrice = (
-    asset: {
-      assetName: string
-      range: { low: number[]; mid: number[]; high: number[]; moon: number[] }
-    },
-    lowRangeThreshHold: number,
-    highRangeThreshHold: number
-  ) => {
-    let coinFlip = Math.floor(Math.random() * 100)
-
-    if (coinFlip < lowRangeThreshHold) {
-      dispatch({
-        type: "SET_LOG",
-        payload: priceMovementEvent(asset.assetName, "crash"),
-      })
-      dispatch({
-        type: `SET_${asset.assetName.toUpperCase()}_PRICE`,
-        payload: randomizePrice(asset.range.low[0], asset.range.low[1]),
-      })
-    } else if (
-      coinFlip >= lowRangeThreshHold &&
-      coinFlip < highRangeThreshHold
-    ) {
-      dispatch({
-        type: `SET_${asset.assetName.toUpperCase()}_PRICE`,
-        payload: randomizePrice(asset.range.mid[0], asset.range.mid[1]),
-      })
-    } else if (coinFlip >= 98) {
-      dispatch({
-        type: "SET_LOG",
-        payload: `🚀🚀🚀 OMG A ${asset.assetName.toUpperCase()} MOONSHOT! 🚀🚀🚀`,
-      })
-      dispatch({
-        type: `SET_${asset.assetName.toUpperCase()}_PRICE`,
-        payload: randomizePrice(asset.range.moon[0], asset.range.moon[1]),
-      })
-    } else {
-      dispatch({
-        type: "SET_LOG",
-        payload: priceMovementEvent(asset.assetName, "moon"),
-      })
-      dispatch({
-        type: `SET_${asset.assetName.toUpperCase()}_PRICE`,
-        payload: randomizePrice(asset.range.high[0], asset.range.high[1]),
-      })
-    }
-  }
-
-  //WALLET EXPANSION LOGIC ====================
-  const increaseWalletCapacity = () => {
-    //error checks =====
-    if (state.currentDay == 0) {
-      showAlert(AlertMessages.NEED_START)
-      return
-    }
-    if (state.cash < state.walletExpansionCost) {
-      alert("You do not have enough cash to expand your wallet")
-      return
-    }
-    // =================
-    dispatch({
-      type: "SET_WALLET_CAPACITY",
-      payload: state.walletCapacity + config.wallet.increase,
-    })
-    dispatch({
-      type: "SET_CASH",
-      payload: state.cash - state.walletExpansionCost,
-    })
-    //increase wallet expansion cost by 25% after each purchase
-    dispatch({
-      type: "SET_WALLET_EXPANSION_COST",
-      payload: Math.floor(
-        state.walletExpansionCost +
-          state.walletExpansionCost * config.wallet.percentIncreace
-      ),
-    })
-    dispatch({
-      type: "SET_LOG",
-      payload: `You have increased your wallet capacity to ${state.walletCapacity}`,
-    })
-    dispatch({
-      type: "SET_LOG",
-      payload: `Wallet Expansion cost has increased in price by 25% to ${state.walletExpansionCost}`,
-    })
-  }
-
-  const payDebt = () => {
-    //error checks =====
-    if (state.currentDay == 0) {
-      showAlert(AlertMessages.NEED_START)
-      return
-    }
-    if (state.debt === 0) {
-      showAlert(AlertMessages.NEED_DEBT)
-      return
-    }
-    if (state.cash < state.debt) {
-      showAlert(AlertMessages.NEED_DEBT_CASH)
-      return
-    }
-    // =================
-    dispatch({
-      type: "SET_LOG",
-      payload: `You have paid off your $${numberWithCommas(
-        state.debt
-      )} debt! 🙌`,
-    })
-    dispatch({ type: "SET_CASH", payload: state.cash - state.debt })
-    dispatch({ type: "PAY_DEBT" })
   }
 
   //BUY LOGIC ===============================
@@ -452,7 +320,7 @@ export default function Home() {
         payload: state.walletAmount - assetWallet,
       })
       dispatch({ type: walletActionType, payload: 0 })
-      dispatch(logMsg)
+      dispatch({ type: "SET_LOG", payload: logMsg })
     }
   }
 
@@ -466,40 +334,15 @@ export default function Home() {
       </Head>
 
       <main className="prose px-5">
-        <Header
-          currentDay={state.currentDay}
-          cash={state.cash}
-          debt={state.debt}
-          walletAmount={state.walletAmount}
-          walletCapacity={state.walletCapacity}
-          highScore={state.highScore}
-        />
+        <Header state={state} />
 
-        <Table
-          handleBuy={handleBuy}
-          handleSell={handleSell}
-          bitcoinPrice={state.bitcoinPrice}
-          bitcoinWallet={state.bitcoinWallet}
-          ethereumPrice={state.ethereumPrice}
-          ethereumWallet={state.ethereumWallet}
-          litecoinPrice={state.litecoinPrice}
-          litecoinWallet={state.litecoinWallet}
-          solanaPrice={state.solanaPrice}
-          solanaWallet={state.solanaWallet}
-          cash={state.cash}
-          walletAmount={state.walletAmount}
-          walletCapacity={state.walletCapacity}
-        />
+        <Table handleBuy={handleBuy} handleSell={handleSell} state={state} />
 
         <Actions
-          increaseWalletCapacity={increaseWalletCapacity}
-          walletExpansionCost={state.walletExpansionCost}
-          debt={state.debt}
           advanceDay={advanceDay}
           init={() => dispatch({ type: "INIT" })}
-          currentDay={state.currentDay}
-          payDebt={payDebt}
-          cash={state.cash}
+          dispatch={dispatch}
+          state={state}
         />
 
         <Log log={state.log} />
