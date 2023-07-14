@@ -93,63 +93,18 @@ export const handleBuy = (e, state: State, dispatch: Dispatch<any>) => {
   }
 }
 
-//SELL LOGIC ========================================================
-export const handleSell = (e, state: State, dispatch: Dispatch<any>) => {
-  if (state.currentDay === 0) {
-    showAlert(AlertMessages.NEED_START)
-    return
-  }
-
-  let salePrice, logMsg, assetPrice, assetWallet, walletActionType
-  switch (e.target.id) {
-    case "bitcoinSell":
-      assetPrice = state.bitcoinPrice
-      assetWallet = state.bitcoinWallet
-      walletActionType = "SET_BITCOIN_WALLET"
-      salePrice = state.bitcoinPrice * state.bitcoinWallet
-      logMsg = `You have sold ${
-        state.bitcoinWallet
-      } Bitcoin at $${numberWithCommas(
-        state.bitcoinPrice
-      )} for $${numberWithCommas(salePrice)}`
-      break
-    case "ethereumSell":
-      assetPrice = state.ethereumPrice
-      assetWallet = state.ethereumWallet
-      walletActionType = "SET_ETHEREUM_WALLET"
-      salePrice = state.ethereumPrice * state.ethereumWallet
-      logMsg = `You have sold ${
-        state.ethereumWallet
-      } Ethereum at $${numberWithCommas(
-        state.ethereumPrice
-      )} for $${numberWithCommas(salePrice)}`
-      break
-    case "litecoinSell":
-      assetPrice = state.litecoinPrice
-      assetWallet = state.litecoinWallet
-      walletActionType = "SET_LITECOIN_WALLET"
-      salePrice = state.litecoinPrice * state.litecoinWallet
-      logMsg = `You have sold ${
-        state.litecoinWallet
-      } Litecoin at $${numberWithCommas(
-        state.litecoinPrice
-      )} for $${numberWithCommas(salePrice)}`
-      break
-    case "solanaSell":
-      assetPrice = state.solanaPrice
-      assetWallet = state.solanaWallet
-      walletActionType = "SET_SOLANA_WALLET"
-      salePrice = state.solanaPrice * state.solanaWallet
-      logMsg = `You have sold ${
-        state.solanaWallet
-      } Solana at $${numberWithCommas(
-        state.solanaPrice
-      )} for $${numberWithCommas(salePrice)}`
-      break
-    default:
-      alert("somehow you sold something you don't have")
-      break
-  }
+const sellAsset = (
+  assetName: string,
+  assetPrice: number,
+  assetWallet: number,
+  walletActionType: string,
+  state: State,
+  dispatch: Dispatch<any>
+) => {
+  const salePrice = assetPrice * assetWallet
+  const logMsg = `You have sold ${assetWallet} ${assetName} at $${numberWithCommas(
+    assetPrice
+  )} for $${numberWithCommas(salePrice)}`
 
   if (assetWallet === 0) {
     showAlert(AlertMessages.NEED_ASSET)
@@ -161,5 +116,58 @@ export const handleSell = (e, state: State, dispatch: Dispatch<any>) => {
     })
     dispatch({ type: walletActionType, payload: 0 })
     dispatch({ type: "SET_LOG", payload: logMsg })
+  }
+}
+
+export const handleSell = (e, state: State, dispatch: Dispatch<any>) => {
+  if (state.currentDay === 0) {
+    showAlert(AlertMessages.NEED_START)
+    return
+  }
+
+  switch (e.target.id) {
+    case "bitcoinSell":
+      sellAsset(
+        "Bitcoin",
+        state.bitcoinPrice,
+        state.bitcoinWallet,
+        "SET_BITCOIN_WALLET",
+        state,
+        dispatch
+      )
+      break
+    case "ethereumSell":
+      sellAsset(
+        "Ethereum",
+        state.ethereumPrice,
+        state.ethereumWallet,
+        "SET_ETHEREUM_WALLET",
+        state,
+        dispatch
+      )
+      break
+    case "litecoinSell":
+      sellAsset(
+        "Litecoin",
+        state.litecoinPrice,
+        state.litecoinWallet,
+        "SET_LITECOIN_WALLET",
+        state,
+        dispatch
+      )
+      break
+    case "solanaSell":
+      sellAsset(
+        "Solana",
+        state.solanaPrice,
+        state.solanaWallet,
+        "SET_SOLANA_WALLET",
+        state,
+        dispatch
+      )
+      break
+    default:
+      alert("somehow you sold something you don't have")
+      break
   }
 }
