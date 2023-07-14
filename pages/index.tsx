@@ -140,7 +140,7 @@ export default function Home() {
           state.cash - state.debt
         )}! Try again to beat your high score! 🤑`
       )
-      if (state.cash > state.highScore) {
+      if (state.cash > state.highScore && state.cash !== 2000) {
         dispatch({ type: "SET_HIGH_SCORE", payload: state.cash })
       }
       dispatch({ type: "INIT" })

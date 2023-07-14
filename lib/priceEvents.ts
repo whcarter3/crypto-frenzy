@@ -19,7 +19,7 @@ export const priceMovementEvent = (
   asset: string,
   crashOrMoon: priceMovement
 ) => {
-  let moonEvents = [
+  const moonEvents = [
     `Elon Musk sent a tweet saying only "${asset.toUpperCase()}". It's going to the moon!`,
     `${
       southAmericanCountries[
@@ -40,7 +40,7 @@ export const priceMovementEvent = (
     `For no particular technical or news event, ${asset} has gone parabolic!`,
   ]
 
-  let crashEvents = [
+  const crashEvents = [
     `Mark Zuckerberg has announced that they will purchase all ${asset} for Facebook! Prices plummet!`,
     `A russian hacker has stolen 1 million ${asset} wallets! Prices plummet!`,
     `A popular exchange has been hacked! ${asset}'s value plummets!`,
@@ -57,7 +57,7 @@ export const priceMovementEvent = (
     `Kim Jong Un has announced that he will be using ${asset} to fund his nuclear program! The world sells it off to stop his plans!`,
     `A top senator sells off all their holdings of ${asset}! Prices plummet!`,
     `Elon Musk tweeted only "${asset.toUpperCase()}", but misspelled! Crash!`,
-    `A submarine full of billionaires blew up near and crashed the ${asset} network! Buy low!`,
+    `A submarine full of billionaires blew up near the sub-ocean internet lines and crashed the ${asset} network! Buy low!`,
   ]
 
   return crashOrMoon === "crash"
