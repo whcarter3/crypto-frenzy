@@ -471,6 +471,8 @@ export default function Home() {
           solanaPrice={state.solanaPrice}
           solanaWallet={state.solanaWallet}
           cash={state.cash}
+          walletAmount={state.walletAmount}
+          walletCapacity={state.walletCapacity}
         />
 
         <Actions

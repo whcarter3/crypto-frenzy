@@ -13,6 +13,8 @@ const Table = ({
   handleBuy,
   handleSell,
   cash,
+  walletAmount,
+  walletCapacity,
 }) => {
   return (
     <div className="max-w-md">
@@ -56,7 +58,9 @@ const Table = ({
                 <td>
                   <button
                     className={`${
-                      cash <= price || price === 0
+                      cash <= price ||
+                      price === 0 ||
+                      walletAmount === walletCapacity
                         ? "bg-slate-700 text-slate-500"
                         : "bg-blue-700"
                     } rounded-full  px-3 py-1 mr-4`}
