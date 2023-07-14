@@ -44,7 +44,7 @@ const Actions = ({
           >
             Pay
           </button>
-          <p className={canPayDebt && "text-slate-500"}>
+          <p className={canPayDebt ? "text-slate-500" : ""}>
             Pay debt: ${numberWithCommas(debt)}
           </p>
         </div>

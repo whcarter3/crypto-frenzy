@@ -47,8 +47,8 @@ export default function Home() {
     ethereumWallet: 0,
     litecoinWallet: 0,
     solanaWallet: 0,
-    log: ["- Click Advance Day to start."],
     highScore: 0,
+    log: ["- Click Advance Day to start."],
     walletExpansionCost: config.wallet.cost,
     debt: config.debt,
   }
@@ -56,7 +56,7 @@ export default function Home() {
   const reducer = (state: State, action) => {
     switch (action.type) {
       case "INIT":
-        return initialState
+        return { ...initialState, highScore: state.highScore }
       case "ADVANCE_DAY":
         return { ...state, currentDay: state.currentDay + 1 }
       case "RANDOMIZE_INITIAL_PRICES":
@@ -135,6 +135,7 @@ export default function Home() {
         )}! Click to start a new game.`
       )
       if (state.cash > state.highScore) {
+        console.log("high score set")
         dispatch({ type: "SET_HIGH_SCORE", payload: state.cash })
       }
       dispatch({ type: "INIT" })
