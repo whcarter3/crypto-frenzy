@@ -19,7 +19,7 @@ export let config = {
         low: [3500, 4550],
         mid: [9000, 65000],
         high: [105000, 125000],
-        moon: [300000, 70000],
+        moon: [300000, 700000],
       },
     },
     ethereum: {
@@ -29,7 +29,7 @@ export let config = {
         low: [175, 350],
         mid: [700, 4800],
         high: [10000, 12500],
-        moon: [30000, 70000],
+        moon: [450000, 99000],
       },
     },
     litecoin: {
@@ -39,15 +39,15 @@ export let config = {
         low: [20, 45],
         mid: [90, 630],
         high: [1200, 1500],
-        moon: [3600, 7500],
+        moon: [4500, 8500],
       },
     },
     solana: {
       assetName: "Solana",
       symbol: "SOL",
       range: {
-        low: [1, 10],
-        mid: [35, 110],
+        low: [1, 5],
+        mid: [20, 110],
         high: [200, 580],
         moon: [1000, 3000],
       },
