@@ -3,6 +3,38 @@ import { State } from "../lib/types"
 import { calculateMaxShares, numberWithCommas } from "../helpers/utils"
 import { AlertMessages, showAlert } from "../helpers/alerts"
 
+const buyAsset = (
+  assetName: string,
+  assetPrice: number,
+  assetWallet: number,
+  walletActionType: string,
+  state: State,
+  dispatch: Dispatch<any>
+) => {
+  const maxShares = calculateMaxShares(
+    assetPrice,
+    state.walletAmount,
+    state.walletCapacity,
+    state.cash
+  )
+  const totalCost = maxShares * assetPrice
+  const logMsg = `You have bought ${maxShares} ${assetName} at $${numberWithCommas(
+    assetPrice
+  )} for $${numberWithCommas(totalCost)}`
+
+  if (totalCost > state.cash) {
+    showAlert(AlertMessages.NEED_CASH)
+  } else {
+    dispatch({ type: "SET_CASH", payload: state.cash - totalCost })
+    dispatch({ type: walletActionType, payload: assetWallet + maxShares })
+    dispatch({
+      type: "SET_WALLET_AMOUNT",
+      payload: state.walletAmount + maxShares,
+    })
+    dispatch({ type: "SET_LOG", payload: logMsg })
+  }
+}
+
 export const handleBuy = (e, state: State, dispatch: Dispatch<any>) => {
   //error checks =====
   if (state.currentDay === 0) {
@@ -13,80 +45,51 @@ export const handleBuy = (e, state: State, dispatch: Dispatch<any>) => {
     showAlert(AlertMessages.NEED_WALLET)
     return
   }
-  // =================
-  let amt, logMsg, assetPrice, assetWallet, walletActionType
+
   switch (e.target.id) {
     case "bitcoinBuy":
-      assetPrice = state.bitcoinPrice
-      assetWallet = state.bitcoinWallet
-      walletActionType = "SET_BITCOIN_WALLET"
-      amt = calculateMaxShares(
-        assetPrice,
-        state.walletAmount,
-        state.walletCapacity,
-        state.cash
+      buyAsset(
+        "Bitcoin",
+        state.bitcoinPrice,
+        state.bitcoinWallet,
+        "SET_BITCOIN_WALLET",
+        state,
+        dispatch
       )
-      logMsg = `You have bought ${amt} Bitcoin at $${numberWithCommas(
-        assetPrice
-      )} for $${numberWithCommas(amt * assetPrice)}`
       break
     case "ethereumBuy":
-      assetPrice = state.ethereumPrice
-      assetWallet = state.ethereumWallet
-      walletActionType = "SET_ETHEREUM_WALLET"
-      amt = calculateMaxShares(
-        assetPrice,
-        state.walletAmount,
-        state.walletCapacity,
-        state.cash
+      buyAsset(
+        "Ethereum",
+        state.ethereumPrice,
+        state.ethereumWallet,
+        "SET_ETHEREUM_WALLET",
+        state,
+        dispatch
       )
-      logMsg = `You have bought ${amt} Ethereum at $${numberWithCommas(
-        assetPrice
-      )} for $${numberWithCommas(amt * assetPrice)}`
       break
     case "litecoinBuy":
-      assetPrice = state.litecoinPrice
-      assetWallet = state.litecoinWallet
-      walletActionType = "SET_LITECOIN_WALLET"
-      amt = calculateMaxShares(
-        assetPrice,
-        state.walletAmount,
-        state.walletCapacity,
-        state.cash
+      buyAsset(
+        "Litecoin",
+        state.litecoinPrice,
+        state.litecoinWallet,
+        "SET_LITECOIN_WALLET",
+        state,
+        dispatch
       )
-      logMsg = ` You have bought ${amt} Litecoin at $${numberWithCommas(
-        assetPrice
-      )} for $${numberWithCommas(amt * assetPrice)}`
       break
     case "solanaBuy":
-      assetPrice = state.solanaPrice
-      assetWallet = state.solanaWallet
-      walletActionType = "SET_SOLANA_WALLET"
-      amt = calculateMaxShares(
-        assetPrice,
-        state.walletAmount,
-        state.walletCapacity,
-        state.cash
+      buyAsset(
+        "Solana",
+        state.solanaPrice,
+        state.solanaWallet,
+        "SET_SOLANA_WALLET",
+        state,
+        dispatch
       )
-      logMsg = `You have bought ${amt} Solana at $${numberWithCommas(
-        assetPrice
-      )} for $${numberWithCommas(amt * assetPrice)}`
       break
     default:
       alert("You have bought something you can't. What the heck?!")
       break
-  }
-
-  if (assetPrice > state.cash) {
-    showAlert(AlertMessages.NEED_CASH)
-  } else {
-    dispatch({ type: "SET_CASH", payload: state.cash - amt * assetPrice })
-    dispatch({ type: walletActionType, payload: assetWallet + amt })
-    dispatch({
-      type: "SET_WALLET_AMOUNT",
-      payload: state.walletAmount + amt,
-    })
-    dispatch({ type: "SET_LOG", payload: logMsg })
   }
 }
 
