@@ -1,13 +1,19 @@
+import { Dispatch } from "react"
+import { State } from "../lib/types"
 import config from "../config/config"
 import { numberWithCommas } from "../helpers/utils"
 import { payDebt } from "../lib/debt"
 import { increaseWalletCapacity } from "../lib/wallet"
+import { advanceDay } from "../lib/advanceDay"
 
 const Actions = ({
-  advanceDay,
   init,
   dispatch,
   state,
+}: {
+  init: any
+  dispatch: Dispatch<any>
+  state: State
 }) => {
   const canPayDebt = state.cash <= state.debt || state.debt === 0
   const cashLessThanWalletExpansionCost =
@@ -23,7 +29,7 @@ const Actions = ({
                 ? "bg-slate-700 text-slate-500"
                 : "bg-green-500"
             } px-3 py-1 mr-5 rounded-full`}
-            onClick={() => increaseWalletCapacity(dispatch, state)}
+            onClick={() => increaseWalletCapacity(state, dispatch)}
           >
             Buy
           </button>
@@ -52,7 +58,7 @@ const Actions = ({
       <button
         className="bg-blue-700 px-6 py-4 rounded-full mt-8 mr-5"
         id="advDay"
-        onClick={advanceDay}
+        onClick={() => advanceDay(state, dispatch)}
       >
         {state.currentDay === config.days ? "Finish Round" : "Advance Day"}
       </button>

@@ -1,29 +1,42 @@
+import config from "../config/config"
 import { numberWithCommas } from "../helpers/utils"
+import HeaderInfo from "./HeaderInfo"
 
 const Header = ({ state }) => {
+  const headerItems = [
+    {
+      label: "Day",
+      value: `${state.currentDay}/${config.days}`,
+    },
+    {
+      label: "Cash",
+      value: `$${numberWithCommas(state.cash)}`,
+    },
+    {
+      label: "Debt",
+      value: `$${numberWithCommas(state.debt)}`,
+    },
+    {
+      label: "Wallet",
+      value: `${state.walletAmount}/${state.walletCapacity}`,
+    },
+  ]
+
   return (
     <>
       <h2>Crypto Frenzy 🚀</h2>
 
-      <p className="mt-5">
-        <span className="font-bold">Day:</span> {state.currentDay}/30
-      </p>
-      <p>
-        <span className="font-bold">Cash:</span> ${numberWithCommas(state.cash)}
-      </p>
-      <p>
-        <span className="font-bold">Debt:</span> ${numberWithCommas(state.debt)}
-      </p>
-      <p>
-        <span className="font-bold">Wallet:</span> {state.walletAmount}/
-        {state.walletCapacity}
-      </p>
-      {state.highScore && (
-        <p>
-          <span className="font-bold">High Score:</span> $
-          {numberWithCommas(state.highScore)}
-        </p>
-      )}
+      <div className="mt-5">
+        {headerItems.map((item) => (
+          <HeaderInfo key={item.label} label={item.label} value={item.value} />
+        ))}
+        {state.highScore && (
+          <HeaderInfo
+            label="High Score"
+            value={`$${numberWithCommas(state.highScore)}`}
+          />
+        )}
+      </div>
     </>
   )
 }

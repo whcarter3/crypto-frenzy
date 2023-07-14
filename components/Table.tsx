@@ -1,7 +1,16 @@
+import { Dispatch } from "react"
+import { State } from "../lib/types"
 import config from "../config/config"
 import { numberWithCommas } from "../helpers/utils"
+import { handleBuy, handleSell } from "../lib/buySell"
 
-const Table = ({ handleBuy, handleSell, state }) => {
+const Table = ({
+  state,
+  dispatch,
+}: {
+  state: State
+  dispatch: Dispatch<any>
+}) => {
   return (
     <div className="max-w-md">
       <table className="mt-5 w-full table-auto border-collapse">
@@ -50,7 +59,7 @@ const Table = ({ handleBuy, handleSell, state }) => {
                         ? "bg-slate-700 text-slate-500"
                         : "bg-blue-700"
                     } rounded-full  px-3 py-1 mr-4`}
-                    onClick={handleBuy}
+                    onClick={(e) => handleBuy(e, state, dispatch)}
                     id={`${asset}Buy`}
                     disabled={state.cash <= price || price === 0}
                   >
@@ -62,7 +71,7 @@ const Table = ({ handleBuy, handleSell, state }) => {
                         ? "bg-slate-700 text-slate-500"
                         : "bg-green-500"
                     } rounded-full px-3 py-1`}
-                    onClick={handleSell}
+                    onClick={(e) => handleSell(e, state, dispatch)}
                     id={`${asset}Sell`}
                     disabled={wallet === 0}
                   >
