@@ -144,19 +144,17 @@ export default function Home() {
         //sets initial prices to randomized value from mid range
         dispatch({
           type: "SET_LOG",
-          payload: addToLog(`======== Start of Game =========`),
+          payload: `======== Start of Game =========`,
         })
         dispatch({
           type: "SET_LOG",
-          payload: addToLog(
-            `- You borrowed $${numberWithCommas(config.cash)} at ${
-              config.interestRate * 100
-            }% daily interest`
-          ),
+          payload: `You borrowed $${numberWithCommas(config.cash)} at ${
+            config.interestRate * 100
+          }% daily interest`,
         })
         dispatch({
           type: "SET_LOG",
-          payload: `- You have ${config.days} days to make as much money as you can! 💎🙌`,
+          payload: `You have ${config.days} days to make as much money as you can! 💎🙌`,
         })
         dispatch({ type: "RANDOMIZE_INITIAL_PRICES" })
       } else {
