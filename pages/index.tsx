@@ -13,6 +13,7 @@ import Table from "../components/Table"
 import Actions from "../components/Actions"
 import Header from "../components/Header"
 import Log from "../components/Log"
+import { priceMovementEvent } from "../lib/priceEvents"
 
 interface State {
   bitcoinPrice: number
@@ -56,7 +57,11 @@ export default function Home() {
   const reducer = (state: State, action) => {
     switch (action.type) {
       case "INIT":
-        return { ...initialState, highScore: state.highScore }
+        const savedHighScore = localStorage.getItem("highScore")
+        return {
+          ...initialState,
+          highScore: savedHighScore ? parseInt(savedHighScore) : 0,
+        }
       case "ADVANCE_DAY":
         return { ...state, currentDay: state.currentDay + 1 }
       case "RANDOMIZE_INITIAL_PRICES":
@@ -104,6 +109,7 @@ export default function Home() {
       case "SET_LOG":
         return { ...state, log: [addToLog(action.payload), ...state.log] }
       case "SET_HIGH_SCORE":
+        localStorage.setItem("highScore", state.cash.toString())
         return { ...state, highScore: action.payload }
       case "SET_WALLET_EXPANSION_COST":
         return { ...state, walletExpansionCost: action.payload }
@@ -132,10 +138,9 @@ export default function Home() {
       alert(
         `This round has been completed. You amassed $${numberWithCommas(
           state.cash - state.debt
-        )}! Click to start a new game.`
+        )}! Try again to beat your high score! 🤑`
       )
       if (state.cash > state.highScore) {
-        console.log("high score set")
         dispatch({ type: "SET_HIGH_SCORE", payload: state.cash })
       }
       dispatch({ type: "INIT" })
@@ -165,10 +170,9 @@ export default function Home() {
         })
         for (const assetKey in config.assets) {
           const asset = config.assets[assetKey]
-          if (asset.assetName === "Solana") {
-            randomizeAssetPrice(asset, 10, 97)
-          }
-          randomizeAssetPrice(asset, 2, 97)
+          asset.assetName === "Solana"
+            ? randomizeAssetPrice(asset, 10, 95)
+            : randomizeAssetPrice(asset, 2, 95)
         }
         //increase date based on daily %
         dispatch({
@@ -183,16 +187,19 @@ export default function Home() {
   //RANDOMIZE PRICE LOGIC =====================================
   //bell curve chance to hit low/mid/high range
   const randomizeAssetPrice = (
-    asset,
-    lowRangeThreshHold,
-    highRangeThreshHold
+    asset: {
+      assetName: string
+      range: { low: number[]; mid: number[]; high: number[]; moon: number[] }
+    },
+    lowRangeThreshHold: number,
+    highRangeThreshHold: number
   ) => {
     let coinFlip = Math.floor(Math.random() * 100)
 
     if (coinFlip < lowRangeThreshHold) {
       dispatch({
         type: "SET_LOG",
-        payload: `🐋 A whale has dumped ${asset.assetName} and the price has plummeted!`,
+        payload: priceMovementEvent(asset.assetName, "crash"),
       })
       dispatch({
         type: `SET_${asset.assetName.toUpperCase()}_PRICE`,
@@ -206,10 +213,19 @@ export default function Home() {
         type: `SET_${asset.assetName.toUpperCase()}_PRICE`,
         payload: randomizePrice(asset.range.mid[0], asset.range.mid[1]),
       })
+    } else if (coinFlip >= 98) {
+      dispatch({
+        type: "SET_LOG",
+        payload: `🚀🚀🚀 OMG A ${asset.assetName.toUpperCase()} MOONSHOT! 🚀🚀🚀`,
+      })
+      dispatch({
+        type: `SET_${asset.assetName.toUpperCase()}_PRICE`,
+        payload: randomizePrice(asset.range.moon[0], asset.range.moon[1]),
+      })
     } else {
       dispatch({
         type: "SET_LOG",
-        payload: `🚀🌕 ${asset.assetName} is going to the moon!`,
+        payload: priceMovementEvent(asset.assetName, "moon"),
       })
       dispatch({
         type: `SET_${asset.assetName.toUpperCase()}_PRICE`,

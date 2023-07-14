@@ -30,7 +30,7 @@ const Actions = ({
           <p
             className={`${cashLessThanWalletExpansionCost && "text-slate-500"}`}
           >
-            Wallet Size +{config.wallet.increase}: $
+            Wallet Capacity +{config.wallet.increase}: $
             {numberWithCommas(walletExpansionCost)}
           </p>
         </div>
@@ -54,7 +54,7 @@ const Actions = ({
         id="advDay"
         onClick={advanceDay}
       >
-        {currentDay === config.days ? "End Round" : "Advance Day"}
+        {currentDay === config.days ? "Finish Round" : "Advance Day"}
       </button>
       <button className="bg-red-700 px-6 py-4 rounded-full" onClick={init}>
         New Game
