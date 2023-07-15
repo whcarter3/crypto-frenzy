@@ -29,7 +29,7 @@ export let config = {
         low: [175, 350],
         mid: [700, 4800],
         high: [10000, 12500],
-        moon: [450000, 99000],
+        moon: [45000, 99999],
       },
     },
     litecoin: {

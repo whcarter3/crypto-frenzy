@@ -66,7 +66,7 @@ export const randomizePrices = (dispatch: Dispatch<any>): void => {
   for (const assetKey in config.assets) {
     const asset = config.assets[assetKey]
     asset.assetName === "Solana"
-      ? randomizeAssetPrice(asset, 10, 95, dispatch)
-      : randomizeAssetPrice(asset, 2, 95, dispatch)
+      ? randomizeAssetPrice(asset, 7, 96, dispatch)
+      : randomizeAssetPrice(asset, 2, 96, dispatch)
   }
 }
