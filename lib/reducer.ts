@@ -1,5 +1,4 @@
 import { State } from "../lib/types"
-import { randomizePrice } from "../lib/prices"
 import { addToLog } from "../helpers/utils"
 
 export const initialState: State = {
@@ -67,6 +66,19 @@ export const initialState: State = {
         mid: [20, 110],
         high: [200, 580],
         moon: [1000, 3000],
+      },
+      price: 0,
+    },
+    cardano: {
+      name: "Cardano",
+      symbol: "ADA",
+      wallet: 0,
+      active: true,
+      range: {
+        low: [1, 3],
+        mid: [5, 25],
+        high: [35, 75],
+        moon: [150, 250],
       },
       price: 0,
     },

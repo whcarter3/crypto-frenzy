@@ -38,6 +38,7 @@ export const advanceDay = (state: State, dispatch: Dispatch<any>) => {
         type: "SET_LOG",
         payload: `You have ${state.days} days to make as much money as you can! 💎🙌`,
       })
+      randomizePrices(state, dispatch)
     } else {
       dispatch({
         type: "SET_LOG",

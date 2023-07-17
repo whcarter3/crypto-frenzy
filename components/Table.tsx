@@ -53,15 +53,18 @@ const Table = ({
         <tbody className="bg-slate-800">
           {Object.keys(state.assets).map((asset) => {
             const name = state.assets[asset].name
+            const symbol = state.assets[asset].symbol
             const price = state.assets[asset].price
             const wallet = state.assets[asset].wallet
             const walletCapacity = state.wallet.capacity
             const walletAmount = state.wallet.amount
             const cash = state.cash
 
+            if (!state.assets[asset].active) return
+
             return (
               <tr key={asset}>
-                <td>{name}</td>
+                <td>{symbol}</td>
                 <td>${numberWithCommas(price)}</td>
                 <td>
                   <button
