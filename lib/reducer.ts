@@ -96,6 +96,23 @@ export const reducer = (
         ...initialState,
         highScore: savedHighScore ? parseInt(savedHighScore) : null,
       }
+    case "SET_EASY_MODE":
+      const savedHighScoreEasy = localStorage.getItem("highScoreEasy")
+      return {
+        ...initialState,
+        highScore: savedHighScoreEasy ? parseInt(savedHighScoreEasy) : null,
+        days: 60,
+        interestRate: 0.1,
+        debt: 1000,
+        cash: 3000,
+        wallet: {
+          ...state.wallet,
+          capacity: 200,
+          expansionCost: 25000,
+          increase: 200,
+          percentIncrease: 0.15,
+        },
+      }
     case "ADVANCE_DAY":
       return { ...state, currentDay: state.currentDay + 1 }
     case "EXPAND_WALLET":
