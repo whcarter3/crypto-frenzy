@@ -1,4 +1,3 @@
-import config from "../config/config"
 import { numberWithCommas } from "../helpers/utils"
 import HeaderInfo from "./HeaderInfo"
 
@@ -6,7 +5,7 @@ const Header = ({ state }) => {
   const headerItems = [
     {
       label: "Day",
-      value: `${state.currentDay}/${config.days}`,
+      value: `${state.currentDay}/${state.days}`,
     },
     {
       label: "Cash",
@@ -18,7 +17,7 @@ const Header = ({ state }) => {
     },
     {
       label: "Wallet",
-      value: `${state.walletAmount}/${state.walletCapacity}`,
+      value: `${state.wallet.amount}/${state.wallet.capacity}`,
     },
   ]
 

@@ -11,7 +11,7 @@ export const increaseWalletCapacity = (
     showAlert(AlertMessages.NEED_START)
     return
   }
-  if (state.cash < state.walletExpansionCost) {
+  if (state.cash < state.wallet.expansionCost) {
     alert("You do not have enough cash to expand your wallet")
     return
   }
@@ -19,10 +19,10 @@ export const increaseWalletCapacity = (
   dispatch({ type: "EXPAND_WALLET" })
   dispatch({
     type: "SET_LOG",
-    payload: `You have increased your wallet capacity to ${state.walletCapacity}`,
+    payload: `You have increased your wallet capacity to ${state.wallet.capacity}`,
   })
   dispatch({
     type: "SET_LOG",
-    payload: `Wallet Expansion cost has increased in price by 25% to ${state.walletExpansionCost}`,
+    payload: `Wallet Expansion cost has increased in price by 25% to ${state.wallet.expansionCost}`,
   })
 }

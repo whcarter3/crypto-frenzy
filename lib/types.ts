@@ -1,18 +1,35 @@
+export interface Asset {
+  name: string
+  symbol: string
+  wallet: number
+  active: boolean
+  range: {
+    low: number[]
+    mid: number[]
+    high: number[]
+    moon: number[]
+  }
+  price: number
+}
+
+export interface Wallet {
+  amount: number
+  capacity: number
+  increase: number
+  expansionCost: number
+  percentIncrease: number
+}
+
 export interface State {
-  bitcoinPrice: number
-  ethereumPrice: number
-  litecoinPrice: number
-  solanaPrice: number
+  days: number
   currentDay: number
   cash: number
-  walletCapacity: number
-  walletAmount: number
-  bitcoinWallet: number
-  ethereumWallet: number
-  litecoinWallet: number
-  solanaWallet: number
-  log: string[]
-  walletExpansionCost: number
   debt: number
+  interestRate: number
+  log: string[]
   highScore?: number | null
+  assets: {
+    [key: string]: Asset
+  }
+  wallet: Wallet
 }

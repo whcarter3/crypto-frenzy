@@ -1,7 +1,6 @@
-import config from "../config/config"
 import { priceMovementEvent } from "./priceEvents"
-// import { randomizePrice } from "../helpers/utils"
 import { Dispatch } from "react"
+import { Asset, State } from "./types"
 
 /**
  * Generates a random price within a given range.
@@ -17,55 +16,70 @@ export const randomizePrice = (max: number, min: number): number => {
 //RANDOMIZE PRICE LOGIC =====================================
 //bell curve chance to hit low/mid/high range
 const randomizeAssetPrice = (
-  asset: {
-    assetName: string
-    range: { low: number[]; mid: number[]; high: number[]; moon: number[] }
-  },
+  asset: Asset,
   lowRangeThreshHold: number,
   highRangeThreshHold: number,
   dispatch: Dispatch<any>
 ) => {
   let coinFlip = Math.floor(Math.random() * 100)
+  let assetName = asset.name.toLowerCase()
+  let assetRange = asset.range
+  console.log("asset.range", assetRange)
 
   if (coinFlip < lowRangeThreshHold) {
     dispatch({
       type: "SET_LOG",
-      payload: priceMovementEvent(asset.assetName, "crash"),
+      payload: priceMovementEvent(asset.name, "crash"),
     })
     dispatch({
-      type: `SET_${asset.assetName.toUpperCase()}_PRICE`,
-      payload: randomizePrice(asset.range.low[0], asset.range.low[1]),
+      type: `SET_ASSET_PRICE`,
+      payload: {
+        setAssetName: assetName,
+        setAssetPrice: randomizePrice(asset.range.low[0], asset.range.low[1]),
+      },
     })
   } else if (coinFlip >= lowRangeThreshHold && coinFlip < highRangeThreshHold) {
     dispatch({
-      type: `SET_${asset.assetName.toUpperCase()}_PRICE`,
-      payload: randomizePrice(asset.range.mid[0], asset.range.mid[1]),
+      type: `SET_ASSET_PRICE`,
+      payload: {
+        setAssetName: assetName,
+        setAssetPrice: randomizePrice(asset.range.mid[0], asset.range.mid[1]),
+      },
     })
   } else if (coinFlip >= 98) {
     dispatch({
       type: "SET_LOG",
-      payload: `🚀🚀🚀 OMG A ${asset.assetName.toUpperCase()} MOONSHOT! 🚀🚀🚀`,
+      payload: `🚀🚀🚀 OMG A ${assetName.toUpperCase()} MOONSHOT! 🚀🚀🚀`,
     })
     dispatch({
-      type: `SET_${asset.assetName.toUpperCase()}_PRICE`,
-      payload: randomizePrice(asset.range.moon[0], asset.range.moon[1]),
+      type: `SET_ASSET_PRICE`,
+      payload: {
+        setAssetName: assetName,
+        setAssetPrice: randomizePrice(asset.range.moon[0], asset.range.moon[1]),
+      },
     })
   } else {
     dispatch({
       type: "SET_LOG",
-      payload: priceMovementEvent(asset.assetName, "moon"),
+      payload: priceMovementEvent(assetName, "moon"),
     })
     dispatch({
-      type: `SET_${asset.assetName.toUpperCase()}_PRICE`,
-      payload: randomizePrice(asset.range.high[0], asset.range.high[1]),
+      type: `SET_ASSET_PRICE`,
+      payload: {
+        setAssetName: assetName,
+        setAssetPrice: randomizePrice(asset.range.high[0], asset.range.high[1]),
+      },
     })
   }
 }
 
-export const randomizePrices = (dispatch: Dispatch<any>): void => {
-  for (const assetKey in config.assets) {
-    const asset = config.assets[assetKey]
-    asset.assetName === "Solana"
+export const randomizePrices = (
+  state: State,
+  dispatch: Dispatch<any>
+): void => {
+  for (const assetKey in state.assets) {
+    const asset = state.assets[assetKey]
+    asset.name === "Solana"
       ? randomizeAssetPrice(asset, 7, 96, dispatch)
       : randomizeAssetPrice(asset, 2, 96, dispatch)
   }

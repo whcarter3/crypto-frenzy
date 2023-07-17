@@ -17,7 +17,7 @@ const Actions = ({
 }) => {
   const canPayDebt = state.cash <= state.debt || state.debt === 0
   const cashLessThanWalletExpansionCost =
-    state.cash <= state.walletExpansionCost
+    state.cash <= state.wallet.expansionCost
 
   return (
     <>
@@ -36,8 +36,8 @@ const Actions = ({
           <p
             className={`${cashLessThanWalletExpansionCost && "text-slate-500"}`}
           >
-            Wallet Capacity +{config.wallet.increase}: $
-            {numberWithCommas(state.walletExpansionCost)}
+            Wallet Capacity +{state.wallet.increase}: $
+            {numberWithCommas(state.wallet.expansionCost)}
           </p>
         </div>
         <div className="flex w-full items-center mt-3">
@@ -60,7 +60,7 @@ const Actions = ({
         id="advDay"
         onClick={() => advanceDay(state, dispatch)}
       >
-        {state.currentDay === config.days ? "Finish Round" : "Advance Day"}
+        {state.currentDay === state.days ? "Finish Round" : "Advance Day"}
       </button>
       <button className="bg-red-700 px-6 py-4 rounded-full" onClick={init}>
         New Game

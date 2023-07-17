@@ -1,6 +1,5 @@
 import { State } from "../lib/types"
 import { Dispatch } from "react"
-import { config } from "../config/config"
 import { randomizePrices } from "../lib/prices"
 import { numberWithCommas } from "../helpers/utils"
 import { AlertMessages, showAlert } from "../helpers/alerts"
@@ -8,11 +7,11 @@ import { AlertMessages, showAlert } from "../helpers/alerts"
 //ADVANCE DAY LOGIC ===================================
 export const advanceDay = (state: State, dispatch: Dispatch<any>) => {
   //warning before last day
-  if (state.currentDay === config.days - 1) {
+  if (state.currentDay === state.days - 1) {
     showAlert(AlertMessages.LAST_DAY)
   }
   //end of game -- alert score -- set high score -- restart
-  if (state.currentDay >= config.days) {
+  if (state.currentDay >= state.days) {
     alert(
       `This round has been completed. You amassed $${numberWithCommas(
         state.cash - state.debt
@@ -31,22 +30,21 @@ export const advanceDay = (state: State, dispatch: Dispatch<any>) => {
       })
       dispatch({
         type: "SET_LOG",
-        payload: `You borrowed $${numberWithCommas(config.cash)} at ${
-          config.interestRate * 100
+        payload: `You borrowed $${numberWithCommas(state.cash)} at ${
+          state.interestRate * 100
         }% daily interest`,
       })
       dispatch({
         type: "SET_LOG",
-        payload: `You have ${config.days} days to make as much money as you can! 💎🙌`,
+        payload: `You have ${state.days} days to make as much money as you can! 💎🙌`,
       })
-      dispatch({ type: "RANDOMIZE_INITIAL_PRICES" })
     } else {
       dispatch({
         type: "SET_LOG",
         payload: `========= End of Day ${state.currentDay} =========`,
       })
 
-      randomizePrices(dispatch)
+      randomizePrices(state, dispatch)
 
       dispatch({
         type: "INCREASE_DEBT",
