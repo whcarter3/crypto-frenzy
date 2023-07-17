@@ -1,6 +1,5 @@
 import { Dispatch } from "react"
 import { State } from "../lib/types"
-import config from "../config/config"
 import { numberWithCommas } from "../helpers/utils"
 import { payDebt } from "../lib/debt"
 import { increaseWalletCapacity } from "../lib/wallet"
