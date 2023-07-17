@@ -23,7 +23,6 @@ export default function Home() {
         <Table state={state} dispatch={dispatch} />
 
         <Actions
-          init={() => dispatch({ type: "INIT" })}
           dispatch={dispatch}
           state={state}
         />

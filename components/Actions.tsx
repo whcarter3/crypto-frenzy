@@ -6,11 +6,9 @@ import { increaseWalletCapacity } from "../lib/wallet"
 import { advanceDay } from "../lib/advanceDay"
 
 const Actions = ({
-  init,
   dispatch,
   state,
 }: {
-  init: any
   dispatch: Dispatch<any>
   state: State
 }) => {
@@ -61,7 +59,10 @@ const Actions = ({
       >
         {state.currentDay === state.days ? "Finish Round" : "Advance Day"}
       </button>
-      <button className="bg-red-700 px-6 py-4 rounded-full" onClick={init}>
+      <button
+        className="bg-red-700 px-6 py-4 rounded-full"
+        onClick={() => dispatch({ type: "INIT" })}
+      >
         New Game
       </button>
     </>

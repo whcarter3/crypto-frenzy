@@ -73,7 +73,7 @@ export const initialState: State = {
       name: "Cardano",
       symbol: "ADA",
       wallet: 0,
-      active: true,
+      active: false,
       range: {
         low: [1, 3],
         mid: [5, 25],
@@ -111,10 +111,6 @@ export const reducer = (
           ),
         },
       }
-    case "SET_CASH":
-      return { ...state, cash: action.payload }
-    case "SET_WALLET_AMOUNT":
-      return { ...state, wallet: { ...state.wallet, amount: action.payload } }
     case "SET_ASSET_PRICE":
       const { setAssetName, setAssetPrice } = action.payload
       return {
@@ -171,7 +167,11 @@ export const reducer = (
       localStorage.setItem("highScore", state.cash.toString())
       return { ...state, highScore: action.payload }
     case "PAY_DEBT":
-      return { ...state, debt: 0 }
+      return {
+        ...state,
+        cash: state.cash - state.debt,
+        debt: 0,
+      }
     case "INCREASE_DEBT":
       return {
         ...state,

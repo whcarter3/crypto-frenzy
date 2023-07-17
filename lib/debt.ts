@@ -22,6 +22,5 @@ export const payDebt = (dispatch: Dispatch<any>, state: State) => {
     type: "SET_LOG",
     payload: `You have paid off your $${numberWithCommas(state.debt)} debt! 🙌`,
   })
-  dispatch({ type: "SET_CASH", payload: state.cash - state.debt })
   dispatch({ type: "PAY_DEBT" })
 }
