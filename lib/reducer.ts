@@ -21,6 +21,8 @@ export const initialState: State = {
       name: "Bitcoin",
       symbol: "BTC",
       wallet: 0,
+      averageCost: 0,
+      totalCost: 0,
       active: true,
       range: {
         low: [3500, 4550],
@@ -34,6 +36,8 @@ export const initialState: State = {
       name: "Ethereum",
       symbol: "ETH",
       wallet: 0,
+      averageCost: 0,
+      totalCost: 0,
       active: true,
       range: {
         low: [175, 350],
@@ -47,6 +51,8 @@ export const initialState: State = {
       name: "Litecoin",
       symbol: "LTC",
       wallet: 0,
+      averageCost: 0,
+      totalCost: 0,
       active: true,
       range: {
         low: [20, 45],
@@ -60,6 +66,8 @@ export const initialState: State = {
       name: "Solana",
       symbol: "SOL",
       wallet: 0,
+      averageCost: 0,
+      totalCost: 0,
       active: true,
       range: {
         low: [1, 5],
@@ -73,6 +81,8 @@ export const initialState: State = {
       name: "Cardano",
       symbol: "ADA",
       wallet: 0,
+      averageCost: 0,
+      totalCost: 0,
       active: false,
       range: {
         low: [1, 3],
@@ -155,6 +165,7 @@ export const reducer = (
           [buyAssetName]: {
             ...state.assets[buyAssetName],
             wallet: state.assets[buyAssetName].wallet + buyAmount,
+            totalCost: state.assets[buyAssetName].totalCost + buyTotalCost,
           },
         },
         log: [addToLog(buyLogMessage), ...state.log],
@@ -174,9 +185,26 @@ export const reducer = (
           [sellAssetName]: {
             ...state.assets[sellAssetName],
             wallet: state.assets[sellAssetName].wallet - sellAmount,
+            totalCost: state.assets[sellAssetName].totalCost - sellTotalCost,
+            averageCost: 0,
           },
         },
         log: [addToLog(sellLogMessage), ...state.log],
+      }
+    case "SET_AVG_COST":
+      const { avgCostAssetName } = action.payload
+      return {
+        ...state,
+        assets: {
+          ...state.assets,
+          [avgCostAssetName]: {
+            ...state.assets[avgCostAssetName],
+            averageCost: Math.floor(
+              state.assets[avgCostAssetName].totalCost /
+                state.assets[avgCostAssetName].wallet
+            ),
+          },
+        },
       }
     case "SET_LOG":
       return { ...state, log: [addToLog(action.payload), ...state.log] }
@@ -195,6 +223,7 @@ export const reducer = (
         debt: Math.floor(state.debt + state.debt * state.interestRate),
       }
     default:
+      console.log("No action type found")
       return state
   }
 }

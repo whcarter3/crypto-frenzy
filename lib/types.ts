@@ -3,6 +3,8 @@ export interface Asset {
   symbol: string
   wallet: number
   active: boolean
+  averageCost: number
+  totalCost: number
   range: {
     low: number[]
     mid: number[]

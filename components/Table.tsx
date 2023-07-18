@@ -47,6 +47,7 @@ const Table = ({
             <th>Asset</th>
             <th>Price</th>
             <th>Action</th>
+            <th>Avg. Price</th>
             <th>Wallet</th>
           </tr>
         </thead>
@@ -94,6 +95,9 @@ const Table = ({
                     Sell
                   </button>
                 </td>
+                <td>{`$${numberWithCommas(
+                  state.assets[asset].averageCost
+                )}`}</td>
                 <td>{wallet}</td>
               </tr>
             )

@@ -32,6 +32,13 @@ export const buyAsset = (
         buyLogMessage: logMsg,
       },
     })
+    dispatch({
+      type: "SET_AVG_COST",
+      payload: {
+        avgCostTotalCost: totalCost,
+        avgCostAssetName: assetName,
+      },
+    })
   }
 }
 
