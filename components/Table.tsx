@@ -64,10 +64,14 @@ const Table = ({
             if (!state.assets[asset].active) return
 
             return (
-              <tr key={asset}>
-                <td>{symbol}</td>
-                <td>${numberWithCommas(price)}</td>
-                <td>
+              <tr key={asset} className="hover:bg-slate-600">
+                <td className="text-slate-300 px-3 py-2 text-center">
+                  {symbol}
+                </td>
+                <td className="text-slate-300 px-3 py-2 text-center">
+                  ${numberWithCommas(price)}
+                </td>
+                <td className="text-slate-300 px-3 py-2 text-center ">
                   <button
                     className={`${
                       cash <= price ||
@@ -95,10 +99,12 @@ const Table = ({
                     Sell
                   </button>
                 </td>
-                <td>{`$${numberWithCommas(
+                <td className="text-slate-300 px-3 py-2 text-center">{`$${numberWithCommas(
                   state.assets[asset].averageCost
                 )}`}</td>
-                <td>{wallet}</td>
+                <td className="text-slate-300 px-3 py-2 text-center ">
+                  {wallet}
+                </td>
               </tr>
             )
           })}
