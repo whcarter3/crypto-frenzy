@@ -1,5 +1,3 @@
-import { type } from "os"
-
 /**
  * Represents an asset in the game.
  * @typedef {Object} Asset
