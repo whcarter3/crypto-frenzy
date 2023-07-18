@@ -35,21 +35,7 @@
     @apply text-blue-600 underline;
     text-decoration: none;
   }
-  td {
-    @apply px-3;
-    @apply py-2;
-    @apply border-b;
-    @apply border-slate-700;
-  }
-  thead,
-  td {
-    @apply border-b;
-    @apply border-slate-700;
-    @apply text-center;
-  }
-
-  ul {
-    @apply bg-slate-800;
-    @apply rounded;
+  thead tbody tr:hover {
+    @apply bg-slate-700;
   }
 }

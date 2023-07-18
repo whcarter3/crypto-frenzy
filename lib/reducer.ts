@@ -188,7 +188,7 @@ export const reducer = (state: State, action: Action) => {
           [sellAssetName]: {
             ...state.assets[sellAssetName],
             wallet: state.assets[sellAssetName].wallet - sellAmount,
-            totalCost: state.assets[sellAssetName].totalCost - sellTotalCost,
+            totalCost: 0,
             averageCost: 0,
           },
         },
