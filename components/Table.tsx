@@ -65,11 +65,13 @@ const Table = ({
 
             return (
               <tr key={asset}>
-                <td className="text-slate-300 px-3 py-2">{symbol}</td>
-                <td className="text-slate-300 px-3 py-2">
-                  ${numberWithCommas(price)}
+                <td className="text-slate-300 px-3 py-2 text-center">
+                  {symbol}
                 </td>
                 <td className="text-slate-300 px-3 py-2 text-center">
+                  ${numberWithCommas(price)}
+                </td>
+                <td className="text-slate-300 px-3 py-2 text-center ">
                   <button
                     className={`${
                       cash <= price ||
@@ -97,10 +99,10 @@ const Table = ({
                     Sell
                   </button>
                 </td>
-                <td className="text-slate-300 px-3 py-2">{`$${numberWithCommas(
+                <td className="text-slate-300 px-3 py-2 text-center">{`$${numberWithCommas(
                   state.assets[asset].averageCost
                 )}`}</td>
-                <td className="text-slate-300 px-3 py-2 text-center">
+                <td className="text-slate-300 px-3 py-2 text-center ">
                   {wallet}
                 </td>
               </tr>
