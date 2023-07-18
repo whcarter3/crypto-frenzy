@@ -64,7 +64,7 @@ const Table = ({
             if (!state.assets[asset].active) return
 
             return (
-              <tr key={asset}>
+              <tr key={asset} className="hover:bg-slate-600">
                 <td className="text-slate-300 px-3 py-2">{symbol}</td>
                 <td className="text-slate-300 px-3 py-2">
                   ${numberWithCommas(price)}

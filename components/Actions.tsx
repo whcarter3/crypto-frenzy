@@ -57,7 +57,7 @@ const Actions = ({
         id="advDay"
         onClick={() => advanceDay(state, dispatch)}
       >
-        {state.currentDay === state.days ? "Finish Round" : "Advance Day"}
+        {state.currentDay === state.days ? "Save score!" : "Advance Day"}
       </button>
       <button
         className="bg-red-700 px-6 py-4 rounded-full"

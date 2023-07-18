@@ -35,7 +35,4 @@
     @apply text-blue-600 underline;
     text-decoration: none;
   }
-  thead tbody tr:hover {
-    @apply bg-slate-700;
-  }
 }
