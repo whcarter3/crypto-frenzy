@@ -46,5 +46,5 @@ export const currentTime = (): string => {
  * @returns {string} - The formatted log message with a timestamp.
  */
 // HELPER FUNCTIONS ===================================
-export const addToLog = (message: string): string =>
+export const addTimestamp = (message: string): string =>
   `${currentTime()} - ${message}`

@@ -1,9 +1,14 @@
 import { Dispatch } from "react"
-import { State } from "../lib/types"
+import { State, Action } from "../lib/types"
 import { showAlert, AlertMessages } from "../helpers/alerts"
 import { numberWithCommas } from "../helpers/utils"
 
-export const payDebt = (dispatch: Dispatch<any>, state: State) => {
+/**
+ * Pays off the player's debt and updates the game state.
+ * @param {Dispatch<Action>} dispatch - The dispatch function for updating the game state.
+ * @param {State} state - The current game state.
+ */
+export const payDebt = (dispatch: Dispatch<Action>, state: State) => {
   //error checks =====
   if (state.currentDay == 0) {
     showAlert(AlertMessages.NEED_START)
@@ -20,7 +25,9 @@ export const payDebt = (dispatch: Dispatch<any>, state: State) => {
   // =================
   dispatch({
     type: "SET_LOG",
-    payload: `You have paid off your $${numberWithCommas(state.debt)} debt! 🙌`,
+    payload: [
+      `You have paid off your $${numberWithCommas(state.debt)} debt! 🙌`,
+    ],
   })
   dispatch({ type: "PAY_DEBT" })
 }

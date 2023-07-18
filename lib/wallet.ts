@@ -1,10 +1,10 @@
 import { Dispatch } from "react"
-import { State } from "../lib/types"
+import { State, Action } from "../lib/types"
 import { showAlert, AlertMessages } from "../helpers/alerts"
 
 export const increaseWalletCapacity = (
   state: State,
-  dispatch: Dispatch<any>
+  dispatch: Dispatch<Action>
 ) => {
   //error checks =====
   if (state.currentDay == 0) {
@@ -19,10 +19,9 @@ export const increaseWalletCapacity = (
   dispatch({ type: "EXPAND_WALLET" })
   dispatch({
     type: "SET_LOG",
-    payload: `You have increased your wallet capacity to ${state.wallet.capacity}`,
-  })
-  dispatch({
-    type: "SET_LOG",
-    payload: `Wallet Expansion cost has increased in price by 25% to ${state.wallet.expansionCost}`,
+    payload: [
+      `You have increased your wallet capacity to ${state.wallet.capacity}`,
+      `Wallet Expansion cost has increased in price by 25% to ${state.wallet.expansionCost}`,
+    ],
   })
 }

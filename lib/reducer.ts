@@ -1,5 +1,5 @@
-import { State } from "../lib/types"
-import { addToLog } from "../helpers/utils"
+import { Action, State } from "../lib/types"
+import { addTimestamp } from "../helpers/utils"
 
 export const initialState: State = {
   days: 30,
@@ -95,10 +95,13 @@ export const initialState: State = {
   },
 }
 
-export const reducer = (
-  state: State,
-  action: { type: string; payload?: any }
-) => {
+/**
+ * The reducer function for updating the game state based on dispatched actions.
+ * @param {State} state - The current game state.
+ * @param {Action} action - The dispatched action.
+ * @returns {State} The updated game state.
+ */
+export const reducer = (state: State, action: Action) => {
   switch (action.type) {
     case "INIT":
       const savedHighScore = localStorage.getItem("highScore")
@@ -168,7 +171,7 @@ export const reducer = (
             totalCost: state.assets[buyAssetName].totalCost + buyTotalCost,
           },
         },
-        log: [addToLog(buyLogMessage), ...state.log],
+        log: [addTimestamp(buyLogMessage), ...state.log],
       }
     case "SELL_ASSET":
       const { sellAssetName, sellAmount, sellTotalCost, sellLogMessage } =
@@ -189,7 +192,7 @@ export const reducer = (
             averageCost: 0,
           },
         },
-        log: [addToLog(sellLogMessage), ...state.log],
+        log: [addTimestamp(sellLogMessage), ...state.log],
       }
     case "SET_AVG_COST":
       const { avgCostAssetName } = action.payload
@@ -207,7 +210,10 @@ export const reducer = (
         },
       }
     case "SET_LOG":
-      return { ...state, log: [addToLog(action.payload), ...state.log] }
+      return {
+        ...state,
+        log: [...action.payload.map(addTimestamp), ...state.log],
+      }
     case "SET_HIGH_SCORE":
       localStorage.setItem("highScore", state.cash.toString())
       return { ...state, highScore: action.payload }

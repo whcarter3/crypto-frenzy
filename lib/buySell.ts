@@ -1,13 +1,20 @@
 import { Dispatch } from "react"
-import { State } from "../lib/types"
+import { State, Action } from "../lib/types"
 import { calculateMaxShares, numberWithCommas } from "../helpers/utils"
 import { AlertMessages, showAlert } from "../helpers/alerts"
 
+/**
+ * Buys an asset and updates the game state.
+ * @param {string} assetName - The name of the asset to buy.
+ * @param {number} assetPrice - The price of the asset to buy.
+ * @param {State} state - The current game state.
+ * @param {Dispatch<Action>} dispatch - The dispatch function for updating the game state.
+ */
 export const buyAsset = (
   assetName: string,
   assetPrice: number,
   state: State,
-  dispatch: Dispatch<any>
+  dispatch: Dispatch<Action>
 ) => {
   const buyAmount = calculateMaxShares(
     assetPrice,
@@ -35,18 +42,24 @@ export const buyAsset = (
     dispatch({
       type: "SET_AVG_COST",
       payload: {
-        avgCostTotalCost: totalCost,
         avgCostAssetName: assetName,
       },
     })
   }
 }
 
+/**
+ * Sells an asset and updates the game state.
+ * @param {string} assetName - The name of the asset to sell.
+ * @param {number} assetPrice - The price of the asset to sell.
+ * @param {number} assetWallet - The number of shares of the asset to sell.
+ * @param {Dispatch<Action>} dispatch - The dispatch function for updating the game state.
+ */
 export const sellAsset = (
   assetName: string,
   assetPrice: number,
   assetWallet: number,
-  dispatch: Dispatch<any>
+  dispatch: Dispatch<Action>
 ) => {
   const salePrice = assetPrice * assetWallet
   const logMsg = `You have sold ${assetWallet} ${assetName} at $${numberWithCommas(

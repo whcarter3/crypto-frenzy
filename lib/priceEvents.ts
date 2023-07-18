@@ -15,10 +15,16 @@ const southAmericanCountries = [
   "Venezuela",
 ]
 
+/**
+ * Generates a random price movement event message for a given asset.
+ * @param {string} asset - The name of the asset to generate a price movement event for.
+ * @param {priceMovement} crashOrMoon - The type of price movement event to generate ("crash" or "moon").
+ * @returns {string} A random price movement event message.
+ */
 export const priceMovementEvent = (
   asset: string,
   crashOrMoon: priceMovement
-) => {
+): string[] => {
   const moonEvents = [
     `Elon Musk sent a tweet saying only "${asset.toUpperCase()}". It's going to the moon!`,
     `${
@@ -61,6 +67,6 @@ export const priceMovementEvent = (
   ]
 
   return crashOrMoon === "crash"
-    ? `📉😲 ${crashEvents[Math.floor(Math.random() * crashEvents.length)]}`
-    : `🚀🌝 ${moonEvents[Math.floor(Math.random() * moonEvents.length)]}`
+    ? [`📉😲 ${crashEvents[Math.floor(Math.random() * crashEvents.length)]}`]
+    : [`🚀🌝 ${moonEvents[Math.floor(Math.random() * moonEvents.length)]}`]
 }

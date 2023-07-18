@@ -1,6 +1,6 @@
 import { priceMovementEvent } from "./priceEvents"
 import { Dispatch } from "react"
-import { Asset, State } from "./types"
+import { Asset, State, Action } from "./types"
 
 /**
  * Generates a random price within a given range.
@@ -13,13 +13,18 @@ export const randomizePrice = (max: number, min: number): number => {
   return Math.floor(Math.random() * (max - min) + min)
 }
 
-//RANDOMIZE PRICE LOGIC =====================================
-//bell curve chance to hit low/mid/high range
+/**
+ * Randomizes the price of a given asset and updates the game state.
+ * @param {Asset} asset - The asset to randomize the price for.
+ * @param {number} lowRangeThreshHold - The lower threshold for the randomization range.
+ * @param {number} highRangeThreshHold - The upper threshold for the randomization range.
+ * @param {Dispatch<Action>} dispatch - The dispatch function for updating the game state.
+ */
 const randomizeAssetPrice = (
   asset: Asset,
   lowRangeThreshHold: number,
   highRangeThreshHold: number,
-  dispatch: Dispatch<any>
+  dispatch: Dispatch<Action>
 ) => {
   let coinFlip = Math.floor(Math.random() * 100)
   let assetName = asset.name.toLowerCase()
@@ -49,7 +54,7 @@ const randomizeAssetPrice = (
   } else if (coinFlip >= 98) {
     dispatch({
       type: "SET_LOG",
-      payload: `🚀🚀🚀 OMG A ${assetName.toUpperCase()} MOONSHOT! 🚀🚀🚀`,
+      payload: [`🚀🚀🚀 OMG A ${assetName.toUpperCase()} MOONSHOT! 🚀🚀🚀`],
     })
     dispatch({
       type: `SET_ASSET_PRICE`,
@@ -73,9 +78,14 @@ const randomizeAssetPrice = (
   }
 }
 
+/**
+ * Randomizes the prices of all active assets in the game state and updates the game state.
+ * @param {State} state - The current game state.
+ * @param {Dispatch<Action>} dispatch - The dispatch function for updating the game state.
+ */
 export const randomizePrices = (
   state: State,
-  dispatch: Dispatch<any>
+  dispatch: Dispatch<Action>
 ): void => {
   for (const assetKey in state.assets) {
     const asset = state.assets[assetKey]

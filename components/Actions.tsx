@@ -1,5 +1,5 @@
 import { Dispatch } from "react"
-import { State } from "../lib/types"
+import { Action, State } from "../lib/types"
 import { numberWithCommas } from "../helpers/utils"
 import { payDebt } from "../lib/debt"
 import { increaseWalletCapacity } from "../lib/wallet"
@@ -9,7 +9,7 @@ const Actions = ({
   dispatch,
   state,
 }: {
-  dispatch: Dispatch<any>
+  dispatch: Dispatch<Action>
   state: State
 }) => {
   const canPayDebt = state.cash <= state.debt || state.debt === 0

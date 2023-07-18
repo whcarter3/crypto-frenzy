@@ -1,11 +1,16 @@
-import { State } from "../lib/types"
 import { Dispatch } from "react"
+import { State, Action } from "../lib/types"
 import { randomizePrices } from "../lib/prices"
 import { numberWithCommas } from "../helpers/utils"
 import { AlertMessages, showAlert } from "../helpers/alerts"
 
-//ADVANCE DAY LOGIC ===================================
-export const advanceDay = (state: State, dispatch: Dispatch<any>) => {
+/**
+ * Advances the game by one day, updating the state and dispatching actions accordingly.
+ * @param {State} state - The current state of the application.
+ * @param {Dispatch<Action>} dispatch - The dispatch function for updating the state.
+ */
+
+export const advanceDay = (state: State, dispatch: Dispatch<Action>) => {
   //warning before last day
   if (state.currentDay === state.days - 1) {
     showAlert(AlertMessages.LAST_DAY)
@@ -26,23 +31,19 @@ export const advanceDay = (state: State, dispatch: Dispatch<any>) => {
       //sets initial prices to randomized value from mid range
       dispatch({
         type: "SET_LOG",
-        payload: `======== Start of Game =========`,
-      })
-      dispatch({
-        type: "SET_LOG",
-        payload: `You borrowed $${numberWithCommas(state.cash)} at ${
-          state.interestRate * 100
-        }% daily interest`,
-      })
-      dispatch({
-        type: "SET_LOG",
-        payload: `You have ${state.days} days to make as much money as you can! 💎🙌`,
+        payload: [
+          `======== Start of Game =========`,
+          `You borrowed $${numberWithCommas(state.cash)} at ${
+            state.interestRate * 100
+          }% daily interest`,
+          `You have ${state.days} days to make as much money as you can! 💎🙌`,
+        ],
       })
       randomizePrices(state, dispatch)
     } else {
       dispatch({
         type: "SET_LOG",
-        payload: `========= End of Day ${state.currentDay} =========`,
+        payload: [`========= End of Day ${state.currentDay} =========`],
       })
 
       randomizePrices(state, dispatch)

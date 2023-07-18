@@ -1,5 +1,5 @@
 import { Dispatch } from "react"
-import { State } from "../lib/types"
+import { State, Action } from "../lib/types"
 import { numberWithCommas } from "../helpers/utils"
 import { showAlert, AlertMessages } from "../helpers/alerts"
 import { buyAsset, sellAsset } from "../lib/buySell"
@@ -9,9 +9,9 @@ const Table = ({
   dispatch,
 }: {
   state: State
-  dispatch: Dispatch<any>
+  dispatch: Dispatch<Action>
 }) => {
-  const handleSell = (e, state: State, dispatch: Dispatch<any>) => {
+  const handleSell = (e, state: State, dispatch: Dispatch<Action>) => {
     if (state.currentDay === 0) {
       showAlert(AlertMessages.NEED_START)
       return
@@ -25,7 +25,7 @@ const Table = ({
     )
   }
 
-  const handleBuy = (e, state: State, dispatch: Dispatch<any>) => {
+  const handleBuy = (e, state: State, dispatch: Dispatch<Action>) => {
     //error checks =====
     if (state.currentDay === 0) {
       showAlert(AlertMessages.NEED_START)
