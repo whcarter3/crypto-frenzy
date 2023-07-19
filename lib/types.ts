@@ -57,6 +57,7 @@ export type Wallet = {
  * @property {number} interestRate - The current interest rate on the player's debt.
  * @property {string[]} log - The log of events that have occurred in the game.
  * @property {number|null} highScore - The player's high score, if any.
+ * @property {boolean} modalOpen - Whether the modal is open.
  * @property {Object.<string, Asset>} assets - The assets in the game, keyed by symbol.
  * @property {Wallet} wallet - The player's wallet.
  */
@@ -68,6 +69,8 @@ export type State = {
   interestRate: number
   log: string[]
   highScore?: number | null
+  modalOpen: boolean
+  mode: "easy" | "hard" | "normal"
   assets: {
     [key: string]: Asset
   }
@@ -98,6 +101,9 @@ export type Action =
     }
   | {
       type: "SET_EASY_MODE"
+    }
+  | {
+      type: "SET_HARD_MODE"
     }
   | {
       type: "ADVANCE_DAY"
@@ -149,4 +155,11 @@ export type Action =
     }
   | {
       type: "INCREASE_DEBT"
+    }
+  | {
+      type: "TOGGLE_MODAL"
+    }
+  | {
+      type: "CHANGE_MODE"
+      payload: "easy" | "hard" | "normal"
     }

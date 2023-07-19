@@ -9,6 +9,8 @@ export const initialState: State = {
   interestRate: 0.2,
   log: ["- Click Advance Day to start."],
   highScore: null,
+  modalOpen: true,
+  mode: "normal",
   wallet: {
     amount: 0,
     capacity: 100,
@@ -126,6 +128,23 @@ export const reducer = (state: State, action: Action) => {
           percentIncrease: 0.15,
         },
       }
+    case "SET_HARD_MODE":
+      const savedHighScoreHard = localStorage.getItem("highScoreHard")
+      return {
+        ...initialState,
+        highScore: savedHighScoreHard ? parseInt(savedHighScoreHard) : null,
+        days: 20,
+        interestRate: 0.3,
+        debt: 3000,
+        cash: 1000,
+        wallet: {
+          ...state.wallet,
+          capacity: 50,
+          expansionCost: 75000,
+          increase: 50,
+          percentIncrease: 0.35,
+        },
+      }
     case "ADVANCE_DAY":
       return { ...state, currentDay: state.currentDay + 1 }
     case "EXPAND_WALLET":
@@ -227,6 +246,16 @@ export const reducer = (state: State, action: Action) => {
       return {
         ...state,
         debt: Math.floor(state.debt + state.debt * state.interestRate),
+      }
+    case "TOGGLE_MODAL":
+      return {
+        ...state,
+        modalOpen: !state.modalOpen,
+      }
+    case "CHANGE_MODE":
+      return {
+        ...state,
+        mode: action.payload,
       }
     default:
       console.log("No action type found")

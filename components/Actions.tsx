@@ -61,7 +61,7 @@ const Actions = ({
       </button>
       <button
         className="bg-red-700 px-6 py-4 rounded-full"
-        onClick={() => dispatch({ type: "INIT" })}
+        onClick={() => dispatch({ type: "TOGGLE_MODAL" })}
       >
         New Game
       </button>
