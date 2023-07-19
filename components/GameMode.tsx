@@ -14,18 +14,18 @@ const GameMode = ({
     dispatch({ type: "INIT" })
     if (state.mode === "easy") {
       dispatch({ type: "SET_EASY_MODE" })
-    } else {
+    } else if (state.mode === "hard") {
       dispatch({ type: "SET_HARD_MODE" })
     }
     dispatch({ type: "TOGGLE_MODAL" })
   }
   return (
     <div className="w-screen h-screen bg-gray-800/60 z-10 absolute top-0 left-0 flex justify-center items-center">
-      <div className="bg-slate-100 w-1/2 h-1/2 rounded-md">
+      <div className="bg-slate-300 w-1/2 h-1/2 rounded-md p-4">
         <h1 className="text-gray-800">Selected game mode: {state.mode}</h1>
         <div className="flex justify-center items-center">
           <button
-            className="px-3 py-1 bg-green-400 rounded-full mr-5"
+            className="px-3 py-1 bg-green-500 rounded-full mr-5"
             onClick={() => dispatch({ type: "CHANGE_MODE", payload: "easy" })}
           >
             Easy

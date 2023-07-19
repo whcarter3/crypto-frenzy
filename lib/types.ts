@@ -70,6 +70,8 @@ export type State = {
   log: string[]
   highScore?: number | null
   modalOpen: boolean
+  lowRangePercent: number
+  highRangePercent: number
   mode: "easy" | "hard" | "normal"
   assets: {
     [key: string]: Asset
