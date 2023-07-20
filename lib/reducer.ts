@@ -11,8 +11,8 @@ export const initialState: State = {
   highScore: null,
   modalOpen: true,
   mode: "normal",
-  lowRangePercent: 5,
-  highRangePercent: 94,
+  lowRangePriceChance: 5,
+  highRangePriceChance: 94,
   wallet: {
     amount: 0,
     capacity: 100,
@@ -122,8 +122,8 @@ export const reducer = (state: State, action: Action) => {
         interestRate: 0.1,
         debt: 2000,
         cash: 1500,
-        lowRangePercent: 7,
-        highRangePercent: 92,
+        lowRangePriceChance: 7,
+        highRangePriceChance: 92,
         wallet: {
           ...state.wallet,
           capacity: 200,
@@ -141,8 +141,8 @@ export const reducer = (state: State, action: Action) => {
         interestRate: 0.3,
         debt: 4000,
         cash: 2000,
-        lowRangePercent: 3,
-        highRangePercent: 96,
+        lowRangePriceChance: 3,
+        highRangePriceChance: 96,
         wallet: {
           ...state.wallet,
           capacity: 50,

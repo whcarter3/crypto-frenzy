@@ -92,8 +92,8 @@ export const randomizePrices = (
     if (!asset.active) continue
     randomizeAssetPrice(
       asset,
-      state.lowRangePercent,
-      state.highRangePercent,
+      state.lowRangePriceChance,
+      state.highRangePriceChance,
       dispatch
     )
   }
