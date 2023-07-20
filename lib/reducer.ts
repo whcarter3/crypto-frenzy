@@ -151,6 +151,11 @@ export const reducer = (state: State, action: Action) => {
           percentIncrease: 0.35,
         },
       }
+    case "SET_TEST_MODE":
+      return {
+        ...initialState,
+        cash: 1000000,
+      }
     case "ADVANCE_DAY":
       return { ...state, currentDay: state.currentDay + 1 }
     case "EXPAND_WALLET":

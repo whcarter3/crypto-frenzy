@@ -60,6 +60,9 @@ export type Wallet = {
  * @property {boolean} modalOpen - Whether the modal is open.
  * @property {Object.<string, Asset>} assets - The assets in the game, keyed by symbol.
  * @property {Wallet} wallet - The player's wallet.
+ * @property {number} lowRangePriceChance - The chance of a low range price movement.
+ * @property {number} highRangePriceChance - The chance of a high range price movement.
+ * @property {"Easy"|"Hard"|"Normal"|"Test"} mode - The game mode.
  */
 export type State = {
   days: number
@@ -72,7 +75,7 @@ export type State = {
   modalOpen: boolean
   lowRangePriceChance: number
   highRangePriceChance: number
-  mode: "Easy" | "Hard" | "Normal"
+  mode: "Easy" | "Hard" | "Normal" | "Test"
   assets: {
     [key: string]: Asset
   }
@@ -106,6 +109,9 @@ export type Action =
     }
   | {
       type: "SET_HARD_MODE"
+    }
+  | {
+      type: "SET_TEST_MODE"
     }
   | {
       type: "ADVANCE_DAY"
@@ -163,5 +169,5 @@ export type Action =
     }
   | {
       type: "CHANGE_MODE"
-      payload: "Easy" | "Hard" | "Normal"
+      payload: "Easy" | "Hard" | "Normal" | "Test"
     }

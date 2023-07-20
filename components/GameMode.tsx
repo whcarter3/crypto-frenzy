@@ -16,6 +16,8 @@ const GameMode = ({
       dispatch({ type: "SET_EASY_MODE" })
     } else if (state.mode === "Hard") {
       dispatch({ type: "SET_HARD_MODE" })
+    } else if (state.mode === "Test") {
+      dispatch({ type: "SET_TEST_MODE" })
     }
     dispatch({ type: "TOGGLE_MODAL" })
   }
@@ -33,13 +35,14 @@ const GameMode = ({
           <p></p>
         </div>
         <div className="flex items-center justify-between mt-4 mb-2">
-          <h4 className="text-gray-800">
+          <h4 className="text-gray-800" id="difficultyMode">
             Choose your difficulty: {state.mode}
           </h4>
           <div>
             <button
               className="px-3 py-1 bg-green-500 rounded-full mr-5 text-xl"
               onClick={() => dispatch({ type: "CHANGE_MODE", payload: "Easy" })}
+              id="easyMode"
             >
               Easy
             </button>
@@ -48,20 +51,28 @@ const GameMode = ({
               onClick={() =>
                 dispatch({ type: "CHANGE_MODE", payload: "Normal" })
               }
+              id="normalMode"
             >
               Normal
             </button>
             <button
               className="px-3 py-1 bg-purple-500 rounded-full text-xl"
               onClick={() => dispatch({ type: "CHANGE_MODE", payload: "Hard" })}
+              id="hardMode"
             >
               Hard
             </button>
+            <button
+              className="w-[1px] h-[1px] opacity-0"
+              onClick={() => dispatch({ type: "CHANGE_MODE", payload: "Test" })}
+              id="testMode"
+            ></button>
           </div>
         </div>
         <button
           className="px-3 py-1 bg-red-400 rounded-full w-2/3 mt-5 text-3xl mx-auto block"
           onClick={handleStart}
+          id="startGame"
         >
           Start Game!
         </button>

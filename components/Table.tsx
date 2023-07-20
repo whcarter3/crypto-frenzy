@@ -65,13 +65,22 @@ const Table = ({
 
             return (
               <tr key={asset} className="hover:bg-slate-600">
-                <td className="text-slate-300 px-3 py-2 text-center">
+                <td
+                  className="text-slate-300 px-3 py-2 text-center"
+                  data-cy="assetSymbol"
+                >
                   {symbol}
                 </td>
-                <td className="text-slate-300 px-3 py-2 text-center">
+                <td
+                  className="text-slate-300 px-3 py-2 text-center"
+                  data-cy="assetPrice"
+                >
                   ${numberWithCommas(price)}
                 </td>
-                <td className="text-slate-300 px-3 py-2 text-center ">
+                <td
+                  className="text-slate-300 px-3 py-2 text-center"
+                  data-cy="assetActions"
+                >
                   <button
                     className={`${
                       cash <= price ||
@@ -83,6 +92,7 @@ const Table = ({
                     onClick={(e) => handleBuy(e, state, dispatch)}
                     id={`${asset}`}
                     disabled={cash <= price || price === 0}
+                    data-cy={`${asset}BuyButton`}
                   >
                     Buy
                   </button>
@@ -95,14 +105,19 @@ const Table = ({
                     onClick={(e) => handleSell(e, state, dispatch)}
                     id={`${asset}`}
                     disabled={wallet === 0}
+                    data-cy={`${asset}SellButton`}
                   >
                     Sell
                   </button>
                 </td>
-                <td className="text-slate-300 px-3 py-2 text-center">{`$${numberWithCommas(
-                  state.assets[asset].averageCost
-                )}`}</td>
-                <td className="text-slate-300 px-3 py-2 text-center ">
+                <td
+                  className="text-slate-300 px-3 py-2 text-center"
+                  data-cy="assetAveragePrice"
+                >{`$${numberWithCommas(state.assets[asset].averageCost)}`}</td>
+                <td
+                  className="text-slate-300 px-3 py-2 text-center"
+                  data-cy={`${asset}AssetWallet`}
+                >
                   {wallet}
                 </td>
               </tr>
