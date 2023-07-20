@@ -6,18 +6,22 @@ const Header = ({ state }) => {
     {
       label: "Day",
       value: `${state.currentDay}/${state.days}`,
+      testId: "day",
     },
     {
       label: "Cash",
       value: `$${numberWithCommas(state.cash)}`,
+      testId: "cash",
     },
     {
       label: "Debt",
       value: `$${numberWithCommas(state.debt)}`,
+      testId: "debt",
     },
     {
       label: "Wallet",
       value: `${state.wallet.amount}/${state.wallet.capacity}`,
+      testId: "wallet",
     },
   ]
 
@@ -27,12 +31,18 @@ const Header = ({ state }) => {
 
       <div className="mt-5">
         {headerItems.map((item) => (
-          <HeaderInfo key={item.label} label={item.label} value={item.value} />
+          <HeaderInfo
+            key={item.label}
+            label={item.label}
+            value={item.value}
+            testId={item.testId}
+          />
         ))}
         {state.highScore && (
           <HeaderInfo
             label="High Score"
             value={`$${numberWithCommas(state.highScore)}`}
+            testId="highScore"
           />
         )}
       </div>

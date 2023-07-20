@@ -27,6 +27,7 @@ const Actions = ({
                 : "bg-green-500"
             } px-3 py-1 mr-3 rounded-full`}
             onClick={() => increaseWalletCapacity(state, dispatch)}
+            id="expandWallet"
           >
             Buy
           </button>
@@ -44,6 +45,7 @@ const Actions = ({
             } px-3 py-1 mr-3 rounded-full`}
             onClick={() => payDebt(dispatch, state)}
             disabled={canPayDebt}
+            id="payDebt"
           >
             Pay
           </button>
@@ -63,6 +65,7 @@ const Actions = ({
         <button
           className="bg-red-700 px-6 py-4 rounded-full w-44"
           onClick={() => dispatch({ type: "TOGGLE_MODAL" })}
+          id="newGame"
         >
           New Game
         </button>
