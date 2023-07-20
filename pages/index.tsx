@@ -18,7 +18,7 @@ export default function Home() {
         <link rel="icon" href="/favicon1.ico" />
       </Head>
 
-      <main className="prose max-w-md">
+      <main className="prose max-w-md mx-2">
         <Header state={state} />
 
         <Table state={state} dispatch={dispatch} />

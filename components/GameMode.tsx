@@ -23,9 +23,11 @@ const GameMode = ({
   }
   return (
     <div className="w-screen h-screen bg-gray-800/60 z-10 absolute top-0 left-0 flex justify-center items-center">
-      <div className="bg-slate-300 max-w-[600px] rounded-md p-6">
+      <div className="bg-slate-300 max-w-[600px] rounded-md p-6 m-3">
         <div className="text-gray-800">
-          <h1 className="text-gray-800 mb-6 font-bold">🚀Crypto Frenzy🌙</h1>
+          <h1 className="text-gray-800 mb-6 font-bold text-4xl">
+            🚀Crypto Frenzy
+          </h1>
           <p>
             Make as much money as you can before the days run out! But,
             don&apos;t forget about the money you borrowed, your debt will
@@ -34,20 +36,20 @@ const GameMode = ({
           </p>
           <p></p>
         </div>
-        <div className="flex items-center justify-between mt-4 mb-2">
+        <div className="flex items-center flex-col justify-between mt-4 mb-2">
           <h4 className="text-gray-800" id="difficultyMode">
             Choose your difficulty: {state.mode}
           </h4>
-          <div>
+          <div className="mt-2">
             <button
-              className="px-3 py-1 bg-green-500 rounded-full mr-5 text-xl"
+              className="w-24 px-3 py-1 bg-green-500 rounded-full mr-5 text-xl"
               onClick={() => dispatch({ type: "CHANGE_MODE", payload: "Easy" })}
               id="easyMode"
             >
               Easy
             </button>
             <button
-              className="px-3 py-1 bg-amber-400 rounded-full mr-5 text-xl"
+              className="w-24 px-3 py-1 bg-amber-400 rounded-full mr-5 text-xl"
               onClick={() =>
                 dispatch({ type: "CHANGE_MODE", payload: "Normal" })
               }
@@ -56,7 +58,7 @@ const GameMode = ({
               Normal
             </button>
             <button
-              className="px-3 py-1 bg-purple-500 rounded-full text-xl"
+              className="w-24 px-3 py-1 bg-purple-500 rounded-full text-xl"
               onClick={() => dispatch({ type: "CHANGE_MODE", payload: "Hard" })}
               id="hardMode"
             >
