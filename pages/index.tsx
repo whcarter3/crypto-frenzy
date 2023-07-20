@@ -5,6 +5,7 @@ import Table from "../components/Table"
 import Actions from "../components/Actions"
 import Header from "../components/Header"
 import Log from "../components/Log"
+import Modal from "../components/GameMode"
 
 export default function Home() {
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -25,6 +26,8 @@ export default function Home() {
         <Actions dispatch={dispatch} state={state} />
 
         <Log log={state.log} />
+
+        {state.modalOpen && <Modal state={state} dispatch={dispatch} />}
       </main>
     </div>
   )

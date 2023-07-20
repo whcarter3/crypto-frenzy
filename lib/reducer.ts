@@ -4,11 +4,15 @@ import { addTimestamp } from "../helpers/utils"
 export const initialState: State = {
   days: 30,
   currentDay: 0,
+  debt: 3000,
   cash: 2000,
-  debt: 2000,
   interestRate: 0.2,
   log: ["- Click Advance Day to start."],
   highScore: null,
+  modalOpen: true,
+  mode: "Normal",
+  lowRangePriceChance: 5,
+  highRangePriceChance: 94,
   wallet: {
     amount: 0,
     capacity: 100,
@@ -116,14 +120,35 @@ export const reducer = (state: State, action: Action) => {
         highScore: savedHighScoreEasy ? parseInt(savedHighScoreEasy) : null,
         days: 60,
         interestRate: 0.1,
-        debt: 1000,
-        cash: 3000,
+        debt: 2000,
+        cash: 1500,
+        lowRangePriceChance: 7,
+        highRangePriceChance: 92,
         wallet: {
           ...state.wallet,
           capacity: 200,
           expansionCost: 25000,
           increase: 200,
           percentIncrease: 0.15,
+        },
+      }
+    case "SET_HARD_MODE":
+      const savedHighScoreHard = localStorage.getItem("highScoreHard")
+      return {
+        ...initialState,
+        highScore: savedHighScoreHard ? parseInt(savedHighScoreHard) : null,
+        days: 20,
+        interestRate: 0.3,
+        debt: 4000,
+        cash: 2000,
+        lowRangePriceChance: 3,
+        highRangePriceChance: 96,
+        wallet: {
+          ...state.wallet,
+          capacity: 50,
+          expansionCost: 75000,
+          increase: 50,
+          percentIncrease: 0.35,
         },
       }
     case "ADVANCE_DAY":
@@ -227,6 +252,16 @@ export const reducer = (state: State, action: Action) => {
       return {
         ...state,
         debt: Math.floor(state.debt + state.debt * state.interestRate),
+      }
+    case "TOGGLE_MODAL":
+      return {
+        ...state,
+        modalOpen: !state.modalOpen,
+      }
+    case "CHANGE_MODE":
+      return {
+        ...state,
+        mode: action.payload,
       }
     default:
       console.log("No action type found")

@@ -90,8 +90,11 @@ export const randomizePrices = (
   for (const assetKey in state.assets) {
     const asset = state.assets[assetKey]
     if (!asset.active) continue
-    asset.name === "Solana"
-      ? randomizeAssetPrice(asset, 7, 96, dispatch)
-      : randomizeAssetPrice(asset, 2, 96, dispatch)
+    randomizeAssetPrice(
+      asset,
+      state.lowRangePriceChance,
+      state.highRangePriceChance,
+      dispatch
+    )
   }
 }

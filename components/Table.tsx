@@ -40,7 +40,7 @@ const Table = ({
   }
 
   return (
-    <div className="max-w-md">
+    <>
       <table className="mt-5 w-full table-auto border-collapse">
         <thead>
           <tr>
@@ -110,7 +110,7 @@ const Table = ({
           })}
         </tbody>
       </table>
-    </div>
+    </>
   )
 }
 
