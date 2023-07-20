@@ -10,7 +10,7 @@ export const initialState: State = {
   log: ["- Click Advance Day to start."],
   highScore: null,
   modalOpen: true,
-  mode: "normal",
+  mode: "Normal",
   lowRangePriceChance: 5,
   highRangePriceChance: 94,
   wallet: {

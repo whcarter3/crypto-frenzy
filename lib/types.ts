@@ -72,7 +72,7 @@ export type State = {
   modalOpen: boolean
   lowRangePriceChance: number
   highRangePriceChance: number
-  mode: "easy" | "hard" | "normal"
+  mode: "Easy" | "Hard" | "Normal"
   assets: {
     [key: string]: Asset
   }
@@ -163,5 +163,5 @@ export type Action =
     }
   | {
       type: "CHANGE_MODE"
-      payload: "easy" | "hard" | "normal"
+      payload: "Easy" | "Hard" | "Normal"
     }

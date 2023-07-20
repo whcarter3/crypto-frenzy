@@ -25,7 +25,7 @@ const Actions = ({
               cashLessThanWalletExpansionCost
                 ? "bg-slate-700 text-slate-500"
                 : "bg-green-500"
-            } px-3 py-1 mr-5 rounded-full`}
+            } px-3 py-1 mr-3 rounded-full`}
             onClick={() => increaseWalletCapacity(state, dispatch)}
           >
             Buy
@@ -41,7 +41,7 @@ const Actions = ({
           <button
             className={`${
               canPayDebt ? "bg-slate-700 text-slate-500" : "bg-green-500"
-            } px-3 py-1 mr-5 rounded-full`}
+            } px-3 py-1 mr-3 rounded-full`}
             onClick={() => payDebt(dispatch, state)}
             disabled={canPayDebt}
           >
@@ -52,19 +52,21 @@ const Actions = ({
           </p>
         </div>
       </div>
-      <button
-        className="bg-blue-700 px-6 py-4 rounded-full mt-8 mr-5"
-        id="advDay"
-        onClick={() => advanceDay(state, dispatch)}
-      >
-        {state.currentDay === state.days ? "Save score!" : "Advance Day"}
-      </button>
-      <button
-        className="bg-red-700 px-6 py-4 rounded-full"
-        onClick={() => dispatch({ type: "TOGGLE_MODAL" })}
-      >
-        New Game
-      </button>
+      <div className="flex justify-between mt-8">
+        <button
+          className="bg-blue-700 px-6 py-4 rounded-full w-44"
+          id="advDay"
+          onClick={() => advanceDay(state, dispatch)}
+        >
+          {state.currentDay === state.days ? "Save score!" : "Advance Day"}
+        </button>
+        <button
+          className="bg-red-700 px-6 py-4 rounded-full w-44"
+          onClick={() => dispatch({ type: "TOGGLE_MODAL" })}
+        >
+          New Game
+        </button>
+      </div>
     </>
   )
 }

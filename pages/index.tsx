@@ -18,7 +18,7 @@ export default function Home() {
         <link rel="icon" href="/favicon1.ico" />
       </Head>
 
-      <main className="prose px-5">
+      <main className="prose px-5 max-w-md">
         <Header state={state} />
 
         <Table state={state} dispatch={dispatch} />
