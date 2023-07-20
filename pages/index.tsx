@@ -17,15 +17,12 @@ export default function Home() {
         <link rel="icon" href="/favicon1.ico" />
       </Head>
 
-      <main className="prose px-5">
+      <main className="prose max-w-md">
         <Header state={state} />
 
         <Table state={state} dispatch={dispatch} />
 
-        <Actions
-          dispatch={dispatch}
-          state={state}
-        />
+        <Actions dispatch={dispatch} state={state} />
 
         <Log log={state.log} />
       </main>
