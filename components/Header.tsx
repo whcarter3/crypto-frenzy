@@ -29,7 +29,7 @@ const Header = ({ state }) => {
     <>
       <h2>Crypto Frenzy 🚀</h2>
 
-      <div className="mt-5 flex">
+      <div className="mt-5 flex justify-between">
         {headerItems.map((item) => (
           <HeaderInfo
             key={item.label}
@@ -38,14 +38,15 @@ const Header = ({ state }) => {
             testId={item.testId}
           />
         ))}
-        {state.highScore && (
-          <HeaderInfo
-            label="High Score"
-            value={`$${numberWithCommas(state.highScore)}`}
-            testId="highScore"
-          />
-        )}
       </div>
+      {state.highScore && (
+        <HeaderInfo
+          label="High Score"
+          value={`$${numberWithCommas(state.highScore)}`}
+          testId="highScore"
+          className="mt-2"
+        />
+      )}
     </>
   )
 }
