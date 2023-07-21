@@ -29,7 +29,7 @@ const Header = ({ state }) => {
     <>
       <h2>Crypto Frenzy 🚀</h2>
 
-      <div className="mt-5">
+      <div className="mt-5 flex">
         {headerItems.map((item) => (
           <HeaderInfo
             key={item.label}

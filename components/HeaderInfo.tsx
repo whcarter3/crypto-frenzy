@@ -8,7 +8,7 @@ const HeaderInfo = ({
   testId: string
 }) => (
   <p data-cy={testId}>
-    <span className="font-bold">{label}:</span> {value}
+    <span className="font-bold">{label}</span> {value}
   </p>
 )
 
