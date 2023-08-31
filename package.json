@@ -10,7 +10,7 @@
     "test": "cypress run"
   },
   "dependencies": {
-    "@vercel/analytics": "^1.0.1",
+    "@vercel/analytics": "^1.0.2",
     "cypress": "^12.17.1",
     "classnames": "^2.3.2",
     "next": "13.4.7",
