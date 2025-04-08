@@ -1,21 +1,37 @@
-/**
- * Enum representing the different alert messages that can be displayed to the user.
- */
-
-export enum AlertMessages {
-  NEED_CASH = "You do not have enough cash to purchase this asset",
-  NEED_ASSET = "You do not have any of this asset to sell",
-  NEED_START = "Please click Advance Day to start the game",
-  NEED_WALLET = "You do not have enough wallet space to purchase this asset",
-  NEED_DEBT = "You have already paid off your debt!",
-  NEED_DEBT_CASH = "You do not have enough cash to pay off this debt",
-  LAST_DAY = "Today is your last day! Better sell all your assets! And make sure to finish round to save your high score!",
-}
+import { NotificationType } from '../components/Notification';
 
 /**
- * Displays an alert message to the user.
- * @param {AlertMessages} msg - The message to display in the alert.
+ * Alert messages that can be displayed to the user through the notification system.
  */
-export const showAlert = (msg: AlertMessages): void => {
-  alert(msg)
-}
+export const AlertMessages = {
+  NEED_START: 'Start the game first!',
+  NEED_WALLET: 'Increase wallet capacity to buy more assets!',
+  INSUFFICIENT_FUNDS: 'Not enough cash to buy this asset!',
+  INSUFFICIENT_ASSETS: 'Not enough assets to sell!',
+  LAST_DAY:
+    'Last day! Better sell all your assets to secure your score!',
+} as const;
+
+export type AlertMessage =
+  (typeof AlertMessages)[keyof typeof AlertMessages];
+
+/**
+ * Gets the appropriate notification type for a given alert message.
+ * Used with the notification system to determine styling and icon.
+ */
+export const getAlertType = (
+  message: AlertMessage
+): NotificationType => {
+  switch (message) {
+    case AlertMessages.NEED_START:
+      return 'info';
+    case AlertMessages.NEED_WALLET:
+    case AlertMessages.LAST_DAY:
+      return 'warning';
+    case AlertMessages.INSUFFICIENT_FUNDS:
+    case AlertMessages.INSUFFICIENT_ASSETS:
+      return 'error';
+    default:
+      return 'info';
+  }
+};

@@ -108,9 +108,16 @@ export const initialState: State = {
 export const reducer = (state: State, action: Action) => {
   switch (action.type) {
     case 'INIT':
-      const savedHighScore = localStorage.getItem('highScore');
+      const initHighScoreKey =
+        state.mode === 'Easy'
+          ? 'highScoreEasy'
+          : state.mode === 'Hard'
+          ? 'highScoreHard'
+          : 'highScore';
+      const savedHighScore = localStorage.getItem(initHighScoreKey);
       return {
         ...initialState,
+        mode: state.mode, // Preserve the current mode
         highScore: savedHighScore ? parseInt(savedHighScore) : null,
       };
     case 'SET_EASY_MODE':
@@ -257,7 +264,18 @@ export const reducer = (state: State, action: Action) => {
         log: [...action.payload.map(addTimestamp), ...state.log],
       };
     case 'SET_HIGH_SCORE':
-      localStorage.setItem('highScore', state.cash.toString());
+      const saveHighScoreKey =
+        state.mode === 'Easy'
+          ? 'highScoreEasy'
+          : state.mode === 'Hard'
+          ? 'highScoreHard'
+          : 'highScore';
+      if (state.mode !== 'Test') {
+        localStorage.setItem(
+          saveHighScoreKey,
+          action.payload.toString()
+        );
+      }
       return { ...state, highScore: action.payload };
     case 'PAY_DEBT':
       return {

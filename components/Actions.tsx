@@ -4,6 +4,7 @@ import { numberWithCommas } from '../helpers/utils';
 import { payDebt } from '../lib/debt';
 import { increaseWalletCapacity } from '../lib/wallet';
 import { advanceDay } from '../lib/advanceDay';
+import { useNotification } from '../lib/NotificationContext';
 
 const Actions = ({
   dispatch,
@@ -12,9 +13,11 @@ const Actions = ({
   dispatch: Dispatch<Action>;
   state: State;
 }) => {
+  const { showNotification } = useNotification();
   const canPayDebt = state.cash <= state.debt || state.debt === 0;
   const cashLessThanWalletExpansionCost =
     state.cash <= state.wallet.expansionCost;
+  const isGameOver = state.currentDay >= state.days;
 
   return (
     <div className="space-y-6">
@@ -75,12 +78,17 @@ const Actions = ({
 
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         <button
-          className="btn btn-primary flex-1 py-3 text-lg"
+          className={`btn ${
+            isGameOver ? 'btn-disabled' : 'btn-primary'
+          } flex-1 py-3 text-lg`}
           id="advDay"
-          onClick={() => advanceDay(state, dispatch)}
+          onClick={() =>
+            advanceDay(state, dispatch, showNotification)
+          }
+          disabled={isGameOver}
         >
           {state.currentDay === state.days
-            ? 'Save score!'
+            ? 'Game Over!'
             : 'Advance Day'}
         </button>
         <button

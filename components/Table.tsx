@@ -1,8 +1,9 @@
 import { Dispatch } from 'react';
 import { State, Action } from '../lib/types';
 import { numberWithCommas } from '../helpers/utils';
-import { showAlert, AlertMessages } from '../helpers/alerts';
+import { AlertMessages, getAlertType } from '../helpers/alerts';
 import { buyAsset, sellAsset } from '../lib/buySell';
+import { useNotification } from '../lib/NotificationContext';
 
 const Table = ({
   state,
@@ -11,13 +12,26 @@ const Table = ({
   state: State;
   dispatch: Dispatch<Action>;
 }) => {
+  const { showNotification } = useNotification();
+
   const handleSell = (
     e,
     state: State,
     dispatch: Dispatch<Action>
   ) => {
     if (state.currentDay === 0) {
-      showAlert(AlertMessages.NEED_START);
+      showNotification(
+        AlertMessages.NEED_START,
+        getAlertType(AlertMessages.NEED_START)
+      );
+      return;
+    }
+
+    if (state.assets[e.target.id].wallet === 0) {
+      showNotification(
+        AlertMessages.INSUFFICIENT_ASSETS,
+        getAlertType(AlertMessages.INSUFFICIENT_ASSETS)
+      );
       return;
     }
 
@@ -31,11 +45,24 @@ const Table = ({
 
   const handleBuy = (e, state: State, dispatch: Dispatch<Action>) => {
     if (state.currentDay === 0) {
-      showAlert(AlertMessages.NEED_START);
+      showNotification(
+        AlertMessages.NEED_START,
+        getAlertType(AlertMessages.NEED_START)
+      );
       return;
     }
     if (state.wallet.amount >= state.wallet.capacity) {
-      showAlert(AlertMessages.NEED_WALLET);
+      showNotification(
+        AlertMessages.NEED_WALLET,
+        getAlertType(AlertMessages.NEED_WALLET)
+      );
+      return;
+    }
+    if (state.cash < state.assets[e.target.id].price) {
+      showNotification(
+        AlertMessages.INSUFFICIENT_FUNDS,
+        getAlertType(AlertMessages.INSUFFICIENT_FUNDS)
+      );
       return;
     }
 
@@ -50,6 +77,24 @@ const Table = ({
   const getPriceColor = (price: number, avgCost: number) => {
     if (avgCost === 0 || price === avgCost) return 'text-slate-300';
     return price > avgCost ? 'text-green-400' : 'text-red-400';
+  };
+
+  const getPerformanceIndicator = (
+    price: number,
+    avgCost: number
+  ) => {
+    if (avgCost === 0 || price === avgCost) return null;
+    const percentChange = ((price - avgCost) / avgCost) * 100;
+    const isProfit = price > avgCost;
+    return (
+      <span
+        className={`ml-2 text-xs ${
+          isProfit ? 'text-green-400' : 'text-red-400'
+        }`}
+      >
+        {isProfit ? '↑' : '↓'} {Math.abs(percentChange).toFixed(1)}%
+      </span>
+    );
   };
 
   return (
@@ -87,6 +132,13 @@ const Table = ({
 
             if (!state.assets[asset].active) return;
 
+            const canBuy = !(
+              cash <= price ||
+              price === 0 ||
+              walletAmount === walletCapacity
+            );
+            const canSell = wallet > 0;
+
             return (
               <tr
                 key={asset}
@@ -96,7 +148,14 @@ const Table = ({
                   className="px-4 py-3 text-sm text-slate-300"
                   data-cy="assetSymbol"
                 >
-                  {symbol}
+                  <div className="flex items-center">
+                    <span className="font-medium">{symbol}</span>
+                    {wallet > 0 && (
+                      <span className="ml-2 px-1.5 py-0.5 text-xs bg-slate-700 text-slate-300 rounded">
+                        Holding
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td
                   className={`px-4 py-3 text-sm font-medium ${getPriceColor(
@@ -104,8 +163,19 @@ const Table = ({
                     avgCost
                   )}`}
                   data-cy="assetPrice"
+                  title={
+                    avgCost > 0
+                      ? `Performance vs Avg. Cost: ${(
+                          ((price - avgCost) / avgCost) *
+                          100
+                        ).toFixed(1)}%`
+                      : ''
+                  }
                 >
-                  ${numberWithCommas(price)}
+                  <div className="flex items-center">
+                    <span>${numberWithCommas(price)}</span>
+                    {getPerformanceIndicator(price, avgCost)}
+                  </div>
                 </td>
                 <td
                   className="px-4 py-3 text-sm"
@@ -114,27 +184,33 @@ const Table = ({
                   <div className="flex items-center gap-2">
                     <button
                       className={`btn ${
-                        cash <= price ||
-                        price === 0 ||
-                        walletAmount === walletCapacity
-                          ? 'btn-disabled'
-                          : 'btn-primary'
+                        canBuy ? 'btn-primary' : 'btn-disabled'
                       }`}
                       onClick={(e) => handleBuy(e, state, dispatch)}
                       id={`${asset}`}
-                      disabled={cash <= price || price === 0}
+                      disabled={!canBuy}
                       data-cy={`${asset}BuyButton`}
+                      title={
+                        !canBuy
+                          ? 'Not enough cash or wallet capacity'
+                          : 'Buy this asset'
+                      }
                     >
                       Buy
                     </button>
                     <button
                       className={`btn ${
-                        wallet === 0 ? 'btn-disabled' : 'btn-success'
+                        canSell ? 'btn-success' : 'btn-disabled'
                       }`}
                       onClick={(e) => handleSell(e, state, dispatch)}
                       id={`${asset}`}
-                      disabled={wallet === 0}
+                      disabled={!canSell}
                       data-cy={`${asset}SellButton`}
+                      title={
+                        !canSell
+                          ? 'No assets to sell'
+                          : 'Sell this asset'
+                      }
                     >
                       Sell
                     </button>
