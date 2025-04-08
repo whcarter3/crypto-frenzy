@@ -1,5 +1,5 @@
-import { Action, State } from "../lib/types"
-import { addTimestamp } from "../helpers/utils"
+import { Action, State } from '../lib/types';
+import { addTimestamp } from '../helpers/utils';
 
 export const initialState: State = {
   days: 30,
@@ -7,10 +7,10 @@ export const initialState: State = {
   debt: 2000,
   cash: 2000,
   interestRate: 0.2,
-  log: ["- Click Advance Day to start."],
+  log: ['- Click Advance Day to start.'],
   highScore: null,
   modalOpen: true,
-  mode: "Normal",
+  mode: 'Normal',
   lowRangePriceChance: 5,
   highRangePriceChance: 94,
   wallet: {
@@ -22,8 +22,8 @@ export const initialState: State = {
   },
   assets: {
     bitcoin: {
-      name: "Bitcoin",
-      symbol: "BTC",
+      name: 'Bitcoin',
+      symbol: 'BTC',
       wallet: 0,
       averageCost: 0,
       totalCost: 0,
@@ -37,8 +37,8 @@ export const initialState: State = {
       price: 0,
     },
     ethereum: {
-      name: "Ethereum",
-      symbol: "ETH",
+      name: 'Ethereum',
+      symbol: 'ETH',
       wallet: 0,
       averageCost: 0,
       totalCost: 0,
@@ -52,8 +52,8 @@ export const initialState: State = {
       price: 0,
     },
     litecoin: {
-      name: "Litecoin",
-      symbol: "LTC",
+      name: 'Litecoin',
+      symbol: 'LTC',
       wallet: 0,
       averageCost: 0,
       totalCost: 0,
@@ -67,8 +67,8 @@ export const initialState: State = {
       price: 0,
     },
     solana: {
-      name: "Solana",
-      symbol: "SOL",
+      name: 'Solana',
+      symbol: 'SOL',
       wallet: 0,
       averageCost: 0,
       totalCost: 0,
@@ -82,8 +82,8 @@ export const initialState: State = {
       price: 0,
     },
     dogecoin: {
-      name: "Dogecoin",
-      symbol: "DOGE",
+      name: 'Dogecoin',
+      symbol: 'DOGE',
       wallet: 0,
       averageCost: 0,
       totalCost: 0,
@@ -96,83 +96,8 @@ export const initialState: State = {
       },
       price: 0,
     },
-    polkadot: {
-      name: "Polkadot",
-      symbol: "DOT",
-      wallet: 0,
-      averageCost: 0,
-      totalCost: 0,
-      active: true,
-      range: {
-        low: [5, 10],
-        mid: [10, 55],
-        high: [150, 250],
-        moon: [500, 1000],
-      },
-      price: 0,
-    },
-    avalanche: {
-      name: "Avalanche",
-      symbol: "AVAX",
-      wallet: 0,
-      averageCost: 0,
-      totalCost: 0,
-      active: true,
-      range: {
-        low: [5, 10],
-        mid: [10, 35],
-        high: [80, 150],
-        moon: [300, 500],
-      },
-      price: 0,
-    },
-    algorand: {
-      name: "Algorand",
-      symbol: "ALGO",
-      wallet: 0,
-      averageCost: 0,
-      totalCost: 0,
-      active: true,
-      range: {
-        low: [1, 3],
-        mid: [3, 9],
-        high: [10, 20],
-        moon: [50, 100],
-      },
-      price: 0,
-    },
-    chainlink: {
-      name: "Chainlink",
-      symbol: "LINK",
-      wallet: 0,
-      averageCost: 0,
-      totalCost: 0,
-      active: true,
-      range: {
-        low: [1, 4],
-        mid: [10, 25],
-        high: [35, 50],
-        moon: [200, 400],
-      },
-      price: 0,
-    },
-    uniswap: {
-      name: "Uniswap",
-      symbol: "UNI",
-      wallet: 0,
-      averageCost: 0,
-      totalCost: 0,
-      active: true,
-      range: {
-        low: [1, 4],
-        mid: [8, 20],
-        high: [30, 43],
-        moon: [150, 300],
-      },
-      price: 0,
-    },
   },
-}
+};
 
 /**
  * The reducer function for updating the game state based on dispatched actions.
@@ -182,17 +107,20 @@ export const initialState: State = {
  */
 export const reducer = (state: State, action: Action) => {
   switch (action.type) {
-    case "INIT":
-      const savedHighScore = localStorage.getItem("highScore")
+    case 'INIT':
+      const savedHighScore = localStorage.getItem('highScore');
       return {
         ...initialState,
         highScore: savedHighScore ? parseInt(savedHighScore) : null,
-      }
-    case "SET_EASY_MODE":
-      const savedHighScoreEasy = localStorage.getItem("highScoreEasy")
+      };
+    case 'SET_EASY_MODE':
+      const savedHighScoreEasy =
+        localStorage.getItem('highScoreEasy');
       return {
         ...initialState,
-        highScore: savedHighScoreEasy ? parseInt(savedHighScoreEasy) : null,
+        highScore: savedHighScoreEasy
+          ? parseInt(savedHighScoreEasy)
+          : null,
         days: 60,
         interestRate: 0.1,
         debt: 2000,
@@ -206,12 +134,15 @@ export const reducer = (state: State, action: Action) => {
           increase: 200,
           percentIncrease: 0.15,
         },
-      }
-    case "SET_HARD_MODE":
-      const savedHighScoreHard = localStorage.getItem("highScoreHard")
+      };
+    case 'SET_HARD_MODE':
+      const savedHighScoreHard =
+        localStorage.getItem('highScoreHard');
       return {
         ...initialState,
-        highScore: savedHighScoreHard ? parseInt(savedHighScoreHard) : null,
+        highScore: savedHighScoreHard
+          ? parseInt(savedHighScoreHard)
+          : null,
         days: 20,
         interestRate: 0.3,
         debt: 4000,
@@ -225,15 +156,15 @@ export const reducer = (state: State, action: Action) => {
           increase: 50,
           percentIncrease: 0.35,
         },
-      }
-    case "SET_TEST_MODE":
+      };
+    case 'SET_TEST_MODE':
       return {
         ...initialState,
         cash: 1000000,
-      }
-    case "ADVANCE_DAY":
-      return { ...state, currentDay: state.currentDay + 1 }
-    case "EXPAND_WALLET":
+      };
+    case 'ADVANCE_DAY':
+      return { ...state, currentDay: state.currentDay + 1 };
+    case 'EXPAND_WALLET':
       return {
         ...state,
         cash: state.cash - state.wallet.expansionCost,
@@ -242,12 +173,13 @@ export const reducer = (state: State, action: Action) => {
           capacity: state.wallet.capacity + state.wallet.increase,
           expansionCost: Math.floor(
             state.wallet.expansionCost +
-              state.wallet.expansionCost * state.wallet.percentIncrease
+              state.wallet.expansionCost *
+                state.wallet.percentIncrease
           ),
         },
-      }
-    case "SET_ASSET_PRICE":
-      const { setAssetName, setAssetPrice } = action.payload
+      };
+    case 'SET_ASSET_PRICE':
+      const { setAssetName, setAssetPrice } = action.payload;
       return {
         ...state,
         assets: {
@@ -257,10 +189,10 @@ export const reducer = (state: State, action: Action) => {
             price: setAssetPrice,
           },
         },
-      }
-    case "BUY_ASSET":
+      };
+    case 'BUY_ASSET':
       const { buyAssetName, buyAmount, buyTotalCost, buyLogMessage } =
-        action.payload
+        action.payload;
       return {
         ...state,
         cash: state.cash - buyTotalCost,
@@ -273,14 +205,19 @@ export const reducer = (state: State, action: Action) => {
           [buyAssetName]: {
             ...state.assets[buyAssetName],
             wallet: state.assets[buyAssetName].wallet + buyAmount,
-            totalCost: state.assets[buyAssetName].totalCost + buyTotalCost,
+            totalCost:
+              state.assets[buyAssetName].totalCost + buyTotalCost,
           },
         },
         log: [addTimestamp(buyLogMessage), ...state.log],
-      }
-    case "SELL_ASSET":
-      const { sellAssetName, sellAmount, sellTotalCost, sellLogMessage } =
-        action.payload
+      };
+    case 'SELL_ASSET':
+      const {
+        sellAssetName,
+        sellAmount,
+        sellTotalCost,
+        sellLogMessage,
+      } = action.payload;
       return {
         ...state,
         cash: state.cash + sellTotalCost,
@@ -298,9 +235,9 @@ export const reducer = (state: State, action: Action) => {
           },
         },
         log: [addTimestamp(sellLogMessage), ...state.log],
-      }
-    case "SET_AVG_COST":
-      const { avgCostAssetName } = action.payload
+      };
+    case 'SET_AVG_COST':
+      const { avgCostAssetName } = action.payload;
       return {
         ...state,
         assets: {
@@ -313,38 +250,40 @@ export const reducer = (state: State, action: Action) => {
             ),
           },
         },
-      }
-    case "SET_LOG":
+      };
+    case 'SET_LOG':
       return {
         ...state,
         log: [...action.payload.map(addTimestamp), ...state.log],
-      }
-    case "SET_HIGH_SCORE":
-      localStorage.setItem("highScore", state.cash.toString())
-      return { ...state, highScore: action.payload }
-    case "PAY_DEBT":
+      };
+    case 'SET_HIGH_SCORE':
+      localStorage.setItem('highScore', state.cash.toString());
+      return { ...state, highScore: action.payload };
+    case 'PAY_DEBT':
       return {
         ...state,
         cash: state.cash - state.debt,
         debt: 0,
-      }
-    case "INCREASE_DEBT":
+      };
+    case 'INCREASE_DEBT':
       return {
         ...state,
-        debt: Math.floor(state.debt + state.debt * state.interestRate),
-      }
-    case "TOGGLE_MODAL":
+        debt: Math.floor(
+          state.debt + state.debt * state.interestRate
+        ),
+      };
+    case 'TOGGLE_MODAL':
       return {
         ...state,
         modalOpen: !state.modalOpen,
-      }
-    case "CHANGE_MODE":
+      };
+    case 'CHANGE_MODE':
       return {
         ...state,
         mode: action.payload,
-      }
+      };
     default:
-      console.log("No action type found")
-      return state
+      console.log('No action type found');
+      return state;
   }
-}
+};
