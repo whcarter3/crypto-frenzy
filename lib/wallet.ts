@@ -1,21 +1,13 @@
 import { Dispatch } from "react"
 import { State, Action } from "../lib/types"
-import { showAlert, AlertMessages } from "../helpers/alerts"
 
 export const increaseWalletCapacity = (
   state: State,
   dispatch: Dispatch<Action>
 ) => {
-  //error checks =====
-  if (state.currentDay == 0) {
-    showAlert(AlertMessages.NEED_START)
-    return
-  }
-  if (state.cash < state.wallet.expansionCost) {
-    alert("You do not have enough cash to expand your wallet")
-    return
-  }
-  // =================
+  if (state.currentDay === 0) return
+  if (state.cash < state.wallet.expansionCost) return
+
   dispatch({ type: "EXPAND_WALLET" })
   dispatch({
     type: "SET_LOG",
