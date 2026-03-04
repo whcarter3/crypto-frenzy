@@ -115,7 +115,7 @@
     font-size: 16px;
     letter-spacing: 0.03em;
     font-weight: 600;
-    background-color: #050505;
+    background-color: #02040a;
     white-space: pre-wrap;
     min-height: 100vh;
     @apply text-crt-yellow text-glow-crt;
@@ -135,42 +135,46 @@
     @apply text-xl md:text-2xl font-medium;
   }
   a {
-    @apply text-blue-400 hover:text-blue-300 transition-colors;
+    @apply text-crt-cyan hover:text-crt-cyan/80 transition-colors;
     text-decoration: none;
   }
 }
 
 @layer components {
   .btn {
-    @apply px-4 py-2 font-medium transition-all duration-200 border-4 rounded-sm;
-    border-style: outset;
-
+    @apply px-4 py-2 font-medium transition-all duration-150 border rounded-sm uppercase tracking-widest;
+    border-style: solid;
+    letter-spacing: 0.12em;
   }
 
   .btn-primary {
-    @apply bg-crt-green hover:bg-crt-green text-white border-crt-green;
-    box-shadow: 0 0 2px rgb(0,255,102),
-                0 0 4px rgb(0, 255, 102),
-                0 0 8px rgb(0, 255, 102);
+    @apply bg-black text-crt-green border-crt-green;
+    box-shadow:
+      0 0 4px rgba(0, 255, 102, 0.9),
+      0 0 16px rgba(0, 255, 102, 0.6);
+    text-shadow:
+      0 0 2px rgba(0, 255, 102, 0.9),
+      0 0 6px rgba(0, 255, 102, 0.7);
   }
 
   .btn-secondary {
-    @apply bg-slate-700 hover:bg-slate-700 text-slate-300 border-slate-600;
+    @apply bg-black text-crt-cyan border-crt-cyan;
   }
 
   .btn-success {
-    @apply bg-crt-green hover:bg-crt-green text-green-400 border-crt-green;
+    @apply bg-black text-crt-green border-crt-green;
   }
 
   .btn-disabled {
-    @apply bg-slate-800 text-slate-500/10 border border-slate-700 cursor-not-allowed;
+    @apply bg-black text-slate-600 border border-slate-800 cursor-not-allowed;
+    box-shadow: none;
   }
 
   .btn-danger {
-    @apply bg-crt-red hover:bg-crt-red text-white border-crt-red;
-    box-shadow: 0 0 2px rgb(255,59,59),
-                0 0 4px rgb(255,59,59),
-                0 0 8px rgb(255,59,59);
+    @apply bg-black text-crt-red border-crt-red;
+    box-shadow:
+      0 0 4px rgba(255, 51, 85, 0.9),
+      0 0 16px rgba(255, 51, 85, 0.6);
   }
 }
 
@@ -180,15 +184,15 @@
   .text-glow-crt {
     text-shadow:
       0 0 2px currentColor,
-      0 0 4px currentColor,
-      0 0 8px currentColor;
+      0 0 6px currentColor,
+      0 0 14px currentColor;
   }
 
   .box-shadow-crt {
     box-shadow:
-      0 0 2px currentColor,
-      0 0 6px currentColor,
-      0 0 12px currentColor;
+      0 0 3px currentColor,
+      0 0 12px currentColor,
+      0 0 24px rgba(0, 229, 255, 0.4);
   }
 
   /* Scanlines overlay */

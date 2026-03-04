@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="min-h-screen text-crt-yellow bg-crt-bg crt-scanlines flex items-center">
+    <div className="min-h-screen text-crt-green bg-crt-bg crt-scanlines flex items-center">
       <Head>
         <title>Crypto Frenzy</title>
         <meta
@@ -14,40 +14,47 @@ export default function Home() {
       </Head>
 
       <main className="container mx-auto px-6 md:px-8 py-10 max-w-4xl">
-        <div className="bg-black rounded-sm border border-crt-yellow box-shadow-crt p-8 space-y-8">
-          <header className="flex items-center justify-between">
+        <div className="bg-crt-bg/80 rounded-sm border border-crt-cyan box-shadow-crt p-8 space-y-8">
+          <header className="flex items-start justify-between gap-6">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-emerald-400 to-purple-500 bg-clip-text text-transparent text-glow-crt">
-                Crypto Frenzy
+              <p className="text-xs text-crt-cyan/70 mb-1">
+                [ ARCADE TERMINAL // BUILD 0.1.0 ]
+              </p>
+              <h1 className="text-4xl md:text-5xl font-bold text-crt-green text-glow-crt">
+                CRYPTO FRENZY
               </h1>
               <p className="mt-3 text-sm md:text-base text-slate-300 max-w-xl">
-                A retro-styled crypto trading sim. Borrow cash, buy
-                volatile coins, and try to pay back your debt before
-                time runs out.
+                A cyberpunk trading sim running on a hacked CRT terminal.
+                Borrow dirty money, ride volatile coins, and clear your debt
+                before the corp shuts you down.
               </p>
             </div>
-            <span className="text-4xl md:text-5xl">🚀</span>
+            <div className="flex flex-col items-end gap-2">
+              <span className="text-4xl md:text-5xl">🚀</span>
+              <span className="text-xs text-crt-cyan/70">
+                NETLINK STATUS: <span className="text-crt-green">ONLINE</span>
+              </span>
+            </div>
           </header>
 
           <section className="grid md:grid-cols-2 gap-6 text-sm md:text-base text-slate-300">
             <div className="space-y-3">
-              <h2 className="text-lg font-semibold text-crt-amber">
-                Your Mission
+              <h2 className="text-lg font-semibold text-crt-green">
+                YOUR CONTRACT
               </h2>
               <p>
-                Survive the full run of days with more net worth than
-                you started. Prices swing wildly every day, and your
-                debt interest never sleeps.
+                Survive the full run of days with more net worth than you started.
+                Prices desync every cycle and compound interest hunts you in the dark.
               </p>
               <p>
-                Stack profits, expand your wallet, and time your
-                exits. Diamond hands, but don&apos;t get liquidated.
+                Stack profits, expand your wallet, and time your exits. Diamond hands…
+                but one bad tick and you&apos;re liquidated.
               </p>
             </div>
 
             <div className="space-y-3">
               <h2 className="text-lg font-semibold text-crt-cyan">
-                How to Play
+                TERMINAL OPS
               </h2>
               <ul className="space-y-1">
                 <li>
@@ -55,19 +62,45 @@ export default function Home() {
                   <span className="text-crt-green">Advance Day</span>{' '}
                   to move time forward.
                 </li>
-                <li>• Buy low, sell high across multiple assets.</li>
-                <li>• Watch your cash, debt, and wallet capacity.</li>
-                <li>• Hit a new high score before the final day.</li>
+                <li>• Buy low, sell high across hostile markets.</li>
+                <li>• Watch cash, debt, and wallet capacity like a hawk.</li>
+                <li>• Push a new high score before the final cycle closes.</li>
               </ul>
             </div>
           </section>
 
-          <div className="pt-4 flex flex-col sm:flex-row gap-4 items-center">
+          <section className="grid md:grid-cols-3 gap-4 text-xs md:text-sm text-slate-300 border-t border-crt-outline pt-6 mt-2">
+            <div className="space-y-2">
+              <h3 className="text-crt-cyan font-semibold">MAIN MENU</h3>
+              <ul className="space-y-1">
+                <li>▶ START RUN</li>
+                <li className="text-slate-500">▢ PROFILES (SOON)</li>
+                <li className="text-slate-500">▢ SETTINGS (SOON)</li>
+                <li className="text-slate-500">▢ CREDITS (SOON)</li>
+              </ul>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-crt-cyan font-semibold">
+                DIFFICULTY (IN-GAME)
+              </h3>
+              <p>
+                Select Easy, Normal, or Hard when the run boots. Each mode
+                adjusts days, starting cash, and how fast your debt mutates.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-crt-cyan font-semibold">SYSTEM STATUS</h3>
+              <p>Save data and custom profiles will live in local corp archives.</p>
+              <p className="text-slate-500">Persistence module: WIP</p>
+            </div>
+          </section>
+
+          <div className="pt-6 flex flex-col sm:flex-row gap-4 items-center">
             <Link
               href="/game"
               className="btn btn-primary flex-1 py-3 text-center text-lg"
             >
-              Start Game
+              START RUN
             </Link>
             <p className="text-xs md:text-sm text-slate-500 text-center sm:text-left">
               Tip: you can change difficulty and see full rules once

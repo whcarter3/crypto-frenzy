@@ -11,17 +11,20 @@ module.exports = {
       ───────────────────────────── */
       colors: {
         crt: {
-          bg: '#050505',
+          bg: '#02040a',
 
-          green: '#00FF66',
-          red: '#FF3B3B',
-          yellow: '#FFD84D',
-          cyan: '#00E5FF',
+          green: '#00ff66',
+          red: '#ff3355',
+          yellow: '#ffd84d',
+          cyan: '#00e5ff',
 
-          greenSoft: '#33FF33',
-          redSoft: '#FF2A2A',
-          amber: '#FFCC00',
-          cyanSoft: '#00FFFF',
+          greenSoft: '#33ff33',
+          redSoft: '#ff2a2a',
+          amber: '#ffcc00',
+          cyanSoft: '#00ffff',
+
+          panel: '#040811',
+          outline: '#1f2937',
         },
       },
 
