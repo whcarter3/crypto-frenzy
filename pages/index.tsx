@@ -24,15 +24,16 @@ export default function Home() {
                 CRYPTO FRENZY
               </h1>
               <p className="mt-3 text-sm md:text-base text-slate-300 max-w-xl">
-                A cyberpunk trading sim running on a hacked CRT terminal.
-                Borrow dirty money, ride volatile coins, and clear your debt
-                before the corp shuts you down.
+                A retro trading sim running on a hacked CRT terminal.
+                Borrow dirty money, ride volatile coins, and clear
+                your debt before the corp shuts you down.
               </p>
             </div>
             <div className="flex flex-col items-end gap-2">
               <span className="text-4xl md:text-5xl">🚀</span>
               <span className="text-xs text-crt-cyan/70">
-                NETLINK STATUS: <span className="text-crt-green">ONLINE</span>
+                NETLINK STATUS:{' '}
+                <span className="text-crt-green">ONLINE</span>
               </span>
             </div>
           </header>
@@ -43,12 +44,14 @@ export default function Home() {
                 YOUR CONTRACT
               </h2>
               <p>
-                Survive the full run of days with more net worth than you started.
-                Prices desync every cycle and compound interest hunts you in the dark.
+                Survive the full run of days with more net worth than
+                you started. Prices desync every cycle and compound
+                interest hunts you in the dark.
               </p>
               <p>
-                Stack profits, expand your wallet, and time your exits. Diamond hands…
-                but one bad tick and you&apos;re liquidated.
+                Stack profits, expand your wallet, and time your
+                exits. Diamond hands… but one bad tick and you&apos;re
+                liquidated.
               </p>
             </div>
 
@@ -63,15 +66,22 @@ export default function Home() {
                   to move time forward.
                 </li>
                 <li>• Buy low, sell high across hostile markets.</li>
-                <li>• Watch cash, debt, and wallet capacity like a hawk.</li>
-                <li>• Push a new high score before the final cycle closes.</li>
+                <li>
+                  • Watch cash, debt, and wallet capacity like a hawk.
+                </li>
+                <li>
+                  • Push a new high score before the final cycle
+                  closes.
+                </li>
               </ul>
             </div>
           </section>
 
           <section className="grid md:grid-cols-3 gap-4 text-xs md:text-sm text-slate-300 border-t border-crt-outline pt-6 mt-2">
             <div className="space-y-2">
-              <h3 className="text-crt-cyan font-semibold">MAIN MENU</h3>
+              <h3 className="text-crt-cyan font-semibold">
+                MAIN MENU
+              </h3>
               <ul className="space-y-1">
                 <li>▶ START RUN</li>
                 <li className="text-slate-500">▢ PROFILES (SOON)</li>
@@ -84,14 +94,22 @@ export default function Home() {
                 DIFFICULTY (IN-GAME)
               </h3>
               <p>
-                Select Easy, Normal, or Hard when the run boots. Each mode
-                adjusts days, starting cash, and how fast your debt mutates.
+                Select Easy, Normal, or Hard when the run boots. Each
+                mode adjusts days, starting cash, and how fast your
+                debt mutates.
               </p>
             </div>
             <div className="space-y-2">
-              <h3 className="text-crt-cyan font-semibold">SYSTEM STATUS</h3>
-              <p>Save data and custom profiles will live in local corp archives.</p>
-              <p className="text-slate-500">Persistence module: WIP</p>
+              <h3 className="text-crt-cyan font-semibold">
+                SYSTEM STATUS
+              </h3>
+              <p>
+                Save data and custom profiles will live in local corp
+                archives.
+              </p>
+              <p className="text-slate-500">
+                Persistence module: WIP
+              </p>
             </div>
           </section>
 

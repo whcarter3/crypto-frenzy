@@ -20,63 +20,47 @@ const Actions = ({
   const isGameOver = state.currentDay >= state.days;
 
   return (
-    <div className="space-y-6">
-      <div className="bg-black p-4 rounded-sm border border-crt-yellow box-shadow-crt">
-        <div className="flex flex-col space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button
-                className={`btn ${
-                  cashLessThanWalletExpansionCost
-                    ? 'btn-disabled'
-                    : 'btn-success'
-                }`}
-                onClick={() =>
-                  increaseWalletCapacity(state, dispatch)
-                }
-                id="expandWallet"
-                disabled={cashLessThanWalletExpansionCost}
-              >
-                Buy
-              </button>
-              <p
-                className={`text-sm ${
-                  cashLessThanWalletExpansionCost
-                    ? 'text-slate-500'
-                    : 'text-slate-300'
-                }`}
-              >
-                Wallet Capacity +{state.wallet.increase}: $
-                {numberWithCommas(state.wallet.expansionCost)}
-              </p>
-            </div>
+    <div className="space-y-4">
+      <div className="panel-crt rounded-lg p-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-3">
+            <button
+              className={`btn ${
+                cashLessThanWalletExpansionCost
+                  ? 'btn-disabled'
+                  : 'btn-success'
+              }`}
+              onClick={() =>
+                increaseWalletCapacity(state, dispatch)
+              }
+              id="expandWallet"
+              disabled={cashLessThanWalletExpansionCost}
+            >
+              Buy
+            </button>
+            <span className="text-sm text-white/80">
+              Wallet +{state.wallet.increase}: ${numberWithCommas(state.wallet.expansionCost)}
+            </span>
           </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button
-                className={`btn ${
-                  canPayDebt ? 'btn-disabled' : 'btn-success'
-                }`}
-                onClick={() => payDebt(dispatch, state)}
-                disabled={canPayDebt}
-                id="payDebt"
-              >
-                Pay
-              </button>
-              <p
-                className={`text-sm ${
-                  canPayDebt ? 'text-slate-500' : 'text-slate-300'
-                }`}
-              >
-                Pay debt: ${numberWithCommas(state.debt)}
-              </p>
-            </div>
+          <div className="flex items-center gap-3">
+            <button
+              className={`btn ${
+                canPayDebt ? 'btn-disabled' : 'btn-success'
+              }`}
+              onClick={() => payDebt(dispatch, state)}
+              disabled={canPayDebt}
+              id="payDebt"
+            >
+              Pay
+            </button>
+            <span className="text-sm text-white/80">
+              Debt: ${numberWithCommas(state.debt)}
+            </span>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 justify-between">
+      <div className="flex flex-col sm:flex-row gap-3">
         <button
           className={`btn ${
             isGameOver ? 'btn-disabled' : 'btn-primary'

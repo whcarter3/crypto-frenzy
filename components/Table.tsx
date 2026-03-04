@@ -75,8 +75,8 @@ const Table = ({
   };
 
   const getPriceColor = (price: number, avgCost: number) => {
-    if (avgCost === 0 || price === avgCost) return 'text-slate-300';
-    return price > avgCost ? 'text-green-400' : 'text-red-400';
+    if (avgCost === 0 || price === avgCost) return 'text-white/80';
+    return price > avgCost ? 'text-crt-green' : 'text-crt-red';
   };
 
   const getPerformanceIndicator = (
@@ -89,7 +89,7 @@ const Table = ({
     return (
       <span
         className={`ml-2 text-xs ${
-          isProfit ? 'text-green-400' : 'text-red-400'
+          isProfit ? 'text-crt-green' : 'text-crt-red'
         }`}
       >
         {isProfit ? '↑' : '↓'} {Math.abs(percentChange).toFixed(1)}%
@@ -98,28 +98,28 @@ const Table = ({
   };
 
   return (
-    <div className="overflow-x-auto rounded-sm border border-crt-yellow box-shadow-crt">
+    <div className="overflow-x-auto panel-crt rounded-lg">
       <table className="w-full">
-        <thead className="bg-slate-800">
+        <thead className="bg-white/5">
           <tr>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
+            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Asset
             </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
+            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Price
             </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
+            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Action
             </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
+            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Avg. Price
             </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
+            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Wallet
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-700">
+        <tbody className="divide-y divide-white/10">
           {Object.keys(state.assets).map((asset) => {
             const name = state.assets[asset].name;
             const symbol = state.assets[asset].symbol;
@@ -142,16 +142,16 @@ const Table = ({
             return (
               <tr
                 key={asset}
-                className="hover:bg-slate-800/50 transition-colors"
+                className="hover:bg-white/5 transition-colors"
               >
                 <td
-                  className="px-4 py-3 text-sm text-slate-300"
+                  className="px-4 py-3 text-sm text-white/90"
                   data-cy="assetSymbol"
                 >
                   <div className="flex items-center">
                     <span className="font-medium">{symbol}</span>
                     {wallet > 0 && (
-                      <span className="ml-2 px-1.5 py-0.5 text-xs bg-slate-700 text-slate-300 rounded">
+                      <span className="ml-2 px-1.5 py-0.5 text-xs bg-crt-green/20 text-crt-green rounded border border-crt-green/40">
                         Holding
                       </span>
                     )}
@@ -200,7 +200,7 @@ const Table = ({
                     </button>
                     <button
                       className={`btn ${
-                        canSell ? 'btn-success' : 'btn-disabled'
+                        canSell ? 'btn-danger' : 'btn-disabled'
                       }`}
                       onClick={(e) => handleSell(e, state, dispatch)}
                       id={`${asset}`}
@@ -217,13 +217,13 @@ const Table = ({
                   </div>
                 </td>
                 <td
-                  className="px-4 py-3 text-sm text-slate-300"
+                  className="px-4 py-3 text-sm text-white/80"
                   data-cy="assetAveragePrice"
                 >
                   ${numberWithCommas(avgCost)}
                 </td>
                 <td
-                  className="px-4 py-3 text-sm text-slate-300"
+                  className="px-4 py-3 text-sm text-crt-cyan font-medium"
                   data-cy={`${asset}AssetWallet`}
                 >
                   {wallet}

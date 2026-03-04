@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { initialState, reducer } from '../lib/reducer';
 import Table from '../components/Table';
 import Actions from '../components/Actions';
-import Header from '../components/Header';
+import GameSidebar from '../components/GameSidebar';
 import Log from '../components/Log';
 import Modal from '../components/GameMode';
 
@@ -11,7 +11,7 @@ export default function Game() {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
-    <div className="min-h-screen text-crt-yellow bg-crt-bg crt-scanlines">
+    <div className="min-h-screen text-crt-green bg-crt-bg crt-scanlines flex">
       <Head>
         <title>Crypto Frenzy – Game</title>
         <meta
@@ -21,21 +21,23 @@ export default function Game() {
         <link rel="icon" href="/favicon1.ico" />
       </Head>
 
-      <main className="container mx-auto px-4 py-6">
-        <Header state={state} />
-
-        <div className="mt-8 space-y-8">
-          <Log log={state.log} />
-
-          <Actions dispatch={dispatch} state={state} />
-
-          <Table state={state} dispatch={dispatch} />
+      <main className="flex-1 flex min-w-0">
+        <div className="w-56 shrink-0 border-r border-white/10 bg-crt-panel/50 py-4 pl-4 pr-2">
+          <GameSidebar state={state} dispatch={dispatch} />
         </div>
 
-        {state.modalOpen && (
-          <Modal state={state} dispatch={dispatch} />
-        )}
+        <div className="flex-1 min-w-0 container mx-auto px-4 py-6">
+          <div className="space-y-6 max-w-4xl">
+            <Log log={state.log} />
+            <Actions dispatch={dispatch} state={state} />
+            <Table state={state} dispatch={dispatch} />
+          </div>
+        </div>
       </main>
+
+      {state.modalOpen && (
+        <Modal state={state} dispatch={dispatch} />
+      )}
     </div>
   );
 }

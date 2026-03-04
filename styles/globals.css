@@ -176,6 +176,30 @@
       0 0 4px rgba(255, 51, 85, 0.9),
       0 0 16px rgba(255, 51, 85, 0.6);
   }
+
+  /* Balatro-style left sidebar */
+  .panel-crt {
+    @apply bg-crt-panel border border-white/20;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 2px 4px rgba(0, 0, 0, 0.4);
+  }
+
+  .chip-crt {
+    @apply bg-crt-panel border border-white/20;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+
+  .btn-run {
+    @apply bg-[#c94a2e] text-white border-2 border-white/90 rounded-lg;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+  }
+  .btn-run:hover:not(:disabled) {
+    @apply bg-[#e05a3e] border-white;
+  }
+  .btn-run:disabled {
+    @apply cursor-not-allowed;
+  }
 }
 
 @layer utilities {
