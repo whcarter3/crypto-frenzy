@@ -69,11 +69,11 @@ const GameMode = ({
   const currentMode = state.mode as keyof typeof modeDescriptions;
 
   return (
-    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-10 flex items-center justify-center p-4">
-      <div className="bg-slate-800 max-w-2xl w-full rounded-xl border border-slate-700 p-8 space-y-8">
+    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-10 flex items-center justify-center p-4 md:p-8">
+      <div className="bg-black w-full max-w-3xl max-h-[600px] rounded-sm border border-crt-yellow box-shadow-crt p-6 md:p-8 space-y-6 md:space-y-8 overflow-y-auto">
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-300 text-glow-crt">
               Crypto Frenzy
             </h1>
             <span className="text-3xl">🚀</span>
@@ -97,7 +97,7 @@ const GameMode = ({
             <span className="text-blue-400">{state.mode}</span>
           </h4>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-3 md:gap-4">
             {modes.map((mode) => {
               const isSelected = state.mode === mode.name;
               return (
@@ -123,7 +123,7 @@ const GameMode = ({
           </div>
 
           {modeDescriptions[currentMode] && (
-            <div className="mt-6 bg-slate-800/50 rounded-lg border border-slate-700 p-4">
+            <div className="mt-6 bg-black rounded-sm border border-crt-yellow box-shadow-crt p-4">
               <h3
                 className={`text-${
                   modes.find((m) => m.name === currentMode)?.color
@@ -144,7 +144,7 @@ const GameMode = ({
                       <span className="mr-2">•</span>
                       {feature}
                     </li>
-                  )
+                  ),
                 )}
               </ul>
             </div>

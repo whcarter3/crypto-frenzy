@@ -62,8 +62,8 @@ const Header = ({ state }: { state: State }) => {
         state.mode === 'Easy'
           ? '10%'
           : state.mode === 'Normal'
-          ? '20%'
-          : '30%'
+            ? '20%'
+            : '30%'
       } daily interest`,
     },
     {
@@ -83,15 +83,15 @@ const Header = ({ state }: { state: State }) => {
         if (!asset.active) return total;
         return total + asset.price * asset.wallet;
       },
-      0
+      0,
     );
     return assetsValue + state.cash - state.debt;
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+      {/* <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-slate-300 drop-shadow-crt">
           Crypto Frenzy
         </h1>
         <div className="flex items-center gap-2">
@@ -100,7 +100,7 @@ const Header = ({ state }: { state: State }) => {
           </span>
           <span className="text-3xl">🚀</span>
         </div>
-      </div>
+      </div> */}
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {headerItems.map((item) => (
@@ -110,7 +110,7 @@ const Header = ({ state }: { state: State }) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {state.highScore && (
-          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-4 rounded-lg border border-slate-700">
+          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-4 rounded-sm border border-crt-yellow box-shadow-crt">
             <HeaderInfo
               label="High Score"
               value={`$${numberWithCommas(state.highScore)}`}
@@ -122,7 +122,7 @@ const Header = ({ state }: { state: State }) => {
             />
           </div>
         )}
-        <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 p-4 rounded-lg border border-slate-700">
+        <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 p-4 rounded-sm border border-crt-yellow box-shadow-crt">
           <HeaderInfo
             label="Net Worth"
             value={`$${numberWithCommas(getNetWorth())}`}

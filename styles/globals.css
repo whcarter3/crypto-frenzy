@@ -2,8 +2,108 @@
 @tailwind components;
 @tailwind utilities;
 
-/* custom styles */
+/* IBM Plex Mono font faces */
 @layer base {
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('/IBM_Plex_Mono/IBMPlexMono-Thin.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('/IBM_Plex_Mono/IBMPlexMono-ThinItalic.ttf') format('truetype');
+    font-weight: 100;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('/IBM_Plex_Mono/IBMPlexMono-ExtraLight.ttf') format('truetype');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('/IBM_Plex_Mono/IBMPlexMono-ExtraLightItalic.ttf') format('truetype');
+    font-weight: 200;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('/IBM_Plex_Mono/IBMPlexMono-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('/IBM_Plex_Mono/IBMPlexMono-LightItalic.ttf') format('truetype');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('/IBM_Plex_Mono/IBMPlexMono-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('/IBM_Plex_Mono/IBMPlexMono-Italic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('/IBM_Plex_Mono/IBMPlexMono-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('/IBM_Plex_Mono/IBMPlexMono-MediumItalic.ttf') format('truetype');
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('/IBM_Plex_Mono/IBMPlexMono-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('/IBM_Plex_Mono/IBMPlexMono-SemiBoldItalic.ttf') format('truetype');
+    font-weight: 600;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('/IBM_Plex_Mono/IBMPlexMono-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('/IBM_Plex_Mono/IBMPlexMono-BoldItalic.ttf') format('truetype');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  /* custom styles */
   * {
     box-sizing: border-box;
   }
@@ -11,13 +111,15 @@
   body {
     padding: 0;
     margin: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-      Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 16px;
-    background-color: #0f172a;
-    @apply text-slate-100;
+    letter-spacing: 0.03em;
+    font-weight: 600;
+    background-color: #050505;
     white-space: pre-wrap;
     min-height: 100vh;
+    @apply text-crt-yellow text-glow-crt;
+    text-transform: uppercase!important;
   }
 
   h1 {
@@ -40,26 +142,70 @@
 
 @layer components {
   .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+    @apply px-4 py-2 font-medium transition-all duration-200 border-4 rounded-sm;
+    border-style: outset;
+
   }
 
   .btn-primary {
-    @apply bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30;
+    @apply bg-crt-green hover:bg-crt-green text-white border-crt-green;
+    box-shadow: 0 0 2px rgb(0,255,102),
+                0 0 4px rgb(0, 255, 102),
+                0 0 8px rgb(0, 255, 102);
   }
 
   .btn-secondary {
-    @apply bg-slate-700/50 hover:bg-slate-700 text-slate-300 border border-slate-600;
+    @apply bg-slate-700 hover:bg-slate-700 text-slate-300 border-slate-600;
   }
 
   .btn-success {
-    @apply bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/30;
+    @apply bg-crt-green hover:bg-crt-green text-green-400 border-crt-green;
   }
 
   .btn-disabled {
-    @apply bg-slate-800/50 text-slate-500 border border-slate-700 cursor-not-allowed;
+    @apply bg-slate-800 text-slate-500/10 border border-slate-700 cursor-not-allowed;
   }
 
   .btn-danger {
-    @apply bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30;
+    @apply bg-crt-red hover:bg-crt-red text-white border-crt-red;
+    box-shadow: 0 0 2px rgb(255,59,59),
+                0 0 4px rgb(255,59,59),
+                0 0 8px rgb(255,59,59);
+  }
+}
+
+@layer utilities {
+
+  /* CRT Glow */
+  .text-glow-crt {
+    text-shadow:
+      0 0 2px currentColor,
+      0 0 4px currentColor,
+      0 0 8px currentColor;
+  }
+
+  .box-shadow-crt {
+    box-shadow:
+      0 0 2px currentColor,
+      0 0 6px currentColor,
+      0 0 12px currentColor;
+  }
+
+  /* Scanlines overlay */
+  .crt-scanlines {
+    position: relative;
+  }
+
+  .crt-scanlines::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 9999;
+    background: repeating-linear-gradient(to bottom,
+        rgba(255, 255, 255, 0.03) 0px,
+        rgba(255, 255, 255, 0.03) 1px,
+        transparent 2px,
+        transparent 4px);
   }
 }

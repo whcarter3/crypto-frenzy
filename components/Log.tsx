@@ -1,7 +1,7 @@
 const Log = ({ log }) => {
   return (
-    <div className="bg-slate-800 rounded-lg border border-slate-700 p-4">
-      <h3 className="text-lg font-semibold text-slate-300 mb-3">
+    <div className="bg-black rounded-sm border-2 border-crt-yellow p-4 box-shadow-crt">
+      <h3 className="text-lg font-semibold text-slate-300 mb-3 drop-shadow-crt">
         Activity Log
       </h3>
       <ul className="space-y-2 max-h-64 overflow-y-auto text-sm">

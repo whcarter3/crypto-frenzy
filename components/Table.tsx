@@ -17,12 +17,12 @@ const Table = ({
   const handleSell = (
     e,
     state: State,
-    dispatch: Dispatch<Action>
+    dispatch: Dispatch<Action>,
   ) => {
     if (state.currentDay === 0) {
       showNotification(
         AlertMessages.NEED_START,
-        getAlertType(AlertMessages.NEED_START)
+        getAlertType(AlertMessages.NEED_START),
       );
       return;
     }
@@ -30,7 +30,7 @@ const Table = ({
     if (state.assets[e.target.id].wallet === 0) {
       showNotification(
         AlertMessages.INSUFFICIENT_ASSETS,
-        getAlertType(AlertMessages.INSUFFICIENT_ASSETS)
+        getAlertType(AlertMessages.INSUFFICIENT_ASSETS),
       );
       return;
     }
@@ -39,7 +39,7 @@ const Table = ({
       e.target.id,
       state.assets[e.target.id].price,
       state.assets[e.target.id].wallet,
-      dispatch
+      dispatch,
     );
   };
 
@@ -47,21 +47,21 @@ const Table = ({
     if (state.currentDay === 0) {
       showNotification(
         AlertMessages.NEED_START,
-        getAlertType(AlertMessages.NEED_START)
+        getAlertType(AlertMessages.NEED_START),
       );
       return;
     }
     if (state.wallet.amount >= state.wallet.capacity) {
       showNotification(
         AlertMessages.NEED_WALLET,
-        getAlertType(AlertMessages.NEED_WALLET)
+        getAlertType(AlertMessages.NEED_WALLET),
       );
       return;
     }
     if (state.cash < state.assets[e.target.id].price) {
       showNotification(
         AlertMessages.INSUFFICIENT_FUNDS,
-        getAlertType(AlertMessages.INSUFFICIENT_FUNDS)
+        getAlertType(AlertMessages.INSUFFICIENT_FUNDS),
       );
       return;
     }
@@ -70,7 +70,7 @@ const Table = ({
       e.target.id,
       state.assets[e.target.id].price,
       state,
-      dispatch
+      dispatch,
     );
   };
 
@@ -81,7 +81,7 @@ const Table = ({
 
   const getPerformanceIndicator = (
     price: number,
-    avgCost: number
+    avgCost: number,
   ) => {
     if (avgCost === 0 || price === avgCost) return null;
     const percentChange = ((price - avgCost) / avgCost) * 100;
@@ -98,7 +98,7 @@ const Table = ({
   };
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-700">
+    <div className="overflow-x-auto rounded-sm border border-crt-yellow box-shadow-crt">
       <table className="w-full">
         <thead className="bg-slate-800">
           <tr>
@@ -160,7 +160,7 @@ const Table = ({
                 <td
                   className={`px-4 py-3 text-sm font-medium ${getPriceColor(
                     price,
-                    avgCost
+                    avgCost,
                   )}`}
                   data-cy="assetPrice"
                   title={

@@ -21,7 +21,7 @@ const Actions = ({
 
   return (
     <div className="space-y-6">
-      <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+      <div className="bg-black p-4 rounded-sm border border-crt-yellow box-shadow-crt">
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

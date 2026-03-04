@@ -15,7 +15,7 @@ const HeaderInfo = ({
 }) => (
   <div
     data-cy={testId}
-    className={`bg-slate-800/50 p-3 rounded-lg border border-slate-700 ${
+    className={`bg-black p-3 rounded-sm border border-crt-yellow box-shadow-crt ${
       className || ''
     }`}
     title={description}
@@ -29,8 +29,8 @@ const HeaderInfo = ({
             trend === 'up'
               ? 'text-green-400'
               : trend === 'down'
-              ? 'text-red-400'
-              : 'text-slate-400'
+                ? 'text-red-400'
+                : 'text-slate-400'
           }`}
         >
           {trend === 'up' ? '↑' : trend === 'down' ? '↓' : '•'}
