@@ -89,6 +89,7 @@ export default function Home() {
                 <li className="text-slate-500">▢ CREDITS (SOON)</li>
               </ul>
             </div>
+            {/* Difficulty selector commented out – Normal mode only for now
             <div className="space-y-2">
               <h3 className="text-crt-cyan font-semibold">
                 DIFFICULTY (IN-GAME)
@@ -99,6 +100,7 @@ export default function Home() {
                 debt mutates.
               </p>
             </div>
+            */}
             <div className="space-y-2">
               <h3 className="text-crt-cyan font-semibold">
                 SYSTEM STATUS
@@ -120,10 +122,7 @@ export default function Home() {
             >
               START RUN
             </Link>
-            <p className="text-xs md:text-sm text-slate-500 text-center sm:text-left">
-              Tip: you can change difficulty and see full rules once
-              the game loads.
-            </p>
+            {/* Tip: you can change difficulty and see full rules once the game loads. */}
           </div>
         </div>
       </main>

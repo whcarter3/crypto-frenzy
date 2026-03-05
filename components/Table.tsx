@@ -102,7 +102,7 @@ const Table = ({
       <table className="w-full">
         <thead className="bg-white/5">
           <tr>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
+            <th className="w-28 min-w-28 max-w-28 px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Asset
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
@@ -145,13 +145,13 @@ const Table = ({
                 className="hover:bg-white/5 transition-colors"
               >
                 <td
-                  className="px-4 py-3 text-sm text-white/90"
+                  className="w-28 min-w-28 max-w-28 px-4 py-3 text-sm text-white/90"
                   data-cy="assetSymbol"
                 >
-                  <div className="flex items-center">
-                    <span className="font-medium">{symbol}</span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="font-medium shrink-0">{symbol}</span>
                     {wallet > 0 && (
-                      <span className="ml-2 px-1.5 py-0.5 text-xs bg-crt-green/20 text-crt-green rounded border border-crt-green/40">
+                      <span className="shrink-0 px-1.5 py-0.5 text-xs bg-crt-green/20 text-crt-green rounded border border-crt-green/40">
                         Holding
                       </span>
                     )}

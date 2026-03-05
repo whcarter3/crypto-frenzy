@@ -4,7 +4,7 @@ const Log = ({ log }) => {
       <h3 className="text-sm font-semibold text-crt-cyan mb-3 tracking-wide">
         ACTIVITY LOG
       </h3>
-      <ul className="space-y-1.5 max-h-48 overflow-y-auto text-sm text-white/90">
+      <ul className="space-y-1.5 h-48 overflow-y-auto text-sm text-white/90">
         {log.map((msg, idx) => (
           <li
             key={idx}

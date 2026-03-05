@@ -4,7 +4,7 @@ import { addTimestamp } from '../helpers/utils';
 export const initialState: State = {
   days: 30,
   currentDay: 0,
-  debt: 2000,
+  debt: 5000,
   cash: 2000,
   interestRate: 0.2,
   log: ['- Click Advance Day to start.'],
@@ -112,8 +112,8 @@ export const reducer = (state: State, action: Action) => {
         state.mode === 'Easy'
           ? 'highScoreEasy'
           : state.mode === 'Hard'
-          ? 'highScoreHard'
-          : 'highScore';
+            ? 'highScoreHard'
+            : 'highScore';
       const savedHighScore = localStorage.getItem(initHighScoreKey);
       return {
         ...initialState,
@@ -181,7 +181,7 @@ export const reducer = (state: State, action: Action) => {
           expansionCost: Math.floor(
             state.wallet.expansionCost +
               state.wallet.expansionCost *
-                state.wallet.percentIncrease
+                state.wallet.percentIncrease,
           ),
         },
       };
@@ -253,7 +253,7 @@ export const reducer = (state: State, action: Action) => {
             ...state.assets[avgCostAssetName],
             averageCost: Math.floor(
               state.assets[avgCostAssetName].totalCost /
-                state.assets[avgCostAssetName].wallet
+                state.assets[avgCostAssetName].wallet,
             ),
           },
         },
@@ -268,12 +268,12 @@ export const reducer = (state: State, action: Action) => {
         state.mode === 'Easy'
           ? 'highScoreEasy'
           : state.mode === 'Hard'
-          ? 'highScoreHard'
-          : 'highScore';
+            ? 'highScoreHard'
+            : 'highScore';
       if (state.mode !== 'Test') {
         localStorage.setItem(
           saveHighScoreKey,
-          action.payload.toString()
+          action.payload.toString(),
         );
       }
       return { ...state, highScore: action.payload };
@@ -287,7 +287,7 @@ export const reducer = (state: State, action: Action) => {
       return {
         ...state,
         debt: Math.floor(
-          state.debt + state.debt * state.interestRate
+          state.debt + state.debt * state.interestRate,
         ),
       };
     case 'TOGGLE_MODAL':

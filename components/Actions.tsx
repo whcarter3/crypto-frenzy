@@ -2,7 +2,6 @@ import { Dispatch } from 'react';
 import { Action, State } from '../lib/types';
 import { numberWithCommas } from '../helpers/utils';
 import { payDebt } from '../lib/debt';
-import { increaseWalletCapacity } from '../lib/wallet';
 import { advanceDay } from '../lib/advanceDay';
 import { useNotification } from '../lib/NotificationContext';
 
@@ -15,33 +14,12 @@ const Actions = ({
 }) => {
   const { showNotification } = useNotification();
   const canPayDebt = state.cash <= state.debt || state.debt === 0;
-  const cashLessThanWalletExpansionCost =
-    state.cash <= state.wallet.expansionCost;
   const isGameOver = state.currentDay >= state.days;
 
   return (
     <div className="space-y-4">
       <div className="panel-crt rounded-lg p-4">
         <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-3">
-            <button
-              className={`btn ${
-                cashLessThanWalletExpansionCost
-                  ? 'btn-disabled'
-                  : 'btn-success'
-              }`}
-              onClick={() =>
-                increaseWalletCapacity(state, dispatch)
-              }
-              id="expandWallet"
-              disabled={cashLessThanWalletExpansionCost}
-            >
-              Buy
-            </button>
-            <span className="text-sm text-white/80">
-              Wallet +{state.wallet.increase}: ${numberWithCommas(state.wallet.expansionCost)}
-            </span>
-          </div>
           <div className="flex items-center gap-3">
             <button
               className={`btn ${
@@ -77,7 +55,7 @@ const Actions = ({
         </button>
         <button
           className="btn btn-danger flex-1 py-3 text-lg"
-          onClick={() => dispatch({ type: 'TOGGLE_MODAL' })}
+          onClick={() => dispatch({ type: 'INIT' })}
           id="newGame"
         >
           New Game

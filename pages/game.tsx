@@ -1,14 +1,22 @@
-import { useReducer } from 'react';
+import { useEffect, useReducer } from 'react';
 import Head from 'next/head';
 import { initialState, reducer } from '../lib/reducer';
 import Table from '../components/Table';
 import Actions from '../components/Actions';
 import GameSidebar from '../components/GameSidebar';
 import Log from '../components/Log';
-import Modal from '../components/GameMode';
+// import Modal from '../components/GameMode';
 
 export default function Game() {
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  // Difficulty modal commented out: assume Normal mode and auto-start
+  useEffect(() => {
+    if (state.modalOpen) {
+      dispatch({ type: 'INIT' });
+      dispatch({ type: 'TOGGLE_MODAL' });
+    }
+  }, []);
 
   return (
     <div className="min-h-screen text-crt-green bg-crt-bg crt-scanlines flex">
@@ -22,7 +30,7 @@ export default function Game() {
       </Head>
 
       <main className="flex-1 flex min-w-0">
-        <div className="w-56 shrink-0 border-r border-white/10 bg-crt-panel/50 py-4 pl-4 pr-2">
+        <div className="w-1/6 shrink-0 border-r border-white/10 bg-crt-panel/50 py-4 pl-4 pr-2">
           <GameSidebar state={state} dispatch={dispatch} />
         </div>
 
@@ -35,9 +43,11 @@ export default function Game() {
         </div>
       </main>
 
+      {/* Difficulty modal commented out – Normal mode only for now
       {state.modalOpen && (
         <Modal state={state} dispatch={dispatch} />
       )}
+      */}
     </div>
   );
 }
