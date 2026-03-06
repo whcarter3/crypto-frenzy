@@ -9,11 +9,13 @@ export const increaseWalletCapacity = (
   if (state.cash < state.wallet.expansionCost) return
 
   dispatch({ type: "EXPAND_WALLET" })
+  const nextCapacity = state.wallet.capacity * 2
+  const nextCost = state.wallet.expansionCost * 2
   dispatch({
     type: "SET_LOG",
     payload: [
-      `You have increased your wallet capacity to ${state.wallet.capacity}`,
-      `Wallet Expansion cost has increased in price by 25% to ${state.wallet.expansionCost}`,
+      `Wallet upgraded to Level ${state.wallet.level + 1}: capacity ${nextCapacity}.`,
+      `Next upgrade: $${nextCost.toLocaleString()} → ${nextCapacity * 2} capacity.`,
     ],
   })
 }

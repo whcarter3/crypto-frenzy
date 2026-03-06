@@ -1,11 +1,12 @@
 import { Dispatch } from 'react';
 import { State, Action } from '../lib/types';
 import { numberWithCommas } from '../helpers/utils';
+import { cn } from '../lib/cn';
 import { AlertMessages, getAlertType } from '../helpers/alerts';
 import { buyAsset, sellAsset } from '../lib/buySell';
 import { useNotification } from '../lib/NotificationContext';
 
-const Table = ({
+const AssetTable = ({
   state,
   dispatch,
 }: {
@@ -88,9 +89,11 @@ const Table = ({
     const isProfit = price > avgCost;
     return (
       <span
-        className={`ml-2 text-xs ${
-          isProfit ? 'text-crt-green' : 'text-crt-red'
-        }`}
+        className={cn(
+          'ml-2 text-xs',
+          isProfit && 'text-crt-green',
+          !isProfit && 'text-crt-red',
+        )}
       >
         {isProfit ? '↑' : '↓'} {Math.abs(percentChange).toFixed(1)}%
       </span>
@@ -101,7 +104,7 @@ const Table = ({
     <div className="overflow-x-auto panel-crt rounded-lg">
       <table className="w-full">
         <thead className="bg-white/5">
-          <tr>
+          <tr className="border-b border-white/20">
             <th className="w-28 min-w-28 max-w-28 px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Asset
             </th>
@@ -109,13 +112,13 @@ const Table = ({
               Price
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
-              Action
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Avg. Price
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Wallet
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
+              Action
             </th>
           </tr>
         </thead>
@@ -149,7 +152,9 @@ const Table = ({
                   data-cy="assetSymbol"
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="font-medium shrink-0">{symbol}</span>
+                    <span className="font-medium shrink-0">
+                      {symbol}
+                    </span>
                     {wallet > 0 && (
                       <span className="shrink-0 px-1.5 py-0.5 text-xs bg-crt-green/20 text-crt-green rounded border border-crt-green/40">
                         Holding
@@ -158,10 +163,10 @@ const Table = ({
                   </div>
                 </td>
                 <td
-                  className={`px-4 py-3 text-sm font-medium ${getPriceColor(
-                    price,
-                    avgCost,
-                  )}`}
+                  className={cn(
+                    'px-4 py-3 text-sm font-medium',
+                    getPriceColor(price, avgCost),
+                  )}
                   data-cy="assetPrice"
                   title={
                     avgCost > 0
@@ -178,14 +183,28 @@ const Table = ({
                   </div>
                 </td>
                 <td
+                  className="px-4 py-3 text-sm text-white/80"
+                  data-cy="assetAveragePrice"
+                >
+                  ${numberWithCommas(avgCost)}
+                </td>
+                <td
+                  className="px-4 py-3 text-sm text-crt-cyan font-medium"
+                  data-cy={`${asset}AssetWallet`}
+                >
+                  {wallet}
+                </td>
+                <td
                   className="px-4 py-3 text-sm"
                   data-cy="assetActions"
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 justify-end">
                     <button
-                      className={`btn ${
-                        canBuy ? 'btn-primary' : 'btn-disabled'
-                      }`}
+                      className={cn(
+                        'btn',
+                        canBuy && 'btn-primary',
+                        !canBuy && 'btn-disabled',
+                      )}
                       onClick={(e) => handleBuy(e, state, dispatch)}
                       id={`${asset}`}
                       disabled={!canBuy}
@@ -198,35 +217,7 @@ const Table = ({
                     >
                       Buy
                     </button>
-                    <button
-                      className={`btn ${
-                        canSell ? 'btn-danger' : 'btn-disabled'
-                      }`}
-                      onClick={(e) => handleSell(e, state, dispatch)}
-                      id={`${asset}`}
-                      disabled={!canSell}
-                      data-cy={`${asset}SellButton`}
-                      title={
-                        !canSell
-                          ? 'No assets to sell'
-                          : 'Sell this asset'
-                      }
-                    >
-                      Sell
-                    </button>
                   </div>
-                </td>
-                <td
-                  className="px-4 py-3 text-sm text-white/80"
-                  data-cy="assetAveragePrice"
-                >
-                  ${numberWithCommas(avgCost)}
-                </td>
-                <td
-                  className="px-4 py-3 text-sm text-crt-cyan font-medium"
-                  data-cy={`${asset}AssetWallet`}
-                >
-                  {wallet}
                 </td>
               </tr>
             );
@@ -237,4 +228,4 @@ const Table = ({
   );
 };
 
-export default Table;
+export default AssetTable;

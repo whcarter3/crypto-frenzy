@@ -112,7 +112,7 @@
     padding: 0;
     margin: 0;
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 16px;
+    font-size: 14px;
     letter-spacing: 0.03em;
     font-weight: 600;
     background-color: #02040a;
@@ -120,6 +120,13 @@
     min-height: 100vh;
     @apply text-crt-yellow text-glow-crt;
     text-transform: uppercase!important;
+  }
+
+  body.debug-styles * {
+    background: black!important;
+    outline: 1px solid red!important;
+    outline-offset: -1px!important;
+    color: green!important
   }
 
   h1 {

@@ -7,7 +7,10 @@ import { NotificationProvider } from '../lib/NotificationContext';
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <NotificationProvider>
-      <Component {...pageProps} className="bg-slate-600 crt" />
+      <Component
+        {...pageProps}
+        className="bg-slate-600 crt p-4 overflow-y-hidden"
+      />
       <Analytics />
     </NotificationProvider>
   );

@@ -18,10 +18,10 @@ module.exports = {
           yellow: '#ffd84d',
           cyan: '#00e5ff',
 
-          greenSoft: '#33ff33',
-          redSoft: '#ff2a2a',
-          amber: '#ffcc00',
-          cyanSoft: '#00ffff',
+          transparentGreen: 'rgba(0, 255, 102, 0.1)',
+          transparentRed: 'rgba(255, 51, 85, 0.1)',
+          transparentYellow: 'rgba(255, 216, 77, 0.1)',
+          transparentCyan: 'rgba(0, 229, 255, 0.1)',
 
           panel: '#040811',
           outline: '#1f2937',
@@ -29,10 +29,14 @@ module.exports = {
       },
 
       /* ─────────────────────────────
-         TERMINAL FONT
+         TERMINAL FONT + MIN 16PX
       ───────────────────────────── */
       fontFamily: {
         terminal: ["'IBM Plex Mono'", 'monospace'],
+      },
+      fontSize: {
+        xs: ['1rem', { lineHeight: '1.5rem' }] /* 16px min */,
+        sm: ['1rem', { lineHeight: '1.5rem' }] /* 16px min */,
       },
 
       /* ─────────────────────────────

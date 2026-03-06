@@ -23,10 +23,10 @@ export const calculateMaxShares = (
 /**
  * Adds commas to a string representation of a number to improve readability.
  *
- * @param {number} num The number to format.
+ * @param {number | string} num The number to format.
  * @returns {string} The formatted string with commas.
  */
-export const numberWithCommas = (num: number): string => {
+export const numberWithCommas = (num: number | string): string => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 

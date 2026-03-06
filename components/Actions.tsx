@@ -1,9 +1,11 @@
 import { Dispatch } from 'react';
 import { Action, State } from '../lib/types';
 import { numberWithCommas } from '../helpers/utils';
+import { cn } from '../lib/cn';
 import { payDebt } from '../lib/debt';
 import { advanceDay } from '../lib/advanceDay';
 import { useNotification } from '../lib/NotificationContext';
+import Chip from './Chip';
 
 const Actions = ({
   dispatch,
@@ -18,48 +20,35 @@ const Actions = ({
 
   return (
     <div className="space-y-4">
-      <div className="panel-crt rounded-lg p-4">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-3">
-            <button
-              className={`btn ${
-                canPayDebt ? 'btn-disabled' : 'btn-success'
-              }`}
-              onClick={() => payDebt(dispatch, state)}
-              disabled={canPayDebt}
-              id="payDebt"
-            >
-              Pay
-            </button>
-            <span className="text-sm text-white/80">
-              Debt: ${numberWithCommas(state.debt)}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-3">
-        <button
-          className={`btn ${
-            isGameOver ? 'btn-disabled' : 'btn-primary'
-          } flex-1 py-3 text-lg`}
-          id="advDay"
-          onClick={() =>
-            advanceDay(state, dispatch, showNotification)
-          }
-          disabled={isGameOver}
-        >
-          {state.currentDay === state.days
-            ? 'Game Over!'
-            : 'Advance Day'}
-        </button>
-        <button
-          className="btn btn-danger flex-1 py-3 text-lg"
-          onClick={() => dispatch({ type: 'INIT' })}
-          id="newGame"
-        >
-          New Game
-        </button>
+      <div className="flex sm:flex-row gap-3">
+        <Chip
+          figure={`${state.cash}`}
+          label="Cash"
+          color="green"
+          currency
+        />
+        <Chip
+          figure={`${state.debt}`}
+          label="Debt"
+          color="red"
+          currency
+          button={{
+            bool: canPayDebt,
+            label: 'Pay',
+            action: () => payDebt(dispatch, state),
+          }}
+        />
+        <Chip
+          figure={`${state.days - state.currentDay}`}
+          label="Days Left"
+          color="cyan"
+          button={{
+            bool: isGameOver,
+            label: 'Adv Day',
+            action: () =>
+              advanceDay(state, dispatch, showNotification),
+          }}
+        />
       </div>
     </div>
   );

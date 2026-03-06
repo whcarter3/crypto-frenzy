@@ -1,7 +1,8 @@
 import { useEffect, useReducer } from 'react';
 import Head from 'next/head';
-import { initialState, reducer } from '../lib/reducer';
-import Table from '../components/Table';
+import { reducer } from '../lib/reducer';
+import { initialState } from '../lib/state/initialState';
+import AssetTable from '../components/AssetTable';
 import Actions from '../components/Actions';
 import GameSidebar from '../components/GameSidebar';
 import Log from '../components/Log';
@@ -19,7 +20,7 @@ export default function Game() {
   }, []);
 
   return (
-    <div className="min-h-screen text-crt-green bg-crt-bg crt-scanlines flex">
+    <div className=" text-crt-green bg-crt-bg crt-scanlines flex min-h-screen">
       <Head>
         <title>Crypto Frenzy – Game</title>
         <meta
@@ -29,17 +30,17 @@ export default function Game() {
         <link rel="icon" href="/favicon1.ico" />
       </Head>
 
-      <main className="flex-1 flex min-w-0">
-        <div className="w-1/6 shrink-0 border-r border-white/10 bg-crt-panel/50 py-4 pl-4 pr-2">
+      <main className="flex-1 flex">
+        <div className="w-1/4 shrink-0 border-r border-white/10 bg-crt-panel/50 px-4 py-6">
           <GameSidebar state={state} dispatch={dispatch} />
         </div>
 
-        <div className="flex-1 min-w-0 container mx-auto px-4 py-6">
-          <div className="space-y-6 max-w-4xl">
+        <div className="flex flex-1 flex-col justify-between mx-auto px-4 py-6 gap-6">
+          <div className="w-1/2 space-y-6">
             <Log log={state.log} />
-            <Actions dispatch={dispatch} state={state} />
-            <Table state={state} dispatch={dispatch} />
+            <AssetTable state={state} dispatch={dispatch} />
           </div>
+          <Actions dispatch={dispatch} state={state} />
         </div>
       </main>
 

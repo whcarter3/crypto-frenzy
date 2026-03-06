@@ -1,5 +1,6 @@
 import { Dispatch } from 'react';
 import { Action, State } from '../lib/types';
+import { cn } from '../lib/cn';
 import { advanceDay } from '../lib/advanceDay';
 
 type GameMode = 'Easy' | 'Normal' | 'Hard' | 'Test';
@@ -60,13 +61,39 @@ const GameMode = ({
     dispatch({ type: 'TOGGLE_MODAL' });
   };
 
-  const modes: { name: GameMode; color: string }[] = [
-    { name: 'Easy', color: 'green' },
-    { name: 'Normal', color: 'amber' },
-    { name: 'Hard', color: 'purple' },
+  const modes: { name: GameMode }[] = [
+    { name: 'Easy' },
+    { name: 'Normal' },
+    { name: 'Hard' },
   ];
 
-  const currentMode = state.mode as keyof typeof modeDescriptions;
+  const currentMode = state.mode;
+
+  const getModeButtonClasses = (modeName: GameMode, isSelected: boolean) =>
+    cn(
+      'btn',
+      modeName === 'Easy' &&
+        (isSelected
+          ? 'bg-green-500/20 text-green-400 border-green-500/50 ring-2 ring-green-500/50 ring-offset-2 ring-offset-slate-800'
+          : 'bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-green-500/10 hover:text-green-400 hover:border-green-500/30'),
+      modeName === 'Normal' &&
+        (isSelected
+          ? 'bg-amber-500/20 text-amber-400 border-amber-500/50 ring-2 ring-amber-500/50 ring-offset-2 ring-offset-slate-800'
+          : 'bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-amber-500/10 hover:text-amber-400 hover:border-amber-500/30'),
+      modeName === 'Hard' &&
+        (isSelected
+          ? 'bg-purple-500/20 text-purple-400 border-purple-500/50 ring-2 ring-purple-500/50 ring-offset-2 ring-offset-slate-800'
+          : 'bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-purple-500/10 hover:text-purple-400 hover:border-purple-500/30'),
+    );
+
+  const getModeTitleClasses = (modeName: GameMode) =>
+    cn(
+      'font-semibold mb-2',
+      modeName === 'Easy' && 'text-green-400',
+      modeName === 'Normal' && 'text-amber-400',
+      modeName === 'Hard' && 'text-purple-400',
+      modeName === 'Test' && 'text-slate-400',
+    );
 
   return (
     <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-10 flex items-center justify-center p-4 md:p-8">
@@ -103,11 +130,7 @@ const GameMode = ({
               return (
                 <button
                   key={mode.name}
-                  className={`btn ${
-                    isSelected
-                      ? `bg-${mode.color}-500/20 text-${mode.color}-400 border-${mode.color}-500/50 ring-2 ring-${mode.color}-500/50 ring-offset-2 ring-offset-slate-800`
-                      : `bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-${mode.color}-500/10 hover:text-${mode.color}-400 hover:border-${mode.color}-500/30`
-                  }`}
+                  className={getModeButtonClasses(mode.name, isSelected)}
                   onClick={() =>
                     dispatch({
                       type: 'CHANGE_MODE',
@@ -124,11 +147,7 @@ const GameMode = ({
 
           {modeDescriptions[currentMode] && (
             <div className="mt-6 bg-black rounded-sm border border-crt-yellow box-shadow-crt p-4">
-              <h3
-                className={`text-${
-                  modes.find((m) => m.name === currentMode)?.color
-                }-400 font-semibold mb-2`}
-              >
+              <h3 className={getModeTitleClasses(currentMode)}>
                 {modeDescriptions[currentMode].title}
               </h3>
               <p className="text-slate-300 mb-4">

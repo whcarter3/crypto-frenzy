@@ -67,7 +67,7 @@ const Header = ({ state }: { state: State }) => {
       } daily interest`,
     },
     {
-      label: 'Wallet',
+      label: `Wallet (Lv ${state.wallet.level})`,
       value: `${state.wallet.amount}/${state.wallet.capacity}`,
       testId: 'wallet',
       trend: getWalletTrend(),
