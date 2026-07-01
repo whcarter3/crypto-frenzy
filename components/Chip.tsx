@@ -8,6 +8,7 @@ function Chip({
   button,
   currency = false,
   className,
+  dataCy,
 }: {
   figure: string;
   label: string;
@@ -17,8 +18,10 @@ function Chip({
     bool: boolean;
     label: string;
     action: () => void;
+    id?: string;
   };
   className?: string;
+  dataCy?: string;
 }) {
   return (
     <div
@@ -31,7 +34,7 @@ function Chip({
       <div>
         <p
           className={cn('text-5xl font-bold', `text-crt-${color}`)}
-          data-cy={`${label.toLowerCase()}`}
+          data-cy={dataCy ?? label.toLowerCase()}
         >
           {currency ? `$${numberWithCommas(figure)}` : figure}
         </p>
@@ -49,7 +52,7 @@ function Chip({
           )}
           onClick={button.action}
           disabled={button.bool}
-          id={button.label.toLowerCase()}
+          id={button.id ?? button.label.toLowerCase().replace(/\s+/g, '-')}
         >
           {button.label}
         </button>

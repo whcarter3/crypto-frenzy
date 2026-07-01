@@ -8,7 +8,7 @@ import { initialState } from './state/initialState';
  * @param {Action} action - The dispatched action.
  * @returns {State} The updated game state.
  */
-export const reducer = (state: State, action: Action) => {
+export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'INIT':
       const initHighScoreKey =
@@ -28,6 +28,7 @@ export const reducer = (state: State, action: Action) => {
         localStorage.getItem('highScoreEasy');
       return {
         ...initialState,
+        mode: 'Easy',
         highScore: savedHighScoreEasy
           ? parseInt(savedHighScoreEasy)
           : null,
@@ -49,6 +50,7 @@ export const reducer = (state: State, action: Action) => {
         localStorage.getItem('highScoreHard');
       return {
         ...initialState,
+        mode: 'Hard',
         highScore: savedHighScoreHard
           ? parseInt(savedHighScoreHard)
           : null,
@@ -68,6 +70,7 @@ export const reducer = (state: State, action: Action) => {
     case 'SET_TEST_MODE':
       return {
         ...initialState,
+        mode: 'Test',
         cash: 1000000,
       };
     case 'ADVANCE_DAY':
@@ -123,6 +126,8 @@ export const reducer = (state: State, action: Action) => {
         sellTotalCost,
         sellLogMessage,
       } = action.payload;
+      const remainingWallet =
+        state.assets[sellAssetName].wallet - sellAmount;
       return {
         ...state,
         cash: state.cash + sellTotalCost,
@@ -134,9 +139,16 @@ export const reducer = (state: State, action: Action) => {
           ...state.assets,
           [sellAssetName]: {
             ...state.assets[sellAssetName],
-            wallet: state.assets[sellAssetName].wallet - sellAmount,
-            totalCost: 0,
-            averageCost: 0,
+            wallet: remainingWallet,
+            totalCost:
+              remainingWallet === 0
+                ? 0
+                : state.assets[sellAssetName].totalCost -
+                  sellAmount * state.assets[sellAssetName].averageCost,
+            averageCost:
+              remainingWallet === 0
+                ? 0
+                : state.assets[sellAssetName].averageCost,
           },
         },
         log: [addTimestamp(sellLogMessage), ...state.log],

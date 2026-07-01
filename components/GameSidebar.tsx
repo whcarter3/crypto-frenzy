@@ -183,11 +183,13 @@ const GameSidebar = ({
       <Chip
         figure={`${state.wallet.amount}/${state.wallet.capacity}`}
         label={`Lvl.${state.wallet.level}`}
+        dataCy="wallet"
         color="cyan"
         className="grow-0"
         button={{
           bool: !canExpandWallet,
           label: `lvl.${state.wallet.level + 1} $${numberWithCommas(state.wallet.expansionCost)}`,
+          id: 'expandWallet',
           action: () => increaseWalletCapacity(state, dispatch),
         }}
       />

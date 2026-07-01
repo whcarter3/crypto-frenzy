@@ -35,6 +35,7 @@ const Actions = ({
           button={{
             bool: canPayDebt,
             label: 'Pay',
+            id: 'payDebt',
             action: () => payDebt(dispatch, state),
           }}
         />
@@ -45,6 +46,7 @@ const Actions = ({
           button={{
             bool: isGameOver,
             label: 'Adv Day',
+            id: 'advDay',
             action: () =>
               advanceDay(state, dispatch, showNotification),
           }}
