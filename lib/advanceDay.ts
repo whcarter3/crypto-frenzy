@@ -1,14 +1,20 @@
 import { Dispatch } from 'react';
 import { Action, State } from './types';
 import { randomizePrices } from '../lib/prices';
-import { numberWithCommas } from '../helpers/utils';
-import { AlertMessages, getAlertType } from '../helpers/alerts';
+import { AlertMessages } from '../helpers/alerts';
 
+/**
+ * Persists a score to localStorage if it beats the saved high score
+ * for the given mode.
+ * @param {number} score - The score to consider.
+ * @param {State['mode']} mode - The mode the run was played in.
+ * @returns {boolean} Whether the score set a new high score.
+ */
 const saveHighScore = (
   score: number,
   mode: 'Easy' | 'Hard' | 'Normal' | 'Test'
 ) => {
-  if (mode === 'Test') return; // Don't save high scores for test mode
+  if (mode === 'Test') return false; // Don't save high scores for test mode
 
   const key =
     mode === 'Easy'
@@ -26,26 +32,15 @@ const saveHighScore = (
   return false;
 };
 
-const getModeEmoji = (mode: 'Easy' | 'Hard' | 'Normal' | 'Test') => {
-  switch (mode) {
-    case 'Easy':
-      return '🌱'; // Sprout for beginner
-    case 'Hard':
-      return '🔥'; // Fire for hard
-    case 'Normal':
-      return '⚡'; // Lightning for normal
-    default:
-      return '';
-  }
-};
-
 /**
  * Advances the game by one day, updating the state and dispatching actions accordingly.
+ * When the final day is reached the run is settled: the score (cash - debt) is
+ * computed, the high score persisted, and GAME_OVER dispatched so the game-over
+ * screen renders.
  * @param {State} state - The current state of the application.
  * @param {Dispatch<Action>} dispatch - The dispatch function for updating the state.
  * @param {Function} showNotification - The function to show notifications.
  */
-
 export const advanceDay = (
   state: State,
   dispatch: Dispatch<Action>,
@@ -54,77 +49,28 @@ export const advanceDay = (
     type: 'info' | 'success' | 'error' | 'warning'
   ) => void
 ) => {
-  // Handle game over state first
-  if (state.currentDay >= state.days) {
+  if (state.currentDay >= state.days || state.gameOver) return;
+
+  const completedDay = state.currentDay;
+  const newDay = completedDay + 1;
+  dispatch({ type: 'ADVANCE_DAY' });
+
+  if (newDay >= state.days) {
+    // Run complete — settle up. Unsold holdings don't count toward the score.
     const score = state.cash - state.debt;
-    const isNewHighScore = saveHighScore(score, state.mode);
-    const modeEmoji = getModeEmoji(state.mode);
-
-    showNotification?.(
-      `Game Over! Your score: $${numberWithCommas(score)}${
-        isNewHighScore
-          ? ` - New ${state.mode} Mode ${modeEmoji} High Score! 🏆`
-          : ` (${state.mode} Mode ${modeEmoji})`
-      }`,
-      isNewHighScore ? 'success' : 'info'
-    );
-
-    dispatch({ type: 'SET_HIGH_SCORE', payload: score });
-    dispatch({ type: 'TOGGLE_MODAL' }); // Show game mode modal
+    const newHighScore = saveHighScore(score, state.mode);
+    dispatch({ type: 'GAME_OVER', payload: { score, newHighScore } });
     return;
   }
 
-  dispatch({ type: 'ADVANCE_DAY' });
-
-  //warning before last day
-  if (state.currentDay === state.days - 1) {
+  if (newDay === state.days - 1) {
     showNotification?.(AlertMessages.LAST_DAY, 'warning');
   }
 
-  //end of game -- alert score -- set high score -- show game mode modal
-  if (state.currentDay >= state.days) {
-    const score = state.cash - state.debt;
-    const isNewHighScore = saveHighScore(score, state.mode);
-    const modeEmoji = getModeEmoji(state.mode);
-
-    showNotification?.(
-      `Game Over! Your score: $${numberWithCommas(score)}${
-        isNewHighScore
-          ? ` - New ${state.mode} Mode ${modeEmoji} High Score! 🏆`
-          : ` (${state.mode} Mode ${modeEmoji})`
-      }`,
-      isNewHighScore ? 'success' : 'info'
-    );
-
-    dispatch({ type: 'SET_HIGH_SCORE', payload: score });
-    dispatch({ type: 'TOGGLE_MODAL' }); // Show game mode modal
-  } else {
-    if (state.currentDay === 0) {
-      //sets initial prices to randomized value from mid range
-      dispatch({
-        type: 'SET_LOG',
-        payload: [
-          `======== Start of Game =========`,
-          `You borrowed $${numberWithCommas(state.cash)} at ${
-            state.interestRate * 100
-          }% daily interest`,
-          `You have ${state.days} days to make as much money as you can! 💎🙌`,
-        ],
-      });
-      randomizePrices(state, dispatch);
-    } else {
-      dispatch({
-        type: 'SET_LOG',
-        payload: [
-          `========= End of Day ${state.currentDay} =========`,
-        ],
-      });
-
-      randomizePrices(state, dispatch);
-
-      dispatch({
-        type: 'INCREASE_DEBT',
-      });
-    }
-  }
+  dispatch({
+    type: 'SET_LOG',
+    payload: [`========= End of Day ${completedDay} =========`],
+  });
+  randomizePrices(state, dispatch);
+  dispatch({ type: 'INCREASE_DEBT' });
 };

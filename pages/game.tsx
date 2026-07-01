@@ -1,23 +1,41 @@
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import Head from 'next/head';
 import { reducer } from '../lib/reducer';
 import { initialState } from '../lib/state/initialState';
+import {
+  loadGame,
+  saveGame,
+  clearSave,
+} from '../lib/state/persistence';
 import AssetTable from '../components/AssetTable';
 import Actions from '../components/Actions';
 import GameSidebar from '../components/GameSidebar';
 import Log from '../components/Log';
-// import Modal from '../components/GameMode';
+import GameMode from '../components/GameMode';
+import GameOver from '../components/GameOver';
 
 export default function Game() {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [hydrated, setHydrated] = useState(false);
 
-  // Difficulty modal commented out: assume Normal mode and auto-start
+  // Restore a saved run once on mount; otherwise the difficulty modal shows.
   useEffect(() => {
-    if (state.modalOpen) {
-      dispatch({ type: 'INIT' });
-      dispatch({ type: 'TOGGLE_MODAL' });
+    const saved = loadGame();
+    if (saved) {
+      dispatch({ type: 'RESTORE', payload: saved });
     }
+    setHydrated(true);
   }, []);
+
+  // Autosave mid-run; the save is cleared once the run ends.
+  useEffect(() => {
+    if (!hydrated) return;
+    if (state.gameOver) {
+      clearSave();
+    } else if (!state.modalOpen) {
+      saveGame(state);
+    }
+  }, [state, hydrated]);
 
   return (
     <div className=" text-crt-green bg-crt-bg crt-scanlines flex min-h-screen">
@@ -27,7 +45,8 @@ export default function Game() {
           name="description"
           content="Play Crypto Frenzy, the retro crypto trading sim."
         />
-        <link rel="icon" href="/favicon1.ico" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       </Head>
 
       <main className="flex-1 flex">
@@ -44,11 +63,12 @@ export default function Game() {
         </div>
       </main>
 
-      {/* Difficulty modal commented out – Normal mode only for now
-      {state.modalOpen && (
-        <Modal state={state} dispatch={dispatch} />
+      {hydrated && state.modalOpen && !state.gameOver && (
+        <GameMode state={state} dispatch={dispatch} />
       )}
-      */}
+      {hydrated && state.gameOver && (
+        <GameOver state={state} dispatch={dispatch} />
+      )}
     </div>
   );
 }

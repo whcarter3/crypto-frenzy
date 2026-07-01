@@ -1,7 +1,16 @@
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { hasSave, clearSave } from '../lib/state/persistence';
 
 export default function Home() {
+  const [saveExists, setSaveExists] = useState(false);
+
+  // localStorage is only available client-side
+  useEffect(() => {
+    setSaveExists(hasSave());
+  }, []);
+
   return (
     <div className="min-h-screen text-crt-green bg-crt-bg crt-scanlines flex items-center">
       <Head>
@@ -10,7 +19,8 @@ export default function Home() {
           name="description"
           content="Retro-styled crypto trading sim."
         />
-        <link rel="icon" href="/favicon1.ico" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       </Head>
 
       <main className="container mx-auto px-6 md:px-8 py-10 max-w-4xl">
@@ -18,7 +28,8 @@ export default function Home() {
           <header className="flex items-start justify-between gap-6">
             <div>
               <p className="text-xs text-crt-cyan/70 mb-1">
-                [ ARCADE TERMINAL // BUILD 0.1.0 ]
+                [ ARCADE TERMINAL // BUILD{' '}
+                {process.env.NEXT_PUBLIC_APP_VERSION} ]
               </p>
               <h1 className="text-4xl md:text-5xl font-bold text-crt-green text-glow-crt">
                 CRYPTO FRENZY
@@ -106,23 +117,44 @@ export default function Home() {
                 SYSTEM STATUS
               </h3>
               <p>
-                Save data and custom profiles will live in local corp
-                archives.
+                Save data lives in local corp archives — your run
+                survives a reboot of this browser.
               </p>
               <p className="text-slate-500">
-                Persistence module: WIP
+                Persistence module:{' '}
+                <span className="text-crt-green">ONLINE</span>
               </p>
             </div>
           </section>
 
           <div className="pt-6 flex flex-col sm:flex-row gap-4 items-center">
-            <Link
-              href="/game"
-              className="btn btn-primary flex-1 py-3 text-center text-lg"
-            >
-              START RUN
-            </Link>
-            {/* Tip: you can change difficulty and see full rules once the game loads. */}
+            {saveExists ? (
+              <>
+                <Link
+                  href="/game"
+                  className="btn btn-primary flex-1 py-3 text-center text-lg"
+                  id="resumeRun"
+                >
+                  RESUME RUN
+                </Link>
+                <Link
+                  href="/game"
+                  onClick={() => clearSave()}
+                  className="btn btn-danger flex-1 py-3 text-center text-lg"
+                  id="newRun"
+                >
+                  NEW RUN
+                </Link>
+              </>
+            ) : (
+              <Link
+                href="/game"
+                className="btn btn-primary flex-1 py-3 text-center text-lg"
+                id="startRun"
+              >
+                START RUN
+              </Link>
+            )}
           </div>
         </div>
       </main>

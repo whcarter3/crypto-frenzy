@@ -1,8 +1,13 @@
 import { Dispatch } from 'react';
 import { State, Action } from '../lib/types';
-import { numberWithCommas } from '../helpers/utils';
+import {
+  computeNetWorth,
+  formatMoney,
+  numberWithCommas,
+} from '../helpers/utils';
 import { cn } from '../lib/cn';
 import { increaseWalletCapacity } from '../lib/wallet';
+import { clearSave } from '../lib/state/persistence';
 import Chip from './Chip';
 import { AlertMessages, getAlertType } from '../helpers/alerts';
 import { sellAsset } from '../lib/buySell';
@@ -39,18 +44,7 @@ const GameSidebar = ({
     sellAsset(assetKey, asset.price, asset.wallet, dispatch);
   };
 
-  const getNetWorth = (): number => {
-    const assetsValue = Object.values(state.assets).reduce(
-      (total, asset) => {
-        if (!asset.active) return total;
-        return total + asset.price * asset.wallet;
-      },
-      0,
-    );
-    return assetsValue + state.cash - state.debt;
-  };
-
-  const netWorth = getNetWorth();
+  const netWorth = computeNetWorth(state);
   const daysLeft = Math.max(0, state.days - state.currentDay);
   const hasHighScore = state.highScore != null && state.highScore > 0;
 
@@ -74,12 +68,12 @@ const GameSidebar = ({
       >
         <div
           className={cn(
-            'text-7xl font-bold text-white/90',
+            'text-7xl font-bold text-white/90 break-all',
             netWorth >= 0 && 'text-crt-green',
             netWorth < 0 && 'text-crt-red',
           )}
         >
-          ${numberWithCommas(netWorth)}
+          {formatMoney(netWorth)}
         </div>
       </div>
 
@@ -196,7 +190,10 @@ const GameSidebar = ({
 
       <button
         type="button"
-        onClick={() => dispatch({ type: 'INIT' })}
+        onClick={() => {
+          clearSave();
+          dispatch({ type: 'INIT' });
+        }}
         className="btn btn-danger w-full py-2 px-3 text-xs font-semibold"
         id="runInfo"
       >

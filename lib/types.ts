@@ -47,6 +47,30 @@ export type Wallet = {
 }
 
 /**
+ * Stats tracked over the course of a single run, shown on the game-over screen.
+ * @typedef {Object} RunStats
+ * @property {number} peakNetWorth - The highest net worth reached during the run.
+ * @property {number} totalTrades - Total buys and sells made during the run.
+ * @property {number} bestTradeProfit - The largest realized profit from a single sale.
+ */
+export type RunStats = {
+  peakNetWorth: number
+  totalTrades: number
+  bestTradeProfit: number
+}
+
+/**
+ * The outcome of a finished run. Null while a run is in progress.
+ * @typedef {Object} GameOverSummary
+ * @property {number} score - The final score (cash - debt).
+ * @property {boolean} newHighScore - Whether the score beat the saved high score.
+ */
+export type GameOverSummary = {
+  score: number
+  newHighScore: boolean
+}
+
+/**
  * Represents the state of the game.
  * @typedef {Object} State
  * @property {number} days - The total number of days in the game.
@@ -57,6 +81,8 @@ export type Wallet = {
  * @property {string[]} log - The log of events that have occurred in the game.
  * @property {number|null} highScore - The player's high score, if any.
  * @property {boolean} modalOpen - Whether the modal is open.
+ * @property {GameOverSummary|null} gameOver - Summary of the finished run, or null mid-run.
+ * @property {RunStats} stats - Stats tracked over the current run.
  * @property {Object.<string, Asset>} assets - The assets in the game, keyed by symbol.
  * @property {Wallet} wallet - The player's wallet.
  * @property {number} lowRangePriceChance - The chance of a low range price movement.
@@ -72,6 +98,8 @@ export type State = {
   log: string[]
   highScore?: number | null
   modalOpen: boolean
+  gameOver: GameOverSummary | null
+  stats: RunStats
   lowRangePriceChance: number
   highRangePriceChance: number
   mode: "Easy" | "Hard" | "Normal" | "Test"
@@ -154,8 +182,12 @@ export type Action =
       payload: string[]
     }
   | {
-      type: "SET_HIGH_SCORE"
-      payload: number
+      type: "GAME_OVER"
+      payload: GameOverSummary
+    }
+  | {
+      type: "RESTORE"
+      payload: State
     }
   | {
       type: "PAY_DEBT"

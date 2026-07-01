@@ -1,6 +1,22 @@
 import { Action, State } from '../lib/types';
-import { addTimestamp } from '../helpers/utils';
+import { addTimestamp, computeNetWorth } from '../helpers/utils';
 import { initialState } from './state/initialState';
+
+/**
+ * Keeps stats.peakNetWorth up to date after every state change.
+ * @param {State} next - The state produced by the base reducer.
+ * @returns {State} The state with peakNetWorth raised if a new peak was hit.
+ */
+const trackPeakNetWorth = (next: State): State => {
+  const netWorth = computeNetWorth(next);
+  if (netWorth > next.stats.peakNetWorth) {
+    return {
+      ...next,
+      stats: { ...next.stats, peakNetWorth: netWorth },
+    };
+  }
+  return next;
+};
 
 /**
  * The reducer function for updating the game state based on dispatched actions.
@@ -8,7 +24,10 @@ import { initialState } from './state/initialState';
  * @param {Action} action - The dispatched action.
  * @returns {State} The updated game state.
  */
-export const reducer = (state: State, action: Action): State => {
+export const reducer = (state: State, action: Action): State =>
+  trackPeakNetWorth(baseReducer(state, action));
+
+const baseReducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'INIT':
       const initHighScoreKey =
@@ -104,6 +123,10 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         cash: state.cash - buyTotalCost,
+        stats: {
+          ...state.stats,
+          totalTrades: state.stats.totalTrades + 1,
+        },
         wallet: {
           ...state.wallet,
           amount: state.wallet.amount + buyAmount,
@@ -128,9 +151,20 @@ export const reducer = (state: State, action: Action): State => {
       } = action.payload;
       const remainingWallet =
         state.assets[sellAssetName].wallet - sellAmount;
+      const tradeProfit =
+        sellTotalCost -
+        sellAmount * state.assets[sellAssetName].averageCost;
       return {
         ...state,
         cash: state.cash + sellTotalCost,
+        stats: {
+          ...state.stats,
+          totalTrades: state.stats.totalTrades + 1,
+          bestTradeProfit: Math.max(
+            state.stats.bestTradeProfit,
+            tradeProfit,
+          ),
+        },
         wallet: {
           ...state.wallet,
           amount: state.wallet.amount - sellAmount,
@@ -173,20 +207,26 @@ export const reducer = (state: State, action: Action): State => {
         ...state,
         log: [...action.payload.map(addTimestamp), ...state.log],
       };
-    case 'SET_HIGH_SCORE':
-      const saveHighScoreKey =
-        state.mode === 'Easy'
-          ? 'highScoreEasy'
-          : state.mode === 'Hard'
-            ? 'highScoreHard'
-            : 'highScore';
-      if (state.mode !== 'Test') {
-        localStorage.setItem(
-          saveHighScoreKey,
-          action.payload.toString(),
-        );
-      }
-      return { ...state, highScore: action.payload };
+    case 'GAME_OVER':
+      // localStorage persistence happens in advanceDay's saveHighScore,
+      // which only writes when the score actually beats the record.
+      return {
+        ...state,
+        gameOver: action.payload,
+        highScore: action.payload.newHighScore
+          ? action.payload.score
+          : state.highScore,
+        modalOpen: false,
+      };
+    case 'RESTORE':
+      // Spread over initialState so saves from older builds pick up
+      // defaults for any newly added fields.
+      return {
+        ...initialState,
+        ...action.payload,
+        modalOpen: false,
+        gameOver: null,
+      };
     case 'PAY_DEBT':
       return {
         ...state,
