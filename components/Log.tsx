@@ -1,22 +1,22 @@
 const Log = ({ log }) => {
   return (
-    <div className="bg-slate-800 rounded-lg border border-slate-700 p-4">
-      <h3 className="text-lg font-semibold text-slate-300 mb-3">
-        Activity Log
-      </h3>
-      <ul className="space-y-2 max-h-64 overflow-y-auto text-sm">
-        {log.map((msg, idx) => {
-          return (
+    <>
+      <p className="text-2xl text-white/90 font-semibold tracking-wide">
+        ACTIVITY
+      </p>
+      <div className="panel-crt rounded-lg p-4">
+        <ul className="space-y-1.5 text-sm h-[15vh] overflow-y-auto text-white/90">
+          {log.map((msg, idx) => (
             <li
               key={idx}
-              className="text-slate-400 border-l-2 border-slate-600 pl-3 py-1"
+              className="border-l-2 border-crt-cyan/50 pl-3 py-0.5"
             >
               {msg}
             </li>
-          );
-        })}
-      </ul>
-    </div>
+          ))}
+        </ul>
+      </div>
+    </>
   );
 };
 

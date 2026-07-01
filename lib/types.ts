@@ -32,19 +32,18 @@ export type Asset = {
 
 /**
  * Represents a player's wallet.
+ * Each upgrade level doubles capacity and doubles the cost for the next upgrade.
  * @typedef {Object} Wallet
- * @property {number} amount - The amount of cash in the player's wallet.
- * @property {number} capacity - The maximum capacity of the player's wallet.
- * @property {number} increase - The amount by which the player's wallet capacity increases.
- * @property {number} expansionCost - The cost to expand the player's wallet capacity.
- * @property {number} percentIncrease - The percentage increase in the player's wallet capacity.
+ * @property {number} amount - Current slots used (total asset positions).
+ * @property {number} capacity - Maximum capacity (100 * 2^level).
+ * @property {number} level - Upgrade level (0 = 100 capacity, 1 = 200, 2 = 400, …).
+ * @property {number} expansionCost - Cost for next upgrade (50000 * 2^level).
  */
 export type Wallet = {
   amount: number
   capacity: number
-  increase: number
+  level: number
   expansionCost: number
-  percentIncrease: number
 }
 
 /**

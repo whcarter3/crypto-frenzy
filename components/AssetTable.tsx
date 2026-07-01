@@ -1,11 +1,12 @@
 import { Dispatch } from 'react';
 import { State, Action } from '../lib/types';
 import { numberWithCommas } from '../helpers/utils';
+import { cn } from '../lib/cn';
 import { AlertMessages, getAlertType } from '../helpers/alerts';
 import { buyAsset, sellAsset } from '../lib/buySell';
 import { useNotification } from '../lib/NotificationContext';
 
-const Table = ({
+const AssetTable = ({
   state,
   dispatch,
 }: {
@@ -17,12 +18,12 @@ const Table = ({
   const handleSell = (
     e,
     state: State,
-    dispatch: Dispatch<Action>
+    dispatch: Dispatch<Action>,
   ) => {
     if (state.currentDay === 0) {
       showNotification(
         AlertMessages.NEED_START,
-        getAlertType(AlertMessages.NEED_START)
+        getAlertType(AlertMessages.NEED_START),
       );
       return;
     }
@@ -30,7 +31,7 @@ const Table = ({
     if (state.assets[e.target.id].wallet === 0) {
       showNotification(
         AlertMessages.INSUFFICIENT_ASSETS,
-        getAlertType(AlertMessages.INSUFFICIENT_ASSETS)
+        getAlertType(AlertMessages.INSUFFICIENT_ASSETS),
       );
       return;
     }
@@ -39,7 +40,7 @@ const Table = ({
       e.target.id,
       state.assets[e.target.id].price,
       state.assets[e.target.id].wallet,
-      dispatch
+      dispatch,
     );
   };
 
@@ -47,21 +48,21 @@ const Table = ({
     if (state.currentDay === 0) {
       showNotification(
         AlertMessages.NEED_START,
-        getAlertType(AlertMessages.NEED_START)
+        getAlertType(AlertMessages.NEED_START),
       );
       return;
     }
     if (state.wallet.amount >= state.wallet.capacity) {
       showNotification(
         AlertMessages.NEED_WALLET,
-        getAlertType(AlertMessages.NEED_WALLET)
+        getAlertType(AlertMessages.NEED_WALLET),
       );
       return;
     }
     if (state.cash < state.assets[e.target.id].price) {
       showNotification(
         AlertMessages.INSUFFICIENT_FUNDS,
-        getAlertType(AlertMessages.INSUFFICIENT_FUNDS)
+        getAlertType(AlertMessages.INSUFFICIENT_FUNDS),
       );
       return;
     }
@@ -70,27 +71,29 @@ const Table = ({
       e.target.id,
       state.assets[e.target.id].price,
       state,
-      dispatch
+      dispatch,
     );
   };
 
   const getPriceColor = (price: number, avgCost: number) => {
-    if (avgCost === 0 || price === avgCost) return 'text-slate-300';
-    return price > avgCost ? 'text-green-400' : 'text-red-400';
+    if (avgCost === 0 || price === avgCost) return 'text-white/80';
+    return price > avgCost ? 'text-crt-green' : 'text-crt-red';
   };
 
   const getPerformanceIndicator = (
     price: number,
-    avgCost: number
+    avgCost: number,
   ) => {
     if (avgCost === 0 || price === avgCost) return null;
     const percentChange = ((price - avgCost) / avgCost) * 100;
     const isProfit = price > avgCost;
     return (
       <span
-        className={`ml-2 text-xs ${
-          isProfit ? 'text-green-400' : 'text-red-400'
-        }`}
+        className={cn(
+          'ml-2 text-xs',
+          isProfit && 'text-crt-green',
+          !isProfit && 'text-crt-red',
+        )}
       >
         {isProfit ? '↑' : '↓'} {Math.abs(percentChange).toFixed(1)}%
       </span>
@@ -98,28 +101,28 @@ const Table = ({
   };
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-700">
+    <div className="overflow-x-auto panel-crt rounded-lg">
       <table className="w-full">
-        <thead className="bg-slate-800">
-          <tr>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
+        <thead className="bg-white/5">
+          <tr className="border-b border-white/20">
+            <th className="w-28 min-w-28 max-w-28 px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Asset
             </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
+            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Price
             </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
-              Action
-            </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
+            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Avg. Price
             </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
+            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Wallet
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
+              Action
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-700">
+        <tbody className="divide-y divide-white/10">
           {Object.keys(state.assets).map((asset) => {
             const name = state.assets[asset].name;
             const symbol = state.assets[asset].symbol;
@@ -142,26 +145,28 @@ const Table = ({
             return (
               <tr
                 key={asset}
-                className="hover:bg-slate-800/50 transition-colors"
+                className="hover:bg-white/5 transition-colors"
               >
                 <td
-                  className="px-4 py-3 text-sm text-slate-300"
+                  className="w-28 min-w-28 max-w-28 px-4 py-3 text-sm text-white/90"
                   data-cy="assetSymbol"
                 >
-                  <div className="flex items-center">
-                    <span className="font-medium">{symbol}</span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="font-medium shrink-0">
+                      {symbol}
+                    </span>
                     {wallet > 0 && (
-                      <span className="ml-2 px-1.5 py-0.5 text-xs bg-slate-700 text-slate-300 rounded">
+                      <span className="shrink-0 px-1.5 py-0.5 text-xs bg-crt-green/20 text-crt-green rounded border border-crt-green/40">
                         Holding
                       </span>
                     )}
                   </div>
                 </td>
                 <td
-                  className={`px-4 py-3 text-sm font-medium ${getPriceColor(
-                    price,
-                    avgCost
-                  )}`}
+                  className={cn(
+                    'px-4 py-3 text-sm font-medium',
+                    getPriceColor(price, avgCost),
+                  )}
                   data-cy="assetPrice"
                   title={
                     avgCost > 0
@@ -178,14 +183,28 @@ const Table = ({
                   </div>
                 </td>
                 <td
+                  className="px-4 py-3 text-sm text-white/80"
+                  data-cy="assetAveragePrice"
+                >
+                  ${numberWithCommas(avgCost)}
+                </td>
+                <td
+                  className="px-4 py-3 text-sm text-crt-cyan font-medium"
+                  data-cy={`${asset}AssetWallet`}
+                >
+                  {wallet}
+                </td>
+                <td
                   className="px-4 py-3 text-sm"
                   data-cy="assetActions"
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 justify-end">
                     <button
-                      className={`btn ${
-                        canBuy ? 'btn-primary' : 'btn-disabled'
-                      }`}
+                      className={cn(
+                        'btn',
+                        canBuy && 'btn-primary',
+                        !canBuy && 'btn-disabled',
+                      )}
                       onClick={(e) => handleBuy(e, state, dispatch)}
                       id={`${asset}`}
                       disabled={!canBuy}
@@ -198,35 +217,7 @@ const Table = ({
                     >
                       Buy
                     </button>
-                    <button
-                      className={`btn ${
-                        canSell ? 'btn-success' : 'btn-disabled'
-                      }`}
-                      onClick={(e) => handleSell(e, state, dispatch)}
-                      id={`${asset}`}
-                      disabled={!canSell}
-                      data-cy={`${asset}SellButton`}
-                      title={
-                        !canSell
-                          ? 'No assets to sell'
-                          : 'Sell this asset'
-                      }
-                    >
-                      Sell
-                    </button>
                   </div>
-                </td>
-                <td
-                  className="px-4 py-3 text-sm text-slate-300"
-                  data-cy="assetAveragePrice"
-                >
-                  ${numberWithCommas(avgCost)}
-                </td>
-                <td
-                  className="px-4 py-3 text-sm text-slate-300"
-                  data-cy={`${asset}AssetWallet`}
-                >
-                  {wallet}
                 </td>
               </tr>
             );
@@ -237,4 +228,4 @@ const Table = ({
   );
 };
 
-export default Table;
+export default AssetTable;

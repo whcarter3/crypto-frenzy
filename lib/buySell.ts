@@ -1,7 +1,6 @@
 import { Dispatch } from "react"
 import { State, Action } from "../lib/types"
 import { calculateMaxShares, numberWithCommas } from "../helpers/utils"
-import { AlertMessages, showAlert } from "../helpers/alerts"
 
 /**
  * Buys an asset and updates the game state.
@@ -27,25 +26,23 @@ export const buyAsset = (
     assetPrice
   )} for $${numberWithCommas(totalCost)}`
 
-  if (totalCost > state.cash) {
-    showAlert(AlertMessages.NEED_CASH)
-  } else {
-    dispatch({
-      type: "BUY_ASSET",
-      payload: {
-        buyAssetName: assetName,
-        buyAmount: buyAmount,
-        buyTotalCost: totalCost,
-        buyLogMessage: logMsg,
-      },
-    })
-    dispatch({
-      type: "SET_AVG_COST",
-      payload: {
-        avgCostAssetName: assetName,
-      },
-    })
-  }
+  if (totalCost > state.cash) return
+
+  dispatch({
+    type: "BUY_ASSET",
+    payload: {
+      buyAssetName: assetName,
+      buyAmount: buyAmount,
+      buyTotalCost: totalCost,
+      buyLogMessage: logMsg,
+    },
+  })
+  dispatch({
+    type: "SET_AVG_COST",
+    payload: {
+      avgCostAssetName: assetName,
+    },
+  })
 }
 
 /**
@@ -66,17 +63,15 @@ export const sellAsset = (
     assetPrice
   )} for $${numberWithCommas(salePrice)}`
 
-  if (assetWallet === 0) {
-    showAlert(AlertMessages.NEED_ASSET)
-  } else {
-    dispatch({
-      type: "SELL_ASSET",
-      payload: {
-        sellAssetName: assetName,
-        sellAmount: assetWallet,
-        sellTotalCost: salePrice,
-        sellLogMessage: logMsg,
-      },
-    })
-  }
+  if (assetWallet === 0) return
+
+  dispatch({
+    type: "SELL_ASSET",
+    payload: {
+      sellAssetName: assetName,
+      sellAmount: assetWallet,
+      sellTotalCost: salePrice,
+      sellLogMessage: logMsg,
+    },
+  })
 }
