@@ -1,9 +1,9 @@
 [package]
 name = "app"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
+description = "Crypto Frenzy — a retro crypto trading sim"
+authors = ["William Carter"]
+license = "MIT"
 repository = ""
 edition = "2021"
 rust-version = "1.77.2"

@@ -1,7 +1,7 @@
 import { Dispatch } from 'react';
 import { Action, State } from '../lib/types';
 import { cn } from '../lib/cn';
-import { advanceDay } from '../lib/advanceDay';
+import { clearSave } from '../lib/state/persistence';
 
 type GameMode = 'Easy' | 'Normal' | 'Hard' | 'Test';
 
@@ -49,14 +49,15 @@ const GameMode = ({
   state: State;
 }) => {
   const handleStart = () => {
-    advanceDay(state, dispatch);
-    dispatch({ type: 'INIT' });
+    clearSave(); // starting a new run invalidates any old autosave
     if (state.mode === 'Easy') {
       dispatch({ type: 'SET_EASY_MODE' });
     } else if (state.mode === 'Hard') {
       dispatch({ type: 'SET_HARD_MODE' });
     } else if (state.mode === 'Test') {
       dispatch({ type: 'SET_TEST_MODE' });
+    } else {
+      dispatch({ type: 'INIT' });
     }
     dispatch({ type: 'TOGGLE_MODAL' });
   };

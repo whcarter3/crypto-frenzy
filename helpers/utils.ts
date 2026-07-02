@@ -1,3 +1,5 @@
+import { State } from '../lib/types';
+
 /**
  * Calculates the maximum number of shares that can be purchased with a given amount of cash.
  *
@@ -48,3 +50,51 @@ export const currentTime = (): string => {
 // HELPER FUNCTIONS ===================================
 export const addTimestamp = (message: string): string =>
   `${currentTime()} - ${message}`;
+
+/**
+ * Computes the player's net worth: cash minus debt plus the market
+ * value of all active holdings.
+ *
+ * @param {State} state The current game state.
+ * @returns {number} The player's net worth.
+ */
+export const computeNetWorth = (state: State): number => {
+  const assetsValue = Object.values(state.assets).reduce(
+    (total, asset) => {
+      if (!asset.active) return total;
+      return total + asset.price * asset.wallet;
+    },
+    0,
+  );
+  return assetsValue + state.cash - state.debt;
+};
+
+/**
+ * Formats a dollar amount, keeping the minus sign in front of the $.
+ *
+ * @param {number} amount The dollar amount to format.
+ * @returns {string} The formatted amount, e.g. "-$1,500".
+ */
+export const formatMoney = (amount: number): string =>
+  amount < 0
+    ? `-$${numberWithCommas(Math.abs(amount))}`
+    : `$${numberWithCommas(amount)}`;
+
+/**
+ * Gets the emoji for a game mode, used in score displays.
+ *
+ * @param {State['mode']} mode The game mode.
+ * @returns {string} The emoji for the mode.
+ */
+export const getModeEmoji = (mode: State['mode']): string => {
+  switch (mode) {
+    case 'Easy':
+      return '🌱';
+    case 'Hard':
+      return '🔥';
+    case 'Normal':
+      return '⚡';
+    default:
+      return '';
+  }
+};

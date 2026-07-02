@@ -9,6 +9,12 @@ export const initialState: State = {
   log: ['- Click Advance Day to start.'],
   highScore: null,
   modalOpen: true,
+  gameOver: null,
+  stats: {
+    peakNetWorth: 0,
+    totalTrades: 0,
+    bestTradeProfit: 0,
+  },
   mode: 'Normal',
   lowRangePriceChance: 5,
   highRangePriceChance: 94,
