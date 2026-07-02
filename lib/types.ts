@@ -186,10 +186,6 @@ export type Action =
       payload: GameOverSummary
     }
   | {
-      type: "RESTORE"
-      payload: State
-    }
-  | {
       type: "PAY_DEBT"
     }
   | {

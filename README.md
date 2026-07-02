@@ -20,21 +20,22 @@ Requires Node 24 (see `.node-version`).
 
 ```bash
 npm install
-npm run dev        # dev server on http://localhost:3000
+npm run dev        # Vite dev server on http://localhost:3000
 npm run lint       # eslint
+npm run typecheck  # tsc --noEmit
 ```
 
-The game is a fully client-side Next.js app (`output: 'export'`) — no server, no API.
+The game is a fully client-side Vite + React SPA — no server, no API.
 Game logic lives in `lib/` (reducer, prices, buy/sell, debt), UI in `components/`,
-pages in `pages/`.
+routes in `pages/`.
 
 ## Testing
 
-E2E tests run with Cypress against a static build:
+E2E tests run with Cypress against a production build:
 
 ```bash
-npm run build                      # outputs to out/
-npx serve out -l 3000              # serve the static export
+npm run build                      # outputs to dist/
+npx serve -s dist -l 3000          # serve the build (SPA fallback)
 npm test                           # cypress run (in another shell)
 ```
 

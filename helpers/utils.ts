@@ -15,7 +15,7 @@ export const calculateMaxShares = (
   walletCapacity: number,
   cash: number,
 ): number => {
-  let shares = Math.floor(cash / assetPrice);
+  const shares = Math.floor(cash / assetPrice);
   //ensure shares don't exceed wallet capacity, else return max shares
   return shares + walletAmount >= walletCapacity
     ? walletCapacity - walletAmount

@@ -26,9 +26,9 @@ const randomizeAssetPrice = (
   highRangeThreshHold: number,
   dispatch: Dispatch<Action>
 ) => {
-  let coinFlip = Math.floor(Math.random() * 100)
-  let assetName = asset.name.toLowerCase()
-  let assetRange = asset.range
+  const coinFlip = Math.floor(Math.random() * 100)
+  const assetName = asset.name.toLowerCase()
+  const assetRange = asset.range
 
   if (coinFlip < lowRangeThreshHold) {
     dispatch({

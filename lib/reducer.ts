@@ -218,15 +218,6 @@ const baseReducer = (state: State, action: Action): State => {
           : state.highScore,
         modalOpen: false,
       };
-    case 'RESTORE':
-      // Spread over initialState so saves from older builds pick up
-      // defaults for any newly added fields.
-      return {
-        ...initialState,
-        ...action.payload,
-        modalOpen: false,
-        gameOver: null,
-      };
     case 'PAY_DEBT':
       return {
         ...state,

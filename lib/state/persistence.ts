@@ -41,7 +41,13 @@ export const loadGame = (): State | null => {
   const file = readSaveFile();
   if (!file) return null;
   // Spread over initialState so fields added in newer builds get defaults.
-  return { ...initialState, ...file.state };
+  // A restored run is always mid-run: modal closed, no game-over summary.
+  return {
+    ...initialState,
+    ...file.state,
+    modalOpen: false,
+    gameOver: null,
+  };
 };
 
 export const saveGame = (state: State): void => {
