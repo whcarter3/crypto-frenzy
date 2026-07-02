@@ -11,9 +11,6 @@ jobs:
   cypress-run:
     runs-on: ubuntu-latest
     permissions: write-all
-    # Runs tests in parallel with matrix strategy https://docs.cypress.io/guides/guides/parallelization
-    # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
-    # Also see warning here https://github.com/cypress-io/github-action#parallel
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -21,24 +18,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: ".node-version"
-      - name: Build cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            ${{ github.workspace }}/.next/cache
-          # Generate a new cache whenever packages or source files change.
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          # If source files changed but packages didn't, rebuild from a prior cache.
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+          cache: npm
       - name: E2E Tests
         # Uses the official Cypress GitHub action https://github.com/cypress-io/github-action
         uses: cypress-io/github-action@v4
         with:
-          # next.config.js sets output: 'export' for the Tauri build, so
-          # `next start` can't serve it (Next.js refuses to run a server
-          # against a static export) - serve the `out/` directory instead.
           build: npm run build
-          start: npx serve@latest out -l 3000
+          # -s serves the SPA fallback so /game resolves to index.html
+          start: npx serve -s dist -l 3000
           wait-on: "http://localhost:3000" # Waits for above

@@ -1,5 +1,5 @@
 import { Dispatch } from 'react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { Action, State } from '../lib/types';
 import { formatMoney, getModeEmoji } from '../helpers/utils';
 import { cn } from '../lib/cn';
@@ -96,7 +96,7 @@ const GameOver = ({
             Play Again
           </button>
           <Link
-            href="/"
+            to="/"
             className="btn flex-1 py-3 text-lg text-center"
             id="mainMenu"
           >

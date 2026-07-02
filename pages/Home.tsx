@@ -1,35 +1,22 @@
-import { useEffect, useState } from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { hasSave, clearSave } from '../lib/state/persistence';
+import { usePageTitle } from '../helpers/usePageTitle';
 
 export default function Home() {
-  const [saveExists, setSaveExists] = useState(false);
+  usePageTitle('Crypto Frenzy');
 
-  // localStorage is only available client-side
-  useEffect(() => {
-    setSaveExists(hasSave());
-  }, []);
+  // No prerender, so localStorage is readable on first render
+  const [saveExists] = useState(() => hasSave());
 
   return (
     <div className="min-h-screen text-crt-green bg-crt-bg crt-scanlines flex items-center">
-      <Head>
-        <title>Crypto Frenzy</title>
-        <meta
-          name="description"
-          content="Retro-styled crypto trading sim."
-        />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-      </Head>
-
       <main className="container mx-auto px-6 md:px-8 py-10 max-w-4xl">
         <div className="bg-crt-bg/80 rounded-sm border border-crt-cyan box-shadow-crt p-8 space-y-8">
           <header className="flex items-start justify-between gap-6">
             <div>
               <p className="text-xs text-crt-cyan/70 mb-1">
-                [ ARCADE TERMINAL // BUILD{' '}
-                {process.env.NEXT_PUBLIC_APP_VERSION} ]
+                [ ARCADE TERMINAL // BUILD {__APP_VERSION__} ]
               </p>
               <h1 className="text-4xl md:text-5xl font-bold text-crt-green text-glow-crt">
                 CRYPTO FRENZY
@@ -100,7 +87,6 @@ export default function Home() {
                 <li className="text-slate-500">▢ CREDITS (SOON)</li>
               </ul>
             </div>
-            {/* Difficulty selector commented out – Normal mode only for now
             <div className="space-y-2">
               <h3 className="text-crt-cyan font-semibold">
                 DIFFICULTY (IN-GAME)
@@ -111,7 +97,6 @@ export default function Home() {
                 debt mutates.
               </p>
             </div>
-            */}
             <div className="space-y-2">
               <h3 className="text-crt-cyan font-semibold">
                 SYSTEM STATUS
@@ -131,14 +116,14 @@ export default function Home() {
             {saveExists ? (
               <>
                 <Link
-                  href="/game"
+                  to="/game"
                   className="btn btn-primary flex-1 py-3 text-center text-lg"
                   id="resumeRun"
                 >
                   RESUME RUN
                 </Link>
                 <Link
-                  href="/game"
+                  to="/game"
                   onClick={() => clearSave()}
                   className="btn btn-danger flex-1 py-3 text-center text-lg"
                   id="newRun"
@@ -148,7 +133,7 @@ export default function Home() {
               </>
             ) : (
               <Link
-                href="/game"
+                to="/game"
                 className="btn btn-primary flex-1 py-3 text-center text-lg"
                 id="startRun"
               >
