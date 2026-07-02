@@ -2,6 +2,7 @@ import { Dispatch } from 'react';
 import { Action, State } from '../lib/types';
 import { cn } from '../lib/cn';
 import { clearSave } from '../lib/state/persistence';
+import { loadHighScore } from '../lib/state/highScores';
 
 type GameMode = 'Easy' | 'Normal' | 'Hard' | 'Test';
 
@@ -50,16 +51,14 @@ const GameMode = ({
 }) => {
   const handleStart = () => {
     clearSave(); // starting a new run invalidates any old autosave
-    if (state.mode === 'Easy') {
-      dispatch({ type: 'SET_EASY_MODE' });
-    } else if (state.mode === 'Hard') {
-      dispatch({ type: 'SET_HARD_MODE' });
-    } else if (state.mode === 'Test') {
-      dispatch({ type: 'SET_TEST_MODE' });
-    } else {
-      dispatch({ type: 'INIT' });
-    }
-    dispatch({ type: 'TOGGLE_MODAL' });
+    dispatch({
+      type: 'START_RUN',
+      payload: {
+        mode: state.mode,
+        seed: Date.now(),
+        highScore: loadHighScore(state.mode),
+      },
+    });
   };
 
   const modes: { name: GameMode }[] = [

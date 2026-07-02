@@ -1,10 +1,5 @@
 import { Dispatch } from 'react';
 import { Action, State } from '../lib/types';
-import { numberWithCommas } from '../helpers/utils';
-import { cn } from '../lib/cn';
-import { payDebt } from '../lib/debt';
-import { advanceDay } from '../lib/advanceDay';
-import { useNotification } from '../lib/NotificationContext';
 import Chip from './Chip';
 
 const Actions = ({
@@ -14,7 +9,6 @@ const Actions = ({
   dispatch: Dispatch<Action>;
   state: State;
 }) => {
-  const { showNotification } = useNotification();
   const canPayDebt = state.cash <= state.debt || state.debt === 0;
   const isGameOver = state.currentDay >= state.days;
 
@@ -36,7 +30,7 @@ const Actions = ({
             bool: canPayDebt,
             label: 'Pay',
             id: 'payDebt',
-            action: () => payDebt(dispatch, state),
+            action: () => dispatch({ type: 'PAY_DEBT' }),
           }}
         />
         <Chip
@@ -47,8 +41,7 @@ const Actions = ({
             bool: isGameOver,
             label: 'Adv Day',
             id: 'advDay',
-            action: () =>
-              advanceDay(state, dispatch, showNotification),
+            action: () => dispatch({ type: 'ADVANCE_DAY' }),
           }}
         />
       </div>

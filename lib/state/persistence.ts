@@ -3,7 +3,8 @@ import { initialState } from './initialState';
 
 const SAVE_KEY = 'cryptoFrenzySave';
 // Bump when the State shape changes incompatibly — old saves are discarded.
-const SAVE_VERSION = 1;
+// v2: engine refactor added rngState (deterministic PRNG).
+const SAVE_VERSION = 2;
 
 type SaveFile = {
   version: number;
@@ -24,6 +25,7 @@ const readSaveFile = (): SaveFile | null => {
     if (
       typeof saved?.currentDay !== 'number' ||
       typeof saved?.days !== 'number' ||
+      typeof saved?.rngState !== 'number' ||
       !saved.assets ||
       !saved.wallet
     ) {

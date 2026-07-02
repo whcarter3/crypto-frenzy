@@ -2,9 +2,6 @@ import { Dispatch } from 'react';
 import { State, Action } from '../lib/types';
 import { numberWithCommas } from '../helpers/utils';
 import { cn } from '../lib/cn';
-import { AlertMessages, getAlertType } from '../helpers/alerts';
-import { buyAsset, sellAsset } from '../lib/buySell';
-import { useNotification } from '../lib/NotificationContext';
 
 const AssetTable = ({
   state,
@@ -13,68 +10,6 @@ const AssetTable = ({
   state: State;
   dispatch: Dispatch<Action>;
 }) => {
-  const { showNotification } = useNotification();
-
-  const handleSell = (
-    e,
-    state: State,
-    dispatch: Dispatch<Action>,
-  ) => {
-    if (state.currentDay === 0) {
-      showNotification(
-        AlertMessages.NEED_START,
-        getAlertType(AlertMessages.NEED_START),
-      );
-      return;
-    }
-
-    if (state.assets[e.target.id].wallet === 0) {
-      showNotification(
-        AlertMessages.INSUFFICIENT_ASSETS,
-        getAlertType(AlertMessages.INSUFFICIENT_ASSETS),
-      );
-      return;
-    }
-
-    sellAsset(
-      e.target.id,
-      state.assets[e.target.id].price,
-      state.assets[e.target.id].wallet,
-      dispatch,
-    );
-  };
-
-  const handleBuy = (e, state: State, dispatch: Dispatch<Action>) => {
-    if (state.currentDay === 0) {
-      showNotification(
-        AlertMessages.NEED_START,
-        getAlertType(AlertMessages.NEED_START),
-      );
-      return;
-    }
-    if (state.wallet.amount >= state.wallet.capacity) {
-      showNotification(
-        AlertMessages.NEED_WALLET,
-        getAlertType(AlertMessages.NEED_WALLET),
-      );
-      return;
-    }
-    if (state.cash < state.assets[e.target.id].price) {
-      showNotification(
-        AlertMessages.INSUFFICIENT_FUNDS,
-        getAlertType(AlertMessages.INSUFFICIENT_FUNDS),
-      );
-      return;
-    }
-
-    buyAsset(
-      e.target.id,
-      state.assets[e.target.id].price,
-      state,
-      dispatch,
-    );
-  };
-
   const getPriceColor = (price: number, avgCost: number) => {
     if (avgCost === 0 || price === avgCost) return 'text-white/80';
     return price > avgCost ? 'text-crt-green' : 'text-crt-red';
@@ -124,7 +59,6 @@ const AssetTable = ({
         </thead>
         <tbody className="divide-y divide-white/10">
           {Object.keys(state.assets).map((asset) => {
-            const name = state.assets[asset].name;
             const symbol = state.assets[asset].symbol;
             const price = state.assets[asset].price;
             const avgCost = state.assets[asset].averageCost;
@@ -140,7 +74,6 @@ const AssetTable = ({
               price === 0 ||
               walletAmount === walletCapacity
             );
-            const canSell = wallet > 0;
 
             return (
               <tr
@@ -205,7 +138,12 @@ const AssetTable = ({
                         canBuy && 'btn-primary',
                         !canBuy && 'btn-disabled',
                       )}
-                      onClick={(e) => handleBuy(e, state, dispatch)}
+                      onClick={() =>
+                        dispatch({
+                          type: 'BUY_ASSET',
+                          payload: { assetKey: asset },
+                        })
+                      }
                       id={`${asset}`}
                       disabled={!canBuy}
                       data-cy={`${asset}BuyButton`}

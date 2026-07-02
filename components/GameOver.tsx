@@ -4,6 +4,7 @@ import { Action, State } from '../lib/types';
 import { formatMoney, getModeEmoji } from '../helpers/utils';
 import { cn } from '../lib/cn';
 import { clearSave } from '../lib/state/persistence';
+import { loadHighScore } from '../lib/state/highScores';
 
 const GameOver = ({
   state,
@@ -20,7 +21,10 @@ const GameOver = ({
   const handlePlayAgain = () => {
     clearSave();
     // INIT resets the run and reopens the difficulty modal
-    dispatch({ type: 'INIT' });
+    dispatch({
+      type: 'INIT',
+      payload: { highScore: loadHighScore(state.mode) },
+    });
   };
 
   const stats = [

@@ -6,12 +6,9 @@ import {
   numberWithCommas,
 } from '../helpers/utils';
 import { cn } from '../lib/cn';
-import { increaseWalletCapacity } from '../lib/wallet';
 import { clearSave } from '../lib/state/persistence';
+import { loadHighScore } from '../lib/state/highScores';
 import Chip from './Chip';
-import { AlertMessages, getAlertType } from '../helpers/alerts';
-import { sellAsset } from '../lib/buySell';
-import { useNotification } from '../lib/NotificationContext';
 
 const GameSidebar = ({
   state,
@@ -20,32 +17,11 @@ const GameSidebar = ({
   state: State;
   dispatch: Dispatch<Action>;
 }) => {
-  const { showNotification } = useNotification();
-
   const handleSell = (assetKey: string) => {
-    if (state.currentDay === 0) {
-      showNotification(
-        AlertMessages.NEED_START,
-        getAlertType(AlertMessages.NEED_START),
-      );
-      return;
-    }
-
-    const asset = state.assets[assetKey];
-
-    if (!asset || asset.wallet === 0) {
-      showNotification(
-        AlertMessages.INSUFFICIENT_ASSETS,
-        getAlertType(AlertMessages.INSUFFICIENT_ASSETS),
-      );
-      return;
-    }
-
-    sellAsset(assetKey, asset.price, asset.wallet, dispatch);
+    dispatch({ type: 'SELL_ASSET', payload: { assetKey } });
   };
 
   const netWorth = computeNetWorth(state);
-  const daysLeft = Math.max(0, state.days - state.currentDay);
   const hasHighScore = state.highScore != null && state.highScore > 0;
 
   const holdings = Object.entries(state.assets).filter(
@@ -184,7 +160,7 @@ const GameSidebar = ({
           bool: !canExpandWallet,
           label: `lvl.${state.wallet.level + 1} $${numberWithCommas(state.wallet.expansionCost)}`,
           id: 'expandWallet',
-          action: () => increaseWalletCapacity(state, dispatch),
+          action: () => dispatch({ type: 'EXPAND_WALLET' }),
         }}
       />
 
@@ -192,7 +168,10 @@ const GameSidebar = ({
         type="button"
         onClick={() => {
           clearSave();
-          dispatch({ type: 'INIT' });
+          dispatch({
+            type: 'INIT',
+            payload: { highScore: loadHighScore(state.mode) },
+          });
         }}
         className="btn btn-danger w-full py-2 px-3 text-xs font-semibold"
         id="runInfo"
