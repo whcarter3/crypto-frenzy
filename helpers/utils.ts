@@ -62,6 +62,15 @@ export const formatMoney = (amount: number): string =>
     : `$${numberWithCommas(amount)}`;
 
 /**
+ * Builds a shareable URL that replays the exact same market.
+ *
+ * @param {number} seed The run's seed.
+ * @returns {string} An absolute /game URL pinned to the seed.
+ */
+export const seedShareUrl = (seed: number): string =>
+  `${window.location.origin}/game?seed=${seed}`;
+
+/**
  * Gets the emoji for a game mode, used in score displays.
  *
  * @param {State['mode']} mode The game mode.

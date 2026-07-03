@@ -22,11 +22,20 @@ export default function Game() {
 
   // No prerender means the save can load synchronously on first render:
   // a saved run resumes directly, otherwise the difficulty modal shows.
-  const [state, dispatch] = useReducer(
-    reducer,
-    initialState,
-    (fresh) => loadGame() ?? fresh,
-  );
+  // A reload keeps ?seed= in the URL, so "seed present" can't mean
+  // "start fresh" — only a seed that *doesn't match the saved run*
+  // signals explicit intent to play a different market. Without this
+  // distinction, reusing a seed link in a browser with an unrelated
+  // save just silently resumes that save and the seed is never read.
+  const [state, dispatch] = useReducer(reducer, initialState, (fresh) => {
+    const seedParam = new URLSearchParams(window.location.search).get(
+      'seed',
+    );
+    const saved = loadGame();
+    if (seedParam === null) return saved ?? fresh;
+    const urlSeed = Number(seedParam) >>> 0;
+    return saved && saved.seed === urlSeed ? saved : fresh;
+  });
 
   // Autosave mid-run; the save is cleared once the run ends.
   useEffect(() => {

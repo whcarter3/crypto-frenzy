@@ -46,10 +46,17 @@ describe('START_RUN', () => {
     }
   });
 
-  it('seeds the rng and loads the given high score', () => {
+  it('seeds the rng, stores the seed, and loads the given high score', () => {
     const state = startRun('Normal', 1234, 9999);
     expect(state.rngState).toBe(1234);
+    expect(state.seed).toBe(1234);
     expect(state.highScore).toBe(9999);
+  });
+
+  it('stores huge seeds in their wrapped form so the display matches the rng', () => {
+    const state = startRun('Normal', 2 ** 32 + 7);
+    expect(state.seed).toBe(7);
+    expect(state.rngState).toBe(7);
   });
 });
 
@@ -169,6 +176,48 @@ describe('BUY_ASSET', () => {
     ).toBe(state);
     expect(
       reducer(state, { type: 'BUY_ASSET', payload: { assetKey: 'nope' } }),
+    ).toBe(state);
+  });
+
+  it('buys a specific amount when requested', () => {
+    const state = advance(startRun());
+    const price = state.assets.solana.price;
+    const bought = reducer(state, {
+      type: 'BUY_ASSET',
+      payload: { assetKey: 'solana', amount: 2 },
+    });
+    expect(bought.assets.solana.wallet).toBe(2);
+    expect(bought.cash).toBe(state.cash - 2 * price);
+    expect(bought.wallet.amount).toBe(2);
+  });
+
+  it('clamps a requested amount to the max affordable', () => {
+    const state = advance(startRun());
+    const price = state.assets.solana.price;
+    const maxShares = Math.min(
+      Math.floor(state.cash / price),
+      state.wallet.capacity,
+    );
+    const bought = reducer(state, {
+      type: 'BUY_ASSET',
+      payload: { assetKey: 'solana', amount: 999999 },
+    });
+    expect(bought.assets.solana.wallet).toBe(maxShares);
+  });
+
+  it('is a no-op for a zero or negative requested amount', () => {
+    const state = advance(startRun());
+    expect(
+      reducer(state, {
+        type: 'BUY_ASSET',
+        payload: { assetKey: 'solana', amount: 0 },
+      }),
+    ).toBe(state);
+    expect(
+      reducer(state, {
+        type: 'BUY_ASSET',
+        payload: { assetKey: 'solana', amount: -5 },
+      }),
     ).toBe(state);
   });
 });

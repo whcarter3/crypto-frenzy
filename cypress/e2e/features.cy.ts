@@ -1,6 +1,9 @@
 describe("Testing main features and function", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:3000/game")
+    // ?seed pins the run's RNG so prices are deterministic — without it,
+    // a day-2 moonshot can price Solana above starting cash and disable
+    // the buy controls these tests click (~2% flake)
+    cy.visit("http://localhost:3000/game?seed=42")
     // a fresh run boots into the difficulty modal — start on Normal
     cy.get("#startGame").click()
   })
@@ -32,6 +35,56 @@ describe("Testing main features and function", () => {
       .invoke("text")
       .then(parseInt)
       .should("eq", 0)
+  })
+
+  it("buys and sells a specific quantity", () => {
+    cy.get("#advDay").click()
+    cy.get("[data-cy='solanaAmountInput']").type("2")
+    cy.get("[data-cy='solanaBuyButton']").click()
+    cy.get("[data-cy='solanaAssetWallet']").should("have.text", "2")
+    cy.get("[data-cy='solanaSellInput']").type("1")
+    cy.get("[data-cy='solanaSellButton']").click()
+    cy.get("[data-cy='solanaAssetWallet']").should("have.text", "1")
+  })
+
+  it("fills the max affordable with the Max button", () => {
+    cy.get("#advDay").click()
+    cy.get("[data-cy='solanaMaxButton']").click()
+    cy.get("[data-cy='solanaAmountInput']")
+      .invoke("val")
+      .then((val) => {
+        expect(parseInt(String(val))).to.be.gt(0)
+        cy.get("[data-cy='solanaBuyButton']").click()
+        cy.get("[data-cy='solanaAssetWallet']").should(
+          "have.text",
+          String(val)
+        )
+      })
+  })
+
+  it("starts a deterministic run from a seed typed into the modal", () => {
+    // fresh visit without the ?seed param — must not resume the
+    // autosave from beforeEach
+    cy.clearAllLocalStorage()
+    cy.visit("http://localhost:3000/game")
+    cy.get("[data-cy='seedInput']").type("42")
+    cy.get("#startGame").click()
+    cy.get("#advDay").click()
+    // seed 42 always rolls this exact day-2 market
+    cy.get("[data-cy='assetPrice']").eq(3).should("have.text", "$53")
+    cy.get("[data-cy='seedDisplay']").should("contain", "42")
+  })
+
+  it("a seed link takes priority over resuming an unrelated save", () => {
+    // beforeEach already started a seed=42 run and left it mid-day-1;
+    // revisiting a *different* seed link must not silently resume it
+    cy.visit("http://localhost:3000/game?seed=7")
+    cy.get("#startGame").should("be.visible")
+    cy.get("[data-cy='seedInput']").should("have.value", "7")
+    cy.get("#startGame").click()
+    cy.get("#advDay").click()
+    // seed 7 always rolls this exact day-2 market
+    cy.get("[data-cy='assetPrice']").eq(3).should("have.text", "$86")
   })
 
   it("resets and starts a new game", () => {

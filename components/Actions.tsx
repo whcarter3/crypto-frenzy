@@ -31,6 +31,9 @@ const Actions = ({
             label: 'Pay',
             id: 'payDebt',
             action: () => dispatch({ type: 'PAY_DEBT' }),
+            title: canPayDebt
+              ? 'You need more cash than debt to pay it off in full'
+              : 'Pay off your full debt',
           }}
         />
         <Chip
@@ -42,6 +45,9 @@ const Actions = ({
             label: 'Adv Day',
             id: 'advDay',
             action: () => dispatch({ type: 'ADVANCE_DAY' }),
+            title: isGameOver
+              ? 'The run is over'
+              : 'End the day: prices re-roll and debt compounds',
           }}
         />
       </div>

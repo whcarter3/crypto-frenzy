@@ -26,8 +26,11 @@ npm run typecheck  # tsc --noEmit
 ```
 
 The game is a fully client-side Vite + React SPA — no server, no API.
-Game logic lives in `lib/` (reducer, prices, buy/sell, debt), UI in `components/`,
-routes in `pages/`.
+Game logic lives in `lib/` (a pure, deterministic reducer engine), UI in
+`components/`, routes in `pages/`.
+
+Runs are seeded: append `?seed=<number>` to `/game` for a deterministic run
+(the E2E suite pins `?seed=42`; sharing a seed reproduces the same market).
 
 ## Testing
 

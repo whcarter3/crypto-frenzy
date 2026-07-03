@@ -15,6 +15,7 @@ export const initialState: State = {
     totalTrades: 0,
     bestTradeProfit: 0,
   },
+  seed: 0,
   rngState: 0,
   mode: 'Normal',
   lowRangePriceChance: 5,
