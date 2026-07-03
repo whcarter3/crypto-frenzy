@@ -6,6 +6,9 @@ import {
   saveGame,
   clearSave,
 } from '../lib/state/persistence';
+import { saveHighScore } from '../lib/state/highScores';
+import { useNotification } from '../lib/NotificationContext';
+import { AlertMessages } from '../helpers/alerts';
 import { usePageTitle } from '../helpers/usePageTitle';
 import AssetTable from '../components/AssetTable';
 import Actions from '../components/Actions';
@@ -33,6 +36,21 @@ export default function Game() {
       saveGame(state);
     }
   }, [state]);
+
+  // The engine is pure — localStorage writes happen out here.
+  useEffect(() => {
+    if (state.gameOver?.newHighScore) {
+      saveHighScore(state.mode, state.gameOver.score);
+    }
+  }, [state.gameOver, state.mode]);
+
+  // Warn when one in-game day remains.
+  const { showNotification } = useNotification();
+  useEffect(() => {
+    if (!state.gameOver && state.currentDay === state.days - 1) {
+      showNotification(AlertMessages.LAST_DAY, 'warning');
+    }
+  }, [state.currentDay, state.days, state.gameOver, showNotification]);
 
   return (
     <div className=" text-crt-green bg-crt-bg crt-scanlines flex min-h-screen">

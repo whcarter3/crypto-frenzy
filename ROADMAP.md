@@ -4,32 +4,24 @@ Goal: take the current prototype (playable core loop, live at cryptofrenzy.live)
 releasable **v1.0 webapp**, then a **downloadable desktop build** via the existing Tauri
 scaffold, then optional retention features (leaderboards, daily runs).
 
-## Where the game stands (post [PR #31](https://github.com/whcarter3/crypto-frenzy/pull/31))
+## Where the game stands (post Phase 1b)
 
-**Working:** core trade loop (buy max / sell all), 5 coins with low/mid/high/moon price
-bands, compounding debt, wallet capacity upgrades, event flavor text, difficulty modes
-(Easy/Normal/Hard), run persistence with resume-or-new from the landing page, a real
-game-over screen with run stats, per-mode high scores, Cypress E2E suite (8 tests) in
-GitHub Actions, static export deployed on Vercel, Tauri 2 scaffold that builds.
+**Working:** core trade loop, 5 coins with low/mid/high/moon price bands, compounding
+debt, wallet capacity upgrades, event flavor text, difficulty modes (Easy/Normal/Hard),
+run persistence with resume-or-new from the landing page, a real game-over screen with
+run stats, per-mode high scores. **Vite + React SPA** (no framework tax), and the
+reducer is a **pure, deterministic game engine** — seeded RNG in state, one intent per
+action, replayable from a seed + action log. 40 Vitest unit tests + 8 Cypress E2E
+tests, both in CI. Deployed on Vercel; Tauri 2 scaffold builds.
 
 **Known debt / still missing:**
 
-- **Next.js platform mismatch** — a server-first framework wrapped around a game with
-  no server. Prerendering forces the hydration dance in `pages/game.tsx` (the
-  `hydrated` flag, restore-in-effect, modal-flash gating), the pages router is aging
-  with a CVE-upgrade treadmill (see the pile of Snyk PRs), and CI already tripped once
-  on static-export vs `next start`. Decision: **migrate to Vite** (Phase 1b).
-- **Game logic is split across dispatch helpers and the reducer** — `advanceDay` fires
-  8+ actions per day tick, which is why stats tracking needed the `trackPeakNetWorth`
-  wrapper flagged in PR #31 review. Decision: **reducer-as-game-engine refactor**
-  (Phase 1b).
-- **All randomness is bare `Math.random()`** — blocks seeded/daily runs, replay
-  verification, and deterministic tests. Folded into the engine refactor.
-- **Buy is all-in only, sell is all-out only** (`lib/buySell.ts`) — no quantity control.
+- **Buy is all-in only, sell is all-out in the UI** — no quantity control yet, though
+  the engine's `SELL_ASSET` already accepts an `amount` (Phase 1c).
 - **No settings, no sound, no in-game help** — stubbed "SOON" on the landing page.
 - **Mobile layout is broken** — `/game` uses fixed `w-1/4` / `w-1/2` panels.
-- **No unit tests** — E2E only; the money math deserves fast tests (unlocked by the
-  engine refactor).
+- **Landing page is no longer prerendered** (accepted Vite tradeoff) — revisit with a
+  prerender plugin in Phase 2 if organic search matters.
 - **Tauri scaffold half-configured** — identifier and product name are fixed, but
   default icons, `fullscreen: true`, and no release pipeline remain (Phase 3).
 
@@ -54,35 +46,39 @@ GitHub Actions, static export deployed on Vercel, Tauri 2 scaffold that builds.
       fired, and a losing run could clobber the saved high score.
 - [x] Difficulty modal re-enabled with a cleaned-up start flow.
 
-## Phase 1b — Replatform (NEXT UP)
+## Phase 1b — Replatform ✅ (done)
 
 Swap the foundation before stacking more features on it. Two PRs, in this order:
 
-**Vite migration** — replace Next.js with Vite + React SPA.
-- [ ] Port `pages/` to routes (react-router or equivalent); `next/head` → document
-      titles; `next/link` → router links. `lib/` and components are already
-      framework-free and should move untouched.
-- [ ] Read the save **synchronously** in the `useReducer` lazy initializer — no
-      prerender means no hydration mismatch. Delete the `hydrated` flag, the
-      restore-in-effect, and the modal-flash gating (resolves PR #31 review comments).
-- [ ] Version string via Vite `define`/`import.meta.env` (replaces
-      `NEXT_PUBLIC_APP_VERSION`).
-- [ ] Update CI (`vite build`, serve `dist/`) and Tauri config
-      (`frontendDist`, `devUrl`, beforeDev/BuildCommand).
-- [ ] Known tradeoff: landing page loses prerendered HTML (minor SEO hit).
-      Mitigate later with a prerender plugin for the landing route if it matters.
-- [ ] E2E suite green before and after — it's the migration safety net.
+**Vite migration ✅ (shipped in PR #33)** — replaced Next.js with Vite + React SPA.
+- [x] Ported `pages/` to react-router routes; `next/head` → `usePageTitle`;
+      `next/link` → router links. `lib/` and components moved untouched.
+- [x] Save reads **synchronously** in the `useReducer` lazy initializer; the
+      `hydrated` flag, restore-in-effect, and modal-flash gating are gone
+      (resolved PR #31 review comments).
+- [x] Version string via Vite `define` (`__APP_VERSION__`).
+- [x] CI serves `dist/` with SPA fallback; Tauri `frontendDist` → `../dist`;
+      `vercel.json` rewrites for deep links. Found in flight: Vercel Analytics
+      only works on Vercel — now gated behind a `__VERCEL__` build flag.
+- [x] Known tradeoff accepted: landing page lost prerendered HTML (minor SEO
+      hit). Mitigate later with a prerender plugin if it matters.
+- [x] E2E suite stayed green through the swap (8/8).
 
-**Engine refactor** — make the reducer the actual game engine.
-- [ ] One player intent = one action: `ADVANCE_DAY` computes the entire day transition
-      (prices, events, debt, logs) inside the reducer; kill multi-dispatch helpers.
-- [ ] Injectable, seedable RNG threaded through the engine — unlocks daily challenges,
-      replay verification, and deterministic tests.
-- [ ] Run stats tracked inside transitions — removes the `trackPeakNetWorth` wrapper.
-- [ ] Unit tests for the economy: reducer transitions, cost-basis math, debt
-      compounding, price banding.
+**Engine refactor ✅** — the reducer is now the actual game engine.
+- [x] One player intent = one action (`START_RUN`, `ADVANCE_DAY`, `BUY_ASSET`,
+      `SELL_ASSET`, `PAY_DEBT`, `EXPAND_WALLET`); `ADVANCE_DAY` computes the whole
+      day inside the reducer. `advanceDay`/`buySell`/`debt`/`wallet` dispatch
+      helpers deleted. `SELL_ASSET` already accepts an optional `amount` for 1c.
+- [x] Deterministic seedable RNG (`lib/engine/rng.ts`, mulberry32) with its state
+      in game State — a seed + action log replays a whole run. Timestamps left
+      the log (now day-stamped) so the engine is fully pure.
+- [x] Run stats tracked inside transitions — `trackPeakNetWorth` wrapper removed.
+- [x] 40 Vitest unit tests: rng determinism, mode configs, debt compounding,
+      price banding, buy/sell cost basis, settle + high-score logic, save
+      validation. New `unit-tests` CI job. Save format bumped to v2 (old
+      autosaves are discarded once, high scores unaffected).
 
-## Phase 1c — Trading UX
+## Phase 1c — Trading UX (NEXT UP)
 
 - [ ] Quantity controls for buy/sell (input + Max button) instead of forced
       all-in/all-out.
@@ -110,6 +106,10 @@ Swap the foundation before stacking more features on it. Two PRs, in this order:
 - [ ] Analytics events beyond page views: run started/finished, mode, score.
 - [ ] Privacy page (required once you have analytics) + Credits page (IBM Plex Mono
       OFL attribution already lives in the repo).
+- [ ] Save-file schema + migrations (PR #34 review): validate saves against a real
+      schema (e.g. zod) and migrate old versions forward instead of discarding them.
+      Pre-1.0 the manual `SAVE_VERSION` bump-and-discard is intentional; this lands
+      before v1.0 ships, once real players have runs worth preserving.
 - [ ] Balance/playtest pass — get 5–10 people through full runs on all three modes.
 - [ ] Tag **v1.0.0**, announce.
 

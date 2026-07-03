@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import pkg from './package.json';
@@ -14,4 +15,8 @@ export default defineConfig({
   // Port 3000 is shared contract with Cypress, CI, and Tauri's devUrl
   server: { port: 3000, strictPort: true },
   preview: { port: 3000, strictPort: true },
+  test: {
+    environment: 'node',
+    include: ['lib/**/*.test.ts', 'helpers/**/*.test.ts'],
+  },
 });

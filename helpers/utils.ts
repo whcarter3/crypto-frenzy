@@ -33,25 +33,6 @@ export const numberWithCommas = (num: number | string): string => {
 };
 
 /**
- * Returns the current time as a formatted string.
- *
- * @returns {string} The current time as a formatted string.
- */
-export const currentTime = (): string => {
-  return new Date().toLocaleTimeString();
-};
-
-/**
- * Adds a message to the application log with a timestamp.
- *
- * @param {string} message The message to add to the log.
- * @returns {string} The formatted log message with a timestamp.
- */
-// HELPER FUNCTIONS ===================================
-export const addTimestamp = (message: string): string =>
-  `${currentTime()} - ${message}`;
-
-/**
  * Computes the player's net worth: cash minus debt plus the market
  * value of all active holdings.
  *

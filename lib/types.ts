@@ -100,6 +100,8 @@ export type State = {
   modalOpen: boolean
   gameOver: GameOverSummary | null
   stats: RunStats
+  /** Deterministic PRNG state — see lib/engine/rng.ts */
+  rngState: number
   lowRangePriceChance: number
   highRangePriceChance: number
   mode: "Easy" | "Hard" | "Normal" | "Test"
@@ -110,91 +112,57 @@ export type State = {
 }
 
 /**
- * Represents an action that can be dispatched to update the game state.
- * @typedef {Object} Action
- * @property {string} type - The type of the action.
- * @property {Object} payload - The payload of the action.
- * @property {string} payload.buyAssetName - The name of the asset being bought.
- * @property {number} payload.buyAmount - The amount of the asset being bought.
- * @property {number} payload.buyTotalCost - The total cost of the asset being bought.
- * @property {string} payload.buyLogMessage - The log message for the asset being bought.
- * @property {string} payload.sellAssetName - The name of the asset being sold.
- * @property {number} payload.sellAmount - The amount of the asset being sold.
- * @property {number} payload.sellTotalCost - The total cost of the asset being sold.
- * @property {string} payload.sellLogMessage - The log message for the asset being sold.
- * @property {string} payload.setAssetName - The name of the asset being updated.
- * @property {number} payload.setAssetPrice - The new price of the asset being updated.
- * @property {string} payload.avgCostAssetName - The name of the asset for which to set the average cost.
- * @property {number} payload.highScore - The new high score.
+ * Player intents the engine understands. One action = one intent; the
+ * reducer computes the full transition (prices, debt, logs, stats)
+ * internally. Payloads carry values only the outside world knows
+ * (which asset, the run seed, localStorage reads).
  */
 export type Action =
   | {
+      // Reset to a pre-run state (difficulty modal open), keeping mode.
       type: "INIT"
+      payload?: {
+        highScore: number | null
+      }
     }
   | {
-      type: "SET_EASY_MODE"
+      // Highlight a difficulty in the modal.
+      type: "CHANGE_MODE"
+      payload: "Easy" | "Hard" | "Normal" | "Test"
     }
   | {
-      type: "SET_HARD_MODE"
+      // Begin a run: applies the mode config and seeds the RNG.
+      type: "START_RUN"
+      payload: {
+        mode: "Easy" | "Hard" | "Normal" | "Test"
+        seed: number
+        highScore: number | null
+      }
     }
   | {
-      type: "SET_TEST_MODE"
-    }
-  | {
+      // Advance one day: rolls prices, fires events, compounds debt,
+      // and settles the run (gameOver) when the final day is reached.
       type: "ADVANCE_DAY"
     }
   | {
-      type: "EXPAND_WALLET"
-    }
-  | {
-      type: "SET_ASSET_PRICE"
-      payload: {
-        setAssetName: string
-        setAssetPrice: number
-      }
-    }
-  | {
+      // Buy as many shares as cash and wallet capacity allow.
+      // (amount-limited buys arrive with the Phase 1c trading UX)
       type: "BUY_ASSET"
       payload: {
-        buyAssetName: string
-        buyAmount: number
-        buyTotalCost: number
-        buyLogMessage: string
+        assetKey: string
       }
     }
   | {
+      // Sell `amount` shares, or the whole position when omitted.
       type: "SELL_ASSET"
       payload: {
-        sellAssetName: string
-        sellAmount: number
-        sellTotalCost: number
-        sellLogMessage: string
+        assetKey: string
+        amount?: number
       }
-    }
-  | {
-      type: "SET_AVG_COST"
-      payload: {
-        avgCostAssetName: string
-      }
-    }
-  | {
-      type: "SET_LOG"
-      payload: string[]
-    }
-  | {
-      type: "GAME_OVER"
-      payload: GameOverSummary
     }
   | {
       type: "PAY_DEBT"
     }
   | {
-      type: "INCREASE_DEBT"
-    }
-  | {
-      type: "TOGGLE_MODAL"
-    }
-  | {
-      type: "CHANGE_MODE"
-      payload: "Easy" | "Hard" | "Normal" | "Test"
+      type: "EXPAND_WALLET"
     }

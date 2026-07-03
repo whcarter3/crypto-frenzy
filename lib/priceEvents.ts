@@ -1,3 +1,5 @@
+import { Rng } from "./engine/rng"
+
 type priceMovement = "crash" | "moon"
 
 const southAmericanCountries = [
@@ -19,17 +21,19 @@ const southAmericanCountries = [
  * Generates a random price movement event message for a given asset.
  * @param {string} asset - The name of the asset to generate a price movement event for.
  * @param {priceMovement} crashOrMoon - The type of price movement event to generate ("crash" or "moon").
+ * @param {Rng} rng - The run's deterministic RNG.
  * @returns {string} A random price movement event message.
  */
 export const priceMovementEvent = (
   asset: string,
-  crashOrMoon: priceMovement
+  crashOrMoon: priceMovement,
+  rng: Rng
 ): string[] => {
   const moonEvents = [
     `Elon Musk sent a tweet saying only "${asset.toUpperCase()}". It's going to the moon!`,
     `${
       southAmericanCountries[
-        Math.floor(Math.random() * southAmericanCountries.length)
+        Math.floor(rng.random() * southAmericanCountries.length)
       ]
     } has adopted ${asset} as their national currency! Sell high!`,
     `${asset} has reached meme status. All time highs!`,
@@ -57,7 +61,7 @@ export const priceMovementEvent = (
     `AI gains sentience and sabotages the ${asset} network! Catch the bottom!`,
     `${
       southAmericanCountries[
-        Math.floor(Math.random() * southAmericanCountries.length)
+        Math.floor(rng.random() * southAmericanCountries.length)
       ]
     } is backing out of ${asset}! Back the truck up and dump your money in!`,
     `Kim Jong Un has announced that he will be using ${asset} to fund his nuclear program! The world sells it off to stop his plans!`,
@@ -67,6 +71,6 @@ export const priceMovementEvent = (
   ]
 
   return crashOrMoon === "crash"
-    ? [`📉😲 ${crashEvents[Math.floor(Math.random() * crashEvents.length)]}`]
-    : [`🚀🌝 ${moonEvents[Math.floor(Math.random() * moonEvents.length)]}`]
+    ? [`📉😲 ${crashEvents[Math.floor(rng.random() * crashEvents.length)]}`]
+    : [`🚀🌝 ${moonEvents[Math.floor(rng.random() * moonEvents.length)]}`]
 }

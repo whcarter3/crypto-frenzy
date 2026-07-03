@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
-    "test": "cypress run"
+    "test": "cypress run",
+    "test:unit": "vitest run"
   },
   "dependencies": {
     "@vercel/analytics": "^1.0.1",
@@ -39,6 +40,7 @@
     "postcss": "^8.4.14",
     "tailwindcss": "^3.1.4",
     "typescript": "^5.9.3",
-    "vite": "^8.1.2"
+    "vite": "^8.1.2",
+    "vitest": "^4.1.9"
   }
 }
