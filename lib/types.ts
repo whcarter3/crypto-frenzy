@@ -100,6 +100,8 @@ export type State = {
   modalOpen: boolean
   gameOver: GameOverSummary | null
   stats: RunStats
+  /** The seed this run started from (0 = pre-run/unknown) — shareable via /game?seed= */
+  seed: number
   /** Deterministic PRNG state — see lib/engine/rng.ts */
   rngState: number
   lowRangePriceChance: number

@@ -62,6 +62,19 @@ describe("Testing main features and function", () => {
       })
   })
 
+  it("starts a deterministic run from a seed typed into the modal", () => {
+    // fresh visit without the ?seed param — must not resume the
+    // autosave from beforeEach
+    cy.clearAllLocalStorage()
+    cy.visit("http://localhost:3000/game")
+    cy.get("[data-cy='seedInput']").type("42")
+    cy.get("#startGame").click()
+    cy.get("#advDay").click()
+    // seed 42 always rolls this exact day-2 market
+    cy.get("[data-cy='assetPrice']").eq(3).should("have.text", "$53")
+    cy.get("[data-cy='seedDisplay']").should("contain", "42")
+  })
+
   it("resets and starts a new game", () => {
     cy.get("#advDay").click()
     cy.get("#runInfo").click()

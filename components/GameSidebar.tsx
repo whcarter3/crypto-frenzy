@@ -4,10 +4,12 @@ import {
   computeNetWorth,
   formatMoney,
   numberWithCommas,
+  seedShareUrl,
 } from '../helpers/utils';
 import { cn } from '../lib/cn';
 import { clearSave } from '../lib/state/persistence';
 import { loadHighScore } from '../lib/state/highScores';
+import { useNotification } from '../lib/NotificationContext';
 import Chip from './Chip';
 
 const GameSidebar = ({
@@ -17,8 +19,24 @@ const GameSidebar = ({
   state: State;
   dispatch: Dispatch<Action>;
 }) => {
+  const { showNotification } = useNotification();
+
   // Per-asset sell amount; empty string means "sell the whole position"
   const [amounts, setAmounts] = useState<Record<string, string>>({});
+
+  const copySeedLink = () => {
+    navigator.clipboard
+      .writeText(seedShareUrl(state.seed))
+      .then(() =>
+        showNotification(
+          'Seed link copied — same market, same moonshots',
+          'success',
+        ),
+      )
+      .catch(() =>
+        showNotification(`Market seed: ${state.seed}`, 'info'),
+      );
+  };
 
   const setAmount = (assetKey: string, value: string) =>
     setAmounts((prev) => ({ ...prev, [assetKey]: value }));
@@ -195,6 +213,18 @@ const GameSidebar = ({
             : `Costs $${numberWithCommas(state.wallet.expansionCost)} — not enough cash yet`,
         }}
       />
+
+      {state.seed > 0 && (
+        <button
+          type="button"
+          onClick={copySeedLink}
+          className="text-xs text-white/50 hover:text-crt-cyan text-left tracking-wider"
+          data-cy="seedDisplay"
+          title="Copy a link that replays this exact market"
+        >
+          MARKET SEED: {state.seed} ⧉
+        </button>
+      )}
 
       <button
         type="button"

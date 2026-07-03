@@ -54,6 +54,7 @@ export const reducer = (state: State, action: Action): State => {
         mode,
         modalOpen: false,
         highScore,
+        seed: seedRng(seed),
         rngState: seedRng(seed),
         days: config.days,
         cash: config.cash,

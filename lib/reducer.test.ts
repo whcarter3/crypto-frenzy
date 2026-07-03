@@ -46,10 +46,17 @@ describe('START_RUN', () => {
     }
   });
 
-  it('seeds the rng and loads the given high score', () => {
+  it('seeds the rng, stores the seed, and loads the given high score', () => {
     const state = startRun('Normal', 1234, 9999);
     expect(state.rngState).toBe(1234);
+    expect(state.seed).toBe(1234);
     expect(state.highScore).toBe(9999);
+  });
+
+  it('stores huge seeds in their wrapped form so the display matches the rng', () => {
+    const state = startRun('Normal', 2 ** 32 + 7);
+    expect(state.seed).toBe(7);
+    expect(state.rngState).toBe(7);
   });
 });
 

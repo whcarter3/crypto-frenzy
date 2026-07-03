@@ -87,6 +87,9 @@ Swap the foundation before stacking more features on it. Two PRs, in this order:
       takes an optional clamped `amount` to match `SELL_ASSET`.
 - [x] Confirm/feedback affordances: tooltips on buy/sell/Max/inputs and on the
       Pay/Adv Day/wallet-upgrade chips explaining disabled states.
+- [x] Seeded runs surfaced in the UI: optional market-seed input on the start
+      screen (pre-filled from `?seed=`), seed shown in-run and on the game-over
+      screen with a copyable challenge link. Daily-challenge groundwork.
 - [ ] Deferred could-have: partial debt payments — skipped for now; paying
       "as much as you can" changes game balance, revisit with the Phase 2
       balance/playtest pass.

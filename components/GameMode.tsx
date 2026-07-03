@@ -1,4 +1,4 @@
-import { Dispatch } from 'react';
+import { Dispatch, useState } from 'react';
 import { Action, State } from '../lib/types';
 import { cn } from '../lib/cn';
 import { clearSave } from '../lib/state/persistence';
@@ -49,18 +49,24 @@ const GameMode = ({
   dispatch: Dispatch<Action>;
   state: State;
 }) => {
+  // Pre-fill the seed from a ?seed= URL param (shareable runs); the
+  // player can override it or leave it empty for a random market.
+  const [seedInput, setSeedInput] = useState(
+    () => new URLSearchParams(window.location.search).get('seed') ?? '',
+  );
+
   const handleStart = () => {
     clearSave(); // starting a new run invalidates any old autosave
-    // A ?seed= URL param pins the run (deterministic E2E, shareable
-    // runs, and the groundwork for daily challenges); otherwise roll one.
-    const urlSeed = Number(
-      new URLSearchParams(window.location.search).get('seed'),
-    );
+    const parsed = Number(seedInput);
+    const seed =
+      seedInput.trim() !== '' && Number.isFinite(parsed) && parsed > 0
+        ? parsed
+        : Date.now() >>> 0;
     dispatch({
       type: 'START_RUN',
       payload: {
         mode: state.mode,
-        seed: urlSeed || Date.now(),
+        seed,
         highScore: loadHighScore(state.mode),
       },
     });
@@ -175,13 +181,27 @@ const GameMode = ({
           )}
         </div>
 
-        <button
-          className="btn btn-primary w-full py-3 text-lg"
-          onClick={handleStart}
-          id="startGame"
-        >
-          Start Game!
-        </button>
+        <div className="flex items-stretch gap-3">
+          <input
+            id="seedInput"
+            type="number"
+            min={1}
+            value={seedInput}
+            onChange={(e) => setSeedInput(e.target.value)}
+            placeholder="seed: random"
+            aria-label="Market seed (optional) — same seed, same market"
+            className="w-36 shrink-0 bg-black/40 border border-white/20 rounded px-3 text-sm text-white/90 placeholder:text-white/40"
+            data-cy="seedInput"
+            title="Same seed = same market. Share one to race a friend."
+          />
+          <button
+            className="btn btn-primary flex-1 py-3 text-lg"
+            onClick={handleStart}
+            id="startGame"
+          >
+            Start Game!
+          </button>
+        </div>
 
         <button
           className="w-[1px] h-[1px] opacity-0"

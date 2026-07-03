@@ -1,10 +1,15 @@
 import { Dispatch } from 'react';
 import { Link } from 'react-router-dom';
 import { Action, State } from '../lib/types';
-import { formatMoney, getModeEmoji } from '../helpers/utils';
+import {
+  formatMoney,
+  getModeEmoji,
+  seedShareUrl,
+} from '../helpers/utils';
 import { cn } from '../lib/cn';
 import { clearSave } from '../lib/state/persistence';
 import { loadHighScore } from '../lib/state/highScores';
+import { useNotification } from '../lib/NotificationContext';
 
 const GameOver = ({
   state,
@@ -13,10 +18,26 @@ const GameOver = ({
   state: State;
   dispatch: Dispatch<Action>;
 }) => {
+  const { showNotification } = useNotification();
+
   if (!state.gameOver) return null;
 
   const { score, newHighScore } = state.gameOver;
   const { peakNetWorth, totalTrades, bestTradeProfit } = state.stats;
+
+  const copySeedLink = () => {
+    navigator.clipboard
+      .writeText(seedShareUrl(state.seed))
+      .then(() =>
+        showNotification(
+          'Seed link copied — challenge someone to the same market',
+          'success',
+        ),
+      )
+      .catch(() =>
+        showNotification(`Market seed: ${state.seed}`, 'info'),
+      );
+  };
 
   const handlePlayAgain = () => {
     clearSave();
@@ -90,6 +111,23 @@ const GameOver = ({
             </div>
           ))}
         </div>
+
+        {state.seed > 0 && (
+          <p className="text-center text-xs text-white/50">
+            Market seed{' '}
+            <span className="text-crt-cyan">{state.seed}</span> —{' '}
+            <button
+              type="button"
+              onClick={copySeedLink}
+              className="underline hover:text-crt-cyan"
+              id="copySeed"
+              title="Copy a link that replays this exact market"
+            >
+              copy a link
+            </button>{' '}
+            to challenge the same market
+          </p>
+        )}
 
         <div className="flex flex-col sm:flex-row gap-4">
           <button
