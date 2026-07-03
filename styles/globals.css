@@ -116,7 +116,6 @@
     letter-spacing: 0.03em;
     font-weight: 600;
     background-color: #02040a;
-    white-space: pre-wrap;
     min-height: 100vh;
     @apply text-crt-yellow text-glow-crt;
     text-transform: uppercase!important;
