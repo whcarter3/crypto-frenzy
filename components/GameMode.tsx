@@ -51,11 +51,16 @@ const GameMode = ({
 }) => {
   const handleStart = () => {
     clearSave(); // starting a new run invalidates any old autosave
+    // A ?seed= URL param pins the run (deterministic E2E, shareable
+    // runs, and the groundwork for daily challenges); otherwise roll one.
+    const urlSeed = Number(
+      new URLSearchParams(window.location.search).get('seed'),
+    );
     dispatch({
       type: 'START_RUN',
       payload: {
         mode: state.mode,
-        seed: Date.now(),
+        seed: urlSeed || Date.now(),
         highScore: loadHighScore(state.mode),
       },
     });

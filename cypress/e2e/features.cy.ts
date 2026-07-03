@@ -1,6 +1,9 @@
 describe("Testing main features and function", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:3000/game")
+    // ?seed pins the run's RNG so prices are deterministic — without it,
+    // a day-2 moonshot can price Solana above starting cash and disable
+    // the buy controls these tests click (~2% flake)
+    cy.visit("http://localhost:3000/game?seed=42")
     // a fresh run boots into the difficulty modal — start on Normal
     cy.get("#startGame").click()
   })

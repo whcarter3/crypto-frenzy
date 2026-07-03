@@ -4,20 +4,22 @@ Goal: take the current prototype (playable core loop, live at cryptofrenzy.live)
 releasable **v1.0 webapp**, then a **downloadable desktop build** via the existing Tauri
 scaffold, then optional retention features (leaderboards, daily runs).
 
-## Where the game stands (post Phase 1b)
+## Where the game stands (post Phase 1c)
 
-**Working:** core trade loop, 5 coins with low/mid/high/moon price bands, compounding
-debt, wallet capacity upgrades, event flavor text, difficulty modes (Easy/Normal/Hard),
-run persistence with resume-or-new from the landing page, a real game-over screen with
-run stats, per-mode high scores. **Vite + React SPA** (no framework tax), and the
-reducer is a **pure, deterministic game engine** — seeded RNG in state, one intent per
-action, replayable from a seed + action log. 40 Vitest unit tests + 8 Cypress E2E
-tests, both in CI. Deployed on Vercel; Tauri 2 scaffold builds.
+**Working:** core trade loop with quantity controls (amount input + Max, empty =
+max/all), 5 coins with low/mid/high/moon price bands, compounding debt, wallet
+capacity upgrades, event flavor text, difficulty modes (Easy/Normal/Hard), run
+persistence with resume-or-new from the landing page, a real game-over screen with
+run stats, per-mode high scores, seeded runs via `?seed=` (deterministic E2E, daily-
+challenge groundwork). **Vite + React SPA** (no framework tax), and the reducer is a
+**pure, deterministic game engine** — seeded RNG in state, one intent per action,
+replayable from a seed + action log. 43 Vitest unit tests + 10 Cypress E2E tests,
+both in CI. Deployed on Vercel; Tauri 2 scaffold builds.
 
 **Known debt / still missing:**
 
-- **Buy is all-in only, sell is all-out in the UI** — no quantity control yet, though
-  the engine's `SELL_ASSET` already accepts an `amount` (Phase 1c).
+- **Accessibility gaps** — keyboard nav, screen-reader support, reduced-motion,
+  contrast (Phase 1d, next up).
 - **No settings, no sound, no in-game help** — stubbed "SOON" on the landing page.
 - **Mobile layout is broken** — `/game` uses fixed `w-1/4` / `w-1/2` panels.
 - **Landing page is no longer prerendered** (accepted Vite tradeoff) — revisit with a
@@ -89,16 +91,29 @@ Swap the foundation before stacking more features on it. Two PRs, in this order:
       "as much as you can" changes game balance, revisit with the Phase 2
       balance/playtest pass.
 
-## Phase 1d — Presentation & feel
+## Phase 1d — Accessibility (NEXT UP)
+
+Prioritized ahead of presentation polish (decision 2026-07-03) — table stakes for a
+public release, and cheaper to bake in before more UI lands on top.
+
+- [ ] Keyboard navigation: every control reachable and operable by keyboard, visible
+      focus states, sensible tab order through the trade table.
+- [ ] `aria-live` on the activity log so screen readers announce market events and
+      trades; label the quantity inputs and icon-ish buttons properly.
+- [ ] Don't rely on color alone: profit/loss and price direction get a symbol/text
+      alongside the green/red (partially there via ↑/↓ indicators — audit the rest).
+- [ ] Respect `prefers-reduced-motion`: automatically disable the CRT scanline
+      flicker/glow animation (the full manual settings toggle arrives in 1e).
+- [ ] Contrast audit on the CRT palette (dim white-on-black text, disabled states).
+
+## Phase 1e — Presentation & feel
 
 - [ ] Sound effects (buy, sell, day tick, moonshot, game over) + music toggle; mute
       persisted in settings.
-- [ ] Settings panel: sound, **CRT effects toggle** (scanline flicker is an
-      accessibility issue — also respect `prefers-reduced-motion`), reset high scores.
+- [ ] Settings panel: sound, **CRT effects toggle** (manual override on top of the
+      1d `prefers-reduced-motion` support), reset high scores.
 - [ ] In-game "How to play" (the landing page copy is 80% of it already).
 - [ ] Responsive pass so `/game` works on phones/tablets.
-- [ ] Accessibility pass: keyboard navigation, `aria-live` on the event log, don't
-      rely on color alone for profit/loss.
 
 ## Phase 2 — Web release (v1.0 on cryptofrenzy.live)
 
@@ -168,7 +183,7 @@ Roughly in order of value-for-effort:
 
 ## Suggested sequencing
 
-Phase 1b is next and comes as two PRs (Vite migration, then engine refactor) — swap
-the foundation before building on it. Phases 1c–1d are the feature meat (2–3
-weekends). Phase 2 is a weekend. Phase 3 is a weekend plus signing paperwork latency.
+Phases 0–1c are shipped. Next is 1d (accessibility — one focused PR), then 1e
+(presentation & feel — likely two PRs: settings+sound, then responsive pass).
+Phase 2 is a weekend. Phase 3 is a weekend plus signing paperwork latency.
 Phase 4 is open-ended, one feature at a time.
