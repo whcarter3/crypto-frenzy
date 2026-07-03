@@ -4,7 +4,7 @@ Goal: take the current prototype (playable core loop, live at cryptofrenzy.live)
 releasable **v1.0 webapp**, then a **downloadable desktop build** via the existing Tauri
 scaffold, then optional retention features (leaderboards, daily runs).
 
-## Where the game stands (post Phase 1c)
+## Where the game stands (post Phase 1d)
 
 **Working:** core trade loop with quantity controls (amount input + Max, empty =
 max/all), 5 coins with low/mid/high/moon price bands, compounding debt, wallet
@@ -13,19 +13,24 @@ persistence with resume-or-new from the landing page, a real game-over screen wi
 run stats, per-mode high scores, seeded runs via `?seed=` (deterministic E2E, daily-
 challenge groundwork). **Vite + React SPA** (no framework tax), and the reducer is a
 **pure, deterministic game engine** — seeded RNG in state, one intent per action,
-replayable from a seed + action log. 43 Vitest unit tests + 10 Cypress E2E tests,
-both in CI. Deployed on Vercel; Tauri 2 scaffold builds.
+replayable from a seed + action log. `/game` is responsive (stacks below `lg`) and
+passes an automated **cypress-axe** WCAG scan (landing page, difficulty modal,
+in-game, game-over) with zero violations. 44 Vitest unit tests + 16 Cypress E2E
+tests (12 functional + 4 accessibility), all in CI. Deployed on Vercel; Tauri 2
+scaffold builds.
 
 **Known debt / still missing:**
 
-- **Accessibility gaps** — keyboard nav, screen-reader support, reduced-motion,
-  contrast (Phase 1d, next up).
-- **No settings, no sound, no in-game help** — stubbed "SOON" on the landing page.
-- **Mobile layout is broken** — `/game` uses fixed `w-1/4` / `w-1/2` panels.
+- **No settings, no sound, no in-game help** — stubbed "SOON" on the landing page
+  (Phase 1e, next up).
 - **Landing page is no longer prerendered** (accepted Vite tradeoff) — revisit with a
   prerender plugin in Phase 2 if organic search matters.
 - **Tauri scaffold half-configured** — identifier and product name are fixed, but
   default icons, `fullscreen: true`, and no release pipeline remain (Phase 3).
+- **No automated viewport-overflow regression test** — Phase 1d's responsive fixes
+  were verified by hand (direct DOM measurement, not screenshots, which render at
+  an unreliable size in this environment); a Cypress test for it hit enough
+  infrastructure flakiness to punt rather than force through (see Phase 1d notes).
 
 ---
 
@@ -94,20 +99,53 @@ Swap the foundation before stacking more features on it. Two PRs, in this order:
       "as much as you can" changes game balance, revisit with the Phase 2
       balance/playtest pass.
 
-## Phase 1d — Accessibility (NEXT UP)
+## Phase 1d — Accessibility & responsive ✅ (done)
 
-Prioritized ahead of presentation polish (decision 2026-07-03) — table stakes for a
-public release, and cheaper to bake in before more UI lands on top.
+Accessibility prioritized ahead of presentation polish (decision 2026-07-03) — table
+stakes for a public release, cheaper to bake in before more UI lands on top. Folded
+the mobile/tablet responsive pass in alongside it (decision 2026-07-03) since both
+touch the same layout-heavy components (`AssetTable`, `GameSidebar`, `Game`).
 
-- [ ] Keyboard navigation: every control reachable and operable by keyboard, visible
-      focus states, sensible tab order through the trade table.
-- [ ] `aria-live` on the activity log so screen readers announce market events and
-      trades; label the quantity inputs and icon-ish buttons properly.
-- [ ] Don't rely on color alone: profit/loss and price direction get a symbol/text
-      alongside the green/red (partially there via ↑/↓ indicators — audit the rest).
-- [ ] Respect `prefers-reduced-motion`: automatically disable the CRT scanline
-      flicker/glow animation (the full manual settings toggle arrives in 1e).
-- [ ] Contrast audit on the CRT palette (dim white-on-black text, disabled states).
+- [x] Keyboard navigation: every control is a native `button`/`input`/`Link` (no
+      custom clickable divs); the real gap was `.btn` stripping the focus outline
+      with nothing replacing it — added a visible `:focus-visible` ring. Both modals
+      got `role="dialog"` + `aria-modal` + `aria-labelledby`.
+- [x] `aria-live="polite"` on the activity log. Along the way: its `<li>` keys were
+      array indices, but entries are *prepended* — with aria-live that would've made
+      screen readers re-announce the whole log on every day advance. Keying from the
+      end of the array (stable since entries only ever prepend, never reorder) fixes
+      the reconciliation without any new state.
+- [x] Labeled the quantity inputs and per-asset Buy/Sell/Max buttons (`aria-label`
+      naming the asset — visually redundant, but a screen reader tabbing through 5
+      identical "Buy" buttons has no other way to tell them apart); hid decorative
+      emoji (`aria-hidden`) from screen readers.
+- [x] Color-alone audit: profit/loss already carried +/− signs and ↑/↓ arrows
+      everywhere — no changes needed, confirmed rather than assumed.
+- [x] `prefers-reduced-motion` respected globally (covers today's notification
+      slide-in and the Phase 1e CRT flicker whenever it's wired back up — see below).
+- [x] Contrast audit via **cypress-axe** (`color-contrast` is part of axe's default
+      WCAG ruleset) instead of manual spot-checks — more rigorous and now a
+      permanent CI gate, not a one-time pass. 4 new tests scan the landing page,
+      difficulty modal, in-game screen, and game-over screen; started at 4
+      violations (an unlabeled hidden test-mode button, a heading-order skip, no
+      `<h1>` on the bare game screen, an unfocusable scrollable log) and ended at 0.
+- [x] Responsive pass: `Game.tsx`'s sidebar now stacks above the trade area below
+      `lg`; the difficulty modal's 3-column button grid did the same (its buttons'
+      `white-space: nowrap` was blowing out the whole page on narrow screens — a
+      grid track can't shrink below unwrappable content). Found two more real bugs
+      while verifying by hand: `GameSidebar`'s holdings table lacked the
+      `overflow-x-auto` its sibling `AssetTable` already had, so `table-layout:auto`
+      blew out the page instead of scrolling locally; and a lingering `w-1/2` cap on
+      the trade column meant even an ordinary 1280px desktop needed to
+      horizontal-scroll to reach the Buy button once Phase 1c widened the row —
+      widened it to match `Actions` below, which was already full-width.
+- [ ] Deferred: a dedicated Cypress viewport-overflow test kept fighting
+      infrastructure issues (stale local Cypress profile state, `clearAllLocalStorage`
+      being a no-op before a page's first visit) rather than surfacing real app
+      bugs, and cost more time than it was worth chasing to green — the manual
+      verification (direct DOM measurement across 375/768/1280px, before/after
+      every fix) stands in for it this round. Worth revisiting in Phase 1e/2 with a
+      cleaner setup (dedicated fixture, explicit clear-then-reload from the start).
 
 ## Phase 1e — Presentation & feel
 
@@ -116,7 +154,6 @@ public release, and cheaper to bake in before more UI lands on top.
 - [ ] Settings panel: sound, **CRT effects toggle** (manual override on top of the
       1d `prefers-reduced-motion` support), reset high scores.
 - [ ] In-game "How to play" (the landing page copy is 80% of it already).
-- [ ] Responsive pass so `/game` works on phones/tablets.
 
 ## Phase 2 — Web release (v1.0 on cryptofrenzy.live)
 
@@ -172,6 +209,7 @@ Roughly in order of value-for-effort:
 | 2026-07-01 | Persist runs as a versioned JSON save file | Format ports unchanged to Tauri (disk) and any future backend |
 | 2026-07-02 | **Drop Next.js for Vite + React SPA** | Server-first framework on a client-only game: hydration tax, CVE/upgrade treadmill, CI friction; Vite is Tauri's native pairing |
 | 2026-07-02 | **Reducer-as-game-engine, single-intent actions, seedable RNG** | Multi-dispatch helpers forced wrapper-reducer stats tracking (PR #31 review); engine design unlocks unit tests, daily seeds, replay verification |
+| 2026-07-03 | **Fold the mobile/tablet responsive pass into Phase 1d (accessibility)** | Both touch the same layout components; smaller viewports and assistive tech share a lot of the same fixes (focus order, semantic structure) |
 
 ## Decisions still open
 
@@ -186,7 +224,6 @@ Roughly in order of value-for-effort:
 
 ## Suggested sequencing
 
-Phases 0–1c are shipped. Next is 1d (accessibility — one focused PR), then 1e
-(presentation & feel — likely two PRs: settings+sound, then responsive pass).
-Phase 2 is a weekend. Phase 3 is a weekend plus signing paperwork latency.
-Phase 4 is open-ended, one feature at a time.
+Phases 0–1d are shipped. Next is 1e (presentation & feel — sound, settings,
+in-game help). Phase 2 is a weekend. Phase 3 is a weekend plus signing paperwork
+latency. Phase 4 is open-ended, one feature at a time.

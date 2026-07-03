@@ -56,6 +56,14 @@
   user-select: auto;
 }
 
+/* `outline: none` above strips the default focus ring for every button
+   and Link in the game — restore one for keyboard users. :focus-visible
+   keeps it from showing on mouse/touch clicks. */
+.btn:focus-visible {
+  outline: 2px solid #00e5ff;
+  outline-offset: 2px;
+}
+
 .btn:hover:not(:disabled) {
   filter: brightness(1.1);
   -webkit-filter: brightness(1.1);

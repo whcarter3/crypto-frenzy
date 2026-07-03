@@ -77,6 +77,7 @@ const AssetTable = ({
         </thead>
         <tbody className="divide-y divide-white/10">
           {Object.keys(state.assets).map((asset) => {
+            const name = state.assets[asset].name;
             const symbol = state.assets[asset].symbol;
             const price = state.assets[asset].price;
             const avgCost = state.assets[asset].averageCost;
@@ -160,6 +161,7 @@ const AssetTable = ({
                       className="w-16 bg-black/40 border border-white/20 rounded px-2 py-1 text-sm text-white/90 placeholder:text-white/40 disabled:opacity-40"
                       data-cy={`${asset}AmountInput`}
                       title="How many to buy — leave empty to buy the max"
+                      aria-label={`Amount of ${name} to buy — leave empty to buy the max`}
                     />
                     <button
                       type="button"
@@ -180,6 +182,7 @@ const AssetTable = ({
                       className="text-xs text-crt-cyan/80 hover:text-crt-cyan disabled:opacity-40 uppercase tracking-wider"
                       data-cy={`${asset}MaxButton`}
                       title="Fill in the max you can afford"
+                      aria-label={`Fill in the max ${name} you can afford`}
                     >
                       Max
                     </button>
@@ -198,6 +201,7 @@ const AssetTable = ({
                           ? 'Not enough cash or wallet capacity'
                           : 'Buy this asset'
                       }
+                      aria-label={`Buy ${name}`}
                     >
                       Buy
                     </button>

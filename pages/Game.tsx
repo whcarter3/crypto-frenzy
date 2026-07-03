@@ -63,13 +63,21 @@ export default function Game() {
 
   return (
     <div className=" text-crt-green bg-crt-bg crt-scanlines flex min-h-screen">
-      <main className="flex-1 flex">
-        <div className="w-1/4 shrink-0 border-r border-white/10 bg-crt-panel/50 px-4 py-6">
+      <main className="flex-1 flex flex-col lg:flex-row">
+        {/* Visually hidden: the modals carry their own visible h1 when
+            open, but the bare game screen had no heading at all for
+            screen-reader users to navigate by. Inside <main> so it's
+            contained by a landmark region. */}
+        <h1 className="sr-only">Crypto Frenzy – Game</h1>
+        <div className="w-full lg:w-1/4 lg:shrink-0 border-b lg:border-b-0 lg:border-r border-white/10 bg-crt-panel/50 px-4 py-6">
           <GameSidebar state={state} dispatch={dispatch} />
         </div>
 
-        <div className="flex flex-1 flex-col justify-between mx-auto px-4 py-6 gap-6">
-          <div className="w-1/2 space-y-6">
+        <div className="flex flex-1 flex-col lg:justify-between mx-auto px-4 py-6 gap-6">
+          {/* Full width, matching Actions below — a lingering w-1/2 cap
+              forced the per-row buy controls into horizontal scroll on
+              ordinary 1280px desktops once Phase 1c widened the table. */}
+          <div className="w-full space-y-6">
             <Log log={state.log} />
             <AssetTable state={state} dispatch={dispatch} />
           </div>

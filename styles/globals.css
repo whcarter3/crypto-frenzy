@@ -243,3 +243,19 @@
         transparent 4px);
   }
 }
+
+/* Respect prefers-reduced-motion app-wide: covers the notification
+   slide-in today, and the .crt flicker keyframe (currently unused —
+   dropped when the old Next _app.tsx wrapper's "crt" class didn't
+   carry over in the Vite migration) whenever Phase 1e's CRT toggle
+   re-enables it, without anyone needing to remember to gate it. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

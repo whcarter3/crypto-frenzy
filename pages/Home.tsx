@@ -28,7 +28,9 @@ export default function Home() {
               </p>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <span className="text-4xl md:text-5xl">🚀</span>
+              <span className="text-4xl md:text-5xl" aria-hidden="true">
+                🚀
+              </span>
               <span className="text-xs text-crt-cyan/70">
                 NETLINK STATUS:{' '}
                 <span className="text-crt-green">ONLINE</span>

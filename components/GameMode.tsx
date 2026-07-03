@@ -108,13 +108,24 @@ const GameMode = ({
 
   return (
     <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-10 flex items-center justify-center p-4 md:p-8">
-      <div className="bg-black w-full max-w-3xl max-h-[600px] rounded-sm border border-crt-yellow box-shadow-crt p-6 md:p-8 space-y-6 md:space-y-8 overflow-y-auto">
+      <div
+        className="bg-black w-full max-w-3xl max-h-[600px] rounded-sm border border-crt-yellow box-shadow-crt p-6 md:p-8 space-y-6 md:space-y-8 overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="gameModeTitle"
+        tabIndex={0}
+      >
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-300 text-glow-crt">
+            <h1
+              id="gameModeTitle"
+              className="text-2xl md:text-3xl font-bold text-slate-300 text-glow-crt"
+            >
               Crypto Frenzy
             </h1>
-            <span className="text-3xl">🚀</span>
+            <span className="text-3xl" aria-hidden="true">
+              🚀
+            </span>
           </div>
 
           <p className="text-slate-300 leading-relaxed">
@@ -127,15 +138,15 @@ const GameMode = ({
         </div>
 
         <div className="space-y-4">
-          <h4
+          <h2
             className="text-slate-300 text-lg font-medium"
             id="difficultyMode"
           >
             Choose your difficulty:{' '}
             <span className="text-blue-400">{state.mode}</span>
-          </h4>
+          </h2>
 
-          <div className="grid grid-cols-3 gap-3 md:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
             {modes.map((mode) => {
               const isSelected = state.mode === mode.name;
               return (
@@ -209,6 +220,7 @@ const GameMode = ({
             dispatch({ type: 'CHANGE_MODE', payload: 'Test' })
           }
           id="testMode"
+          aria-label="Enable test mode"
         ></button>
       </div>
     </div>
