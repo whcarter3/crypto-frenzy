@@ -75,6 +75,18 @@ describe("Testing main features and function", () => {
     cy.get("[data-cy='seedDisplay']").should("contain", "42")
   })
 
+  it("a seed link takes priority over resuming an unrelated save", () => {
+    // beforeEach already started a seed=42 run and left it mid-day-1;
+    // revisiting a *different* seed link must not silently resume it
+    cy.visit("http://localhost:3000/game?seed=7")
+    cy.get("#startGame").should("be.visible")
+    cy.get("[data-cy='seedInput']").should("have.value", "7")
+    cy.get("#startGame").click()
+    cy.get("#advDay").click()
+    // seed 7 always rolls this exact day-2 market
+    cy.get("[data-cy='assetPrice']").eq(3).should("have.text", "$86")
+  })
+
   it("resets and starts a new game", () => {
     cy.get("#advDay").click()
     cy.get("#runInfo").click()
