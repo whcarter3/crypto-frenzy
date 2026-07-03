@@ -116,16 +116,17 @@ export const reducer = (state: State, action: Action): State => {
     }
 
     case 'BUY_ASSET': {
-      const { assetKey } = action.payload;
+      const { assetKey, amount: requested } = action.payload;
       const asset = state.assets[assetKey];
       if (!asset || !asset.active || asset.price <= 0) return state;
 
-      const amount = calculateMaxShares(
+      const maxShares = calculateMaxShares(
         asset.price,
         state.wallet.amount,
         state.wallet.capacity,
         state.cash,
       );
+      const amount = Math.min(requested ?? maxShares, maxShares);
       if (amount <= 0) return state;
 
       const totalCost = amount * asset.price;

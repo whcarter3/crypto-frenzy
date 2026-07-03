@@ -34,6 +34,31 @@ describe("Testing main features and function", () => {
       .should("eq", 0)
   })
 
+  it("buys and sells a specific quantity", () => {
+    cy.get("#advDay").click()
+    cy.get("[data-cy='solanaAmountInput']").type("2")
+    cy.get("[data-cy='solanaBuyButton']").click()
+    cy.get("[data-cy='solanaAssetWallet']").should("have.text", "2")
+    cy.get("[data-cy='solanaSellInput']").type("1")
+    cy.get("[data-cy='solanaSellButton']").click()
+    cy.get("[data-cy='solanaAssetWallet']").should("have.text", "1")
+  })
+
+  it("fills the max affordable with the Max button", () => {
+    cy.get("#advDay").click()
+    cy.get("[data-cy='solanaMaxButton']").click()
+    cy.get("[data-cy='solanaAmountInput']")
+      .invoke("val")
+      .then((val) => {
+        expect(parseInt(String(val))).to.be.gt(0)
+        cy.get("[data-cy='solanaBuyButton']").click()
+        cy.get("[data-cy='solanaAssetWallet']").should(
+          "have.text",
+          String(val)
+        )
+      })
+  })
+
   it("resets and starts a new game", () => {
     cy.get("#advDay").click()
     cy.get("#runInfo").click()

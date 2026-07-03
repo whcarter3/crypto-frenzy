@@ -78,12 +78,16 @@ Swap the foundation before stacking more features on it. Two PRs, in this order:
       validation. New `unit-tests` CI job. Save format bumped to v2 (old
       autosaves are discarded once, high scores unaffected).
 
-## Phase 1c — Trading UX (NEXT UP)
+## Phase 1c — Trading UX ✅ (done)
 
-- [ ] Quantity controls for buy/sell (input + Max button) instead of forced
-      all-in/all-out.
-- [ ] Confirm/feedback affordances: disable states that explain themselves, tooltips.
-- [ ] Optional could-have: partial debt payments (currently pay-in-full only).
+- [x] Quantity controls for buy/sell: per-row amount input + Max button, where
+      **empty = max/all** so the old one-click flow is unchanged. Engine `BUY_ASSET`
+      takes an optional clamped `amount` to match `SELL_ASSET`.
+- [x] Confirm/feedback affordances: tooltips on buy/sell/Max/inputs and on the
+      Pay/Adv Day/wallet-upgrade chips explaining disabled states.
+- [ ] Deferred could-have: partial debt payments — skipped for now; paying
+      "as much as you can" changes game balance, revisit with the Phase 2
+      balance/playtest pass.
 
 ## Phase 1d — Presentation & feel
 

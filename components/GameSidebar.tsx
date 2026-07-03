@@ -1,4 +1,4 @@
-import { Dispatch } from 'react';
+import { Dispatch, useState } from 'react';
 import { State, Action } from '../lib/types';
 import {
   computeNetWorth,
@@ -17,8 +17,22 @@ const GameSidebar = ({
   state: State;
   dispatch: Dispatch<Action>;
 }) => {
+  // Per-asset sell amount; empty string means "sell the whole position"
+  const [amounts, setAmounts] = useState<Record<string, string>>({});
+
+  const setAmount = (assetKey: string, value: string) =>
+    setAmounts((prev) => ({ ...prev, [assetKey]: value }));
+
   const handleSell = (assetKey: string) => {
-    dispatch({ type: 'SELL_ASSET', payload: { assetKey } });
+    const parsed = parseInt(amounts[assetKey], 10);
+    dispatch({
+      type: 'SELL_ASSET',
+      payload: {
+        assetKey,
+        amount: Number.isFinite(parsed) && parsed > 0 ? parsed : undefined,
+      },
+    });
+    setAmount(assetKey, '');
   };
 
   const netWorth = computeNetWorth(state);
@@ -112,23 +126,38 @@ const GameSidebar = ({
                       {asset.wallet}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <button
-                        className={cn(
-                          'btn',
-                          asset.wallet > 0 && 'btn-primary',
-                          asset.wallet === 0 && 'btn-disabled',
-                        )}
-                        onClick={() => handleSell(key)}
-                        disabled={asset.wallet === 0}
-                        data-cy={`${key}SellButton`}
-                        title={
-                          asset.wallet === 0
-                            ? 'No assets to sell'
-                            : 'Sell this asset'
-                        }
-                      >
-                        Sell
-                      </button>
+                      <div className="flex items-center gap-1.5 justify-end">
+                        <input
+                          type="number"
+                          min={1}
+                          max={asset.wallet}
+                          value={amounts[key] ?? ''}
+                          onChange={(e) =>
+                            setAmount(key, e.target.value)
+                          }
+                          placeholder="all"
+                          className="w-14 bg-black/40 border border-white/20 rounded px-1.5 py-1 text-sm text-white/90 placeholder:text-white/40"
+                          data-cy={`${key}SellInput`}
+                          title="How many to sell — leave empty to sell the whole position"
+                        />
+                        <button
+                          className={cn(
+                            'btn',
+                            asset.wallet > 0 && 'btn-primary',
+                            asset.wallet === 0 && 'btn-disabled',
+                          )}
+                          onClick={() => handleSell(key)}
+                          disabled={asset.wallet === 0}
+                          data-cy={`${key}SellButton`}
+                          title={
+                            asset.wallet === 0
+                              ? 'No assets to sell'
+                              : 'Sell this asset'
+                          }
+                        >
+                          Sell
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -161,6 +190,9 @@ const GameSidebar = ({
           label: `lvl.${state.wallet.level + 1} $${numberWithCommas(state.wallet.expansionCost)}`,
           id: 'expandWallet',
           action: () => dispatch({ type: 'EXPAND_WALLET' }),
+          title: canExpandWallet
+            ? `Double wallet capacity to ${state.wallet.capacity * 2}`
+            : `Costs $${numberWithCommas(state.wallet.expansionCost)} — not enough cash yet`,
         }}
       />
 

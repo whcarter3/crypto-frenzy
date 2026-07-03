@@ -19,6 +19,7 @@ function Chip({
     label: string;
     action: () => void;
     id?: string;
+    title?: string;
   };
   className?: string;
   dataCy?: string;
@@ -53,6 +54,7 @@ function Chip({
           onClick={button.action}
           disabled={button.bool}
           id={button.id ?? button.label.toLowerCase().replace(/\s+/g, '-')}
+          title={button.title}
         >
           {button.label}
         </button>

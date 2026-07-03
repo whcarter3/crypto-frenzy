@@ -171,6 +171,48 @@ describe('BUY_ASSET', () => {
       reducer(state, { type: 'BUY_ASSET', payload: { assetKey: 'nope' } }),
     ).toBe(state);
   });
+
+  it('buys a specific amount when requested', () => {
+    const state = advance(startRun());
+    const price = state.assets.solana.price;
+    const bought = reducer(state, {
+      type: 'BUY_ASSET',
+      payload: { assetKey: 'solana', amount: 2 },
+    });
+    expect(bought.assets.solana.wallet).toBe(2);
+    expect(bought.cash).toBe(state.cash - 2 * price);
+    expect(bought.wallet.amount).toBe(2);
+  });
+
+  it('clamps a requested amount to the max affordable', () => {
+    const state = advance(startRun());
+    const price = state.assets.solana.price;
+    const maxShares = Math.min(
+      Math.floor(state.cash / price),
+      state.wallet.capacity,
+    );
+    const bought = reducer(state, {
+      type: 'BUY_ASSET',
+      payload: { assetKey: 'solana', amount: 999999 },
+    });
+    expect(bought.assets.solana.wallet).toBe(maxShares);
+  });
+
+  it('is a no-op for a zero or negative requested amount', () => {
+    const state = advance(startRun());
+    expect(
+      reducer(state, {
+        type: 'BUY_ASSET',
+        payload: { assetKey: 'solana', amount: 0 },
+      }),
+    ).toBe(state);
+    expect(
+      reducer(state, {
+        type: 'BUY_ASSET',
+        payload: { assetKey: 'solana', amount: -5 },
+      }),
+    ).toBe(state);
+  });
 });
 
 describe('SELL_ASSET', () => {

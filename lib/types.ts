@@ -145,11 +145,12 @@ export type Action =
       type: "ADVANCE_DAY"
     }
   | {
-      // Buy as many shares as cash and wallet capacity allow.
-      // (amount-limited buys arrive with the Phase 1c trading UX)
+      // Buy `amount` shares (clamped to cash and wallet capacity),
+      // or the max affordable when omitted.
       type: "BUY_ASSET"
       payload: {
         assetKey: string
+        amount?: number
       }
     }
   | {
