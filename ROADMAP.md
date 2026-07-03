@@ -106,6 +106,10 @@ Swap the foundation before stacking more features on it. Two PRs, in this order:
 - [ ] Analytics events beyond page views: run started/finished, mode, score.
 - [ ] Privacy page (required once you have analytics) + Credits page (IBM Plex Mono
       OFL attribution already lives in the repo).
+- [ ] Save-file schema + migrations (PR #34 review): validate saves against a real
+      schema (e.g. zod) and migrate old versions forward instead of discarding them.
+      Pre-1.0 the manual `SAVE_VERSION` bump-and-discard is intentional; this lands
+      before v1.0 ships, once real players have runs worth preserving.
 - [ ] Balance/playtest pass — get 5–10 people through full runs on all three modes.
 - [ ] Tag **v1.0.0**, announce.
 

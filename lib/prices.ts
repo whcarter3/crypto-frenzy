@@ -30,22 +30,22 @@ const rollAssetPrice = (
   highRangeThreshHold: number,
   rng: Rng
 ): { price: number; eventLogs: string[] } => {
-  const coinFlip = Math.floor(rng.random() * 100)
+  const percentRoll = Math.floor(rng.random() * 100)
   const assetName = asset.name.toLowerCase()
 
-  if (coinFlip < lowRangeThreshHold) {
+  if (percentRoll < lowRangeThreshHold) {
     return {
       price: randomizePrice(rng, asset.range.low[0], asset.range.low[1]),
       eventLogs: priceMovementEvent(asset.name, "crash", rng),
     }
   }
-  if (coinFlip >= lowRangeThreshHold && coinFlip < highRangeThreshHold) {
+  if (percentRoll >= lowRangeThreshHold && percentRoll < highRangeThreshHold) {
     return {
       price: randomizePrice(rng, asset.range.mid[0], asset.range.mid[1]),
       eventLogs: [],
     }
   }
-  if (coinFlip >= 98) {
+  if (percentRoll >= 98) {
     return {
       price: randomizePrice(rng, asset.range.moon[0], asset.range.moon[1]),
       eventLogs: [`🚀🚀🚀 OMG A ${assetName.toUpperCase()} MOONSHOT! 🚀🚀🚀`],
