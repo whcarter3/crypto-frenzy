@@ -50,4 +50,22 @@ describe("Accessibility (axe)", () => {
     cy.injectAxe()
     cy.checkA11y(undefined, undefined, logViolations)
   })
+
+  it("settings modal has no violations", () => {
+    cy.visit("http://localhost:3000/game?seed=42")
+    cy.get("#startGame").click()
+    cy.get("#openSettings").click()
+    cy.get("[data-cy='settingsScreen']").should("be.visible")
+    cy.injectAxe()
+    cy.checkA11y(undefined, undefined, logViolations)
+  })
+
+  it("how-to-play modal has no violations", () => {
+    cy.visit("http://localhost:3000/game?seed=42")
+    cy.get("#startGame").click()
+    cy.get("#openHowToPlay").click()
+    cy.get("[data-cy='howToPlayScreen']").should("be.visible")
+    cy.injectAxe()
+    cy.checkA11y(undefined, undefined, logViolations)
+  })
 })

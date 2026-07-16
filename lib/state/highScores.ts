@@ -34,3 +34,15 @@ export const saveHighScore = (
     // ignore — losing a high score write beats crashing the game
   }
 };
+
+/** Wipes the records for every mode (Settings → reset high scores). */
+export const clearHighScores = (): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    (['Easy', 'Normal', 'Hard'] as const).forEach((mode) =>
+      localStorage.removeItem(keyFor(mode)),
+    );
+  } catch {
+    // ignore
+  }
+};

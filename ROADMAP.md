@@ -4,33 +4,34 @@ Goal: take the current prototype (playable core loop, live at cryptofrenzy.live)
 releasable **v1.0 webapp**, then a **downloadable desktop build** via the existing Tauri
 scaffold, then optional retention features (leaderboards, daily runs).
 
-## Where the game stands (post Phase 1d)
+## Where the game stands (post Phase 1e)
 
 **Working:** core trade loop with quantity controls (amount input + Max, empty =
 max/all), 5 coins with low/mid/high/moon price bands, compounding debt, wallet
 capacity upgrades, event flavor text, difficulty modes (Easy/Normal/Hard), run
 persistence with resume-or-new from the landing page, a real game-over screen with
 run stats, per-mode high scores, seeded runs via `?seed=` (deterministic E2E, daily-
-challenge groundwork). **Vite + React SPA** (no framework tax), and the reducer is a
+challenge groundwork). Retro **sound effects** (Web Audio, no assets) with a
+**settings panel** (sound + CRT-effects toggles, reset high scores) and an in-game
+**How to play**. **Vite + React SPA** (no framework tax), and the reducer is a
 **pure, deterministic game engine** — seeded RNG in state, one intent per action,
 replayable from a seed + action log. `/game` is responsive (stacks below `lg`) and
-passes an automated **cypress-axe** WCAG scan (landing page, difficulty modal,
-in-game, game-over) with zero violations, plus a 375px viewport-overflow
-regression test. 44 Vitest unit tests + 18 Cypress E2E tests (12 functional +
-4 accessibility + 2 responsive), all in CI. Deployed on Vercel; Tauri 2
-scaffold builds.
+passes an automated **cypress-axe** WCAG scan (6 screens/states) with zero
+violations, plus a 375px viewport-overflow regression test. 49 Vitest unit tests +
+23 Cypress E2E tests, all in CI. Deployed on Vercel; Tauri 2 scaffold builds.
 
 **Known debt / still missing:**
 
-- **No settings, no sound, no in-game help** — stubbed "SOON" on the landing page
-  (Phase 1e, next up).
+- **UX is rough end-to-end** — responsive ≠ pleasant; comprehensive sweep is
+  Phase 1f, next up.
 - **Landing page is no longer prerendered** (accepted Vite tradeoff) — revisit with a
   prerender plugin in Phase 2 if organic search matters.
 - **Tauri scaffold half-configured** — identifier and product name are fixed, but
   default icons, `fullscreen: true`, and no release pipeline remain (Phase 3).
-- **Real-device spot check still worth doing** — mobile layout is now guarded by an
-  automated 375px Cypress test (see Phase 1d notes), but nobody has played a run on
-  an actual phone yet; worth a pass on the Vercel preview before v1.0.
+- **Real-device spot check still worth doing** — mobile layout is guarded by an
+  automated 375px Cypress test, but nobody has played a run on an actual phone yet;
+  worth a pass on the Vercel preview before v1.0. Sound deserves a real listen too —
+  the synthesized bleeps are tested for "plays without errors", not for taste.
 
 ---
 
@@ -152,13 +153,44 @@ touch the same layout-heavy components (`AssetTable`, `GameSidebar`, `Game`).
       main flex chain and removing `mx-auto`; the test now guards 375px through
       the full trade flow plus the desktop side-by-side layout.
 
-## Phase 1e — Presentation & feel
+## Phase 1e — Presentation & feel ✅ (done)
 
-- [ ] Sound effects (buy, sell, day tick, moonshot, game over) + music toggle; mute
-      persisted in settings.
-- [ ] Settings panel: sound, **CRT effects toggle** (manual override on top of the
-      1d `prefers-reduced-motion` support), reset high scores.
-- [ ] In-game "How to play" (the landing page copy is 80% of it already).
+- [x] Sound effects (buy, sell, pay, day tick, moonshot fanfare, game-over jingle,
+      last-day warning) — synthesized retro bleeps via Web Audio (`lib/sound.ts`),
+      zero assets, on-brand for a CRT terminal. Gated by the sound setting; safe
+      no-ops under SSR/tests/blocked-autoplay. Background *music* needs an actual
+      track and is deferred to the 1f UX sweep (a bad loop is worse than none).
+- [x] Settings panel (`components/Settings.tsx`): sound + CRT-effects toggles,
+      persisted in `cryptoFrenzySettings` localStorage (separate from game state —
+      device preference, not run state). CRT toggle is one `data-crt` attribute on
+      `<html>` + CSS overrides killing scanlines/flicker/glow; layered on the 1d
+      `prefers-reduced-motion` support. Reset-high-scores button included (takes
+      effect next run — the in-run display keeps the loaded value; UX-sweep nit).
+- [x] In-game "How to play" (`components/HowToPlay.tsx`): contract, daily loop,
+      market bands, seeds — including the load-bearing tip that unsold holdings
+      don't count toward the score. Both modals reachable from the sidebar and
+      covered by axe scans + E2E (toggles persist across reload).
+
+## Phase 1f — Comprehensive UX sweep (NEXT UP)
+
+The layout is *responsive* after 1d, but the moment-to-moment experience is rough
+(owner verdict 2026-07-03: "the UI is definitely responsive, but the UX is awful").
+One dedicated pass over how the game *feels* to play, mobile-first, before release
+polish in Phase 2. Candidate items — inventory properly at the start of the phase
+by playing full runs on phone + desktop:
+
+- [ ] Mobile information hierarchy: prices/actions likely belong above the sidebar
+      stats (currently a full screen of NET WORTH/HOLDINGS before the market is
+      visible); the Cash/Debt/Days chips live below the fold entirely.
+- [ ] Trade flow friction: buy/sell need less precision on a phone (bigger tap
+      targets, maybe a per-asset trade sheet instead of inline inputs).
+- [ ] Day-advance pacing and feedback: price changes are instant and silent — no
+      sense of what moved since yesterday (deltas, flash-on-change).
+- [ ] Log noise vs. signal: separators and flavor events drown the lines that
+      matter; consider grouping by day or highlighting events.
+- [ ] Oversized numbers (NET WORTH panel) vs. tiny controls; general type scale.
+- [ ] Landing page menu stubs (PROFILES/CREDITS "SOON") — ship or cut.
+- [ ] Background music (deferred from 1e — needs a real track or a decent loop).
 
 ## Phase 2 — Web release (v1.0 on cryptofrenzy.live)
 
@@ -215,6 +247,7 @@ Roughly in order of value-for-effort:
 | 2026-07-02 | **Drop Next.js for Vite + React SPA** | Server-first framework on a client-only game: hydration tax, CVE/upgrade treadmill, CI friction; Vite is Tauri's native pairing |
 | 2026-07-02 | **Reducer-as-game-engine, single-intent actions, seedable RNG** | Multi-dispatch helpers forced wrapper-reducer stats tracking (PR #31 review); engine design unlocks unit tests, daily seeds, replay verification |
 | 2026-07-03 | **Fold the mobile/tablet responsive pass into Phase 1d (accessibility)** | Both touch the same layout components; smaller viewports and assistive tech share a lot of the same fixes (focus order, semantic structure) |
+| 2026-07-03 | **Insert Phase 1f: comprehensive UX sweep before the Phase 2 release push** | Post-1d verdict: layout is responsive but the experience is rough — a dedicated feel/flow pass beats sprinkling UX fixes across release tasks |
 
 ## Decisions still open
 
@@ -229,6 +262,6 @@ Roughly in order of value-for-effort:
 
 ## Suggested sequencing
 
-Phases 0–1d are shipped. Next is 1e (presentation & feel — sound, settings,
-in-game help). Phase 2 is a weekend. Phase 3 is a weekend plus signing paperwork
+Phases 0–1e are shipped. Next is 1f (comprehensive UX sweep — inventory by
+playing real runs on phone + desktop, then fix). Phase 2 is a weekend. Phase 3 is a weekend plus signing paperwork
 latency. Phase 4 is open-ended, one feature at a time.

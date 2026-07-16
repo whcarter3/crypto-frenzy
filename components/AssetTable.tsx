@@ -2,6 +2,7 @@ import { Dispatch, useState } from 'react';
 import { State, Action } from '../lib/types';
 import { calculateMaxShares, numberWithCommas } from '../helpers/utils';
 import { cn } from '../lib/cn';
+import { playSound } from '../lib/sound';
 
 const AssetTable = ({
   state,
@@ -25,6 +26,7 @@ const AssetTable = ({
         amount: Number.isFinite(parsed) && parsed > 0 ? parsed : undefined,
       },
     });
+    playSound('buy');
     setAmount(assetKey, '');
   };
 

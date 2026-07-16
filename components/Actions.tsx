@@ -1,5 +1,6 @@
 import { Dispatch } from 'react';
 import { Action, State } from '../lib/types';
+import { playSound } from '../lib/sound';
 import Chip from './Chip';
 
 const Actions = ({
@@ -30,7 +31,10 @@ const Actions = ({
             bool: canPayDebt,
             label: 'Pay',
             id: 'payDebt',
-            action: () => dispatch({ type: 'PAY_DEBT' }),
+            action: () => {
+              dispatch({ type: 'PAY_DEBT' });
+              playSound('pay');
+            },
             title: canPayDebt
               ? 'You need more cash than debt to pay it off in full'
               : 'Pay off your full debt',
@@ -44,7 +48,10 @@ const Actions = ({
             bool: isGameOver,
             label: 'Adv Day',
             id: 'advDay',
-            action: () => dispatch({ type: 'ADVANCE_DAY' }),
+            action: () => {
+              dispatch({ type: 'ADVANCE_DAY' });
+              playSound('advance');
+            },
             title: isGameOver
               ? 'The run is over'
               : 'End the day: prices re-roll and debt compounds',

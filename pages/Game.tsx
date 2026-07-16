@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { reducer } from '../lib/reducer';
 import { initialState } from '../lib/state/initialState';
 import {
@@ -8,6 +8,7 @@ import {
 } from '../lib/state/persistence';
 import { saveHighScore } from '../lib/state/highScores';
 import { useNotification } from '../lib/NotificationContext';
+import { playSound } from '../lib/sound';
 import { AlertMessages } from '../helpers/alerts';
 import { usePageTitle } from '../helpers/usePageTitle';
 import AssetTable from '../components/AssetTable';
@@ -16,6 +17,8 @@ import GameSidebar from '../components/GameSidebar';
 import Log from '../components/Log';
 import GameMode from '../components/GameMode';
 import GameOver from '../components/GameOver';
+import Settings from '../components/Settings';
+import HowToPlay from '../components/HowToPlay';
 
 export default function Game() {
   usePageTitle('Crypto Frenzy – Game');
@@ -46,6 +49,10 @@ export default function Game() {
     }
   }, [state]);
 
+  // UI-only chrome, not game state: never saved, never seeded.
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+
   // The engine is pure — localStorage writes happen out here.
   useEffect(() => {
     if (state.gameOver?.newHighScore) {
@@ -53,11 +60,32 @@ export default function Game() {
     }
   }, [state.gameOver, state.mode]);
 
+  // Sound is a side effect too: the run-settled jingle keys off
+  // gameOver flipping, the moonshot fanfare off the day's fresh log
+  // entries (everything above the newest day separator).
+  useEffect(() => {
+    if (state.gameOver) playSound('gameOver');
+  }, [state.gameOver]);
+
+  useEffect(() => {
+    if (state.currentDay <= 1) return;
+    const todaysEntries: string[] = [];
+    for (const entry of state.log) {
+      if (entry.startsWith('=========')) break;
+      todaysEntries.push(entry);
+    }
+    if (todaysEntries.some((entry) => entry.includes('MOONSHOT'))) {
+      playSound('moonshot');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.currentDay]);
+
   // Warn when one in-game day remains.
   const { showNotification } = useNotification();
   useEffect(() => {
     if (!state.gameOver && state.currentDay === state.days - 1) {
       showNotification(AlertMessages.LAST_DAY, 'warning');
+      playSound('warning');
     }
   }, [state.currentDay, state.days, state.gameOver, showNotification]);
 
@@ -76,7 +104,12 @@ export default function Game() {
             contained by a landmark region. */}
         <h1 className="sr-only">Crypto Frenzy – Game</h1>
         <div className="w-full lg:w-1/4 lg:shrink-0 min-w-0 border-b lg:border-b-0 lg:border-r border-white/10 bg-crt-panel/50 px-4 py-6">
-          <GameSidebar state={state} dispatch={dispatch} />
+          <GameSidebar
+            state={state}
+            dispatch={dispatch}
+            onOpenSettings={() => setSettingsOpen(true)}
+            onOpenHelp={() => setHelpOpen(true)}
+          />
         </div>
 
         {/* No mx-auto: auto margins disable flex-item stretch, which at
@@ -102,6 +135,10 @@ export default function Game() {
       {state.gameOver && (
         <GameOver state={state} dispatch={dispatch} />
       )}
+      {settingsOpen && (
+        <Settings onClose={() => setSettingsOpen(false)} />
+      )}
+      {helpOpen && <HowToPlay onClose={() => setHelpOpen(false)} />}
     </div>
   );
 }

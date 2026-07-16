@@ -76,3 +76,26 @@
     0 0 1px rgba(0, 255, 0, 0.4),
     0 0 2px rgba(0, 255, 0, 0.3);
 }
+
+/* Manual CRT-effects kill switch (Settings panel). The SettingsProvider
+   stamps data-crt on <html>; this is the whole implementation — no
+   component needs to know the setting exists. Layered on top of the
+   prefers-reduced-motion support, which only stops the animations. */
+html[data-crt="off"] .crt-scanlines::after,
+html[data-crt="off"] .crt::before,
+html[data-crt="off"] .crt::after {
+  display: none;
+}
+
+html[data-crt="off"] * {
+  text-shadow: none !important;
+}
+
+html[data-crt="off"] .box-shadow-crt {
+  box-shadow: none;
+}
+
+html[data-crt="off"] .btn-primary,
+html[data-crt="off"] .btn-danger {
+  box-shadow: none;
+}
