@@ -176,19 +176,50 @@ touch the same layout-heavy components (`AssetTable`, `GameSidebar`, `Game`).
 The layout is *responsive* after 1d, but the moment-to-moment experience is rough
 (owner verdict 2026-07-03: "the UI is definitely responsive, but the UX is awful").
 One dedicated pass over how the game *feels* to play, mobile-first, before release
-polish in Phase 2. Candidate items — inventory properly at the start of the phase
-by playing full runs on phone + desktop:
+polish in Phase 2.
 
-- [ ] Mobile information hierarchy: prices/actions likely belong above the sidebar
-      stats (currently a full screen of NET WORTH/HOLDINGS before the market is
-      visible); the Cash/Debt/Days chips live below the fold entirely.
-- [ ] Trade flow friction: buy/sell need less precision on a phone (bigger tap
-      targets, maybe a per-asset trade sheet instead of inline inputs).
-- [ ] Day-advance pacing and feedback: price changes are instant and silent — no
-      sense of what moved since yesterday (deltas, flash-on-change).
-- [ ] Log noise vs. signal: separators and flavor events drown the lines that
-      matter; consider grouping by day or highlighting events.
-- [ ] Oversized numbers (NET WORTH panel) vs. tiny controls; general type scale.
+**Inventory (2026-07-16, from playing full runs at phone + desktop widths):**
+
+*A. Run-start dead state — the worst first impression in the game*
+- [ ] A1: Day 1 is a fake day: every price is $0, every Buy disabled, and the fix
+      is knowing to press a button ("Click Advance Day to start") that lives below
+      the fold. `START_RUN` should roll day-1 prices immediately — no limbo state.
+      (Engine change; deterministic; also removes the days-left off-by-one feel.)
+
+*B. Information hierarchy*
+- [ ] B1: Cash/Debt/Days chips sit at the very bottom, far from decisions — after
+      buying, **cash isn't visible anywhere on the mobile screen**. Promote to a
+      compact status bar near the market (pinned/top on mobile).
+- [ ] B2: NET WORTH panel is the largest element in the game and screams alarming
+      red for any negative value — even right after a fair-value buy when −$X is
+      just the debt. Shrink to a stat row; save red for *drops*.
+- [ ] B3: Mobile stacking order: a full screen of portfolio stats precedes the
+      market. Market + actions first; portfolio second.
+- [ ] B4: NEW GAME (destructive!) is the most prominent button on screen, no
+      confirm. Demote + confirm.
+- [ ] B5: Adv Day — the game's core verb — is the smallest control, buried in the
+      corner. Make it the primary button, in the status bar.
+
+*C. Market feedback (game feel)*
+- [ ] C1: **Price movement is invisible.** BTC can drop 61% in a tick with zero
+      visual change; deltas only exist vs. your own avg cost. Track previous
+      price in the engine, show day-over-day Δ%+arrow per row; ties the news
+      events to visible moves.
+- [ ] C2: AVG. PRICE column shows $0 for coins you don't hold — render “—”.
+- [ ] C3: Log noise: `====` separators (including two adjacent for empty days)
+      drown signal; no visual hierarchy between trades and market events.
+
+*D. Controls polish*
+- [ ] D1: "max" placeholder next to a "MAX" button reads as a stutter — pick one.
+- [ ] D2: Sell input clips its own placeholder ("al]") — width vs 16px font.
+- [ ] D3: Disabled buttons explain themselves via `title` only — invisible on
+      touch. Inline reasons or helper text.
+
+*E. Odds & ends*
+- [ ] E1: Empty high-score state renders a stray "—" + "SET A RECORD THIS RUN!"
+      widow.
+- [ ] E2: "+0.0%" in green immediately after every buy — noise.
+- [ ] E3: Desktop: log capped at ~3 lines while half the screen is dead space.
 - [ ] Landing page menu stubs (PROFILES/CREDITS "SOON") — ship or cut.
 - [ ] Background music (deferred from 1e — needs a real track or a decent loop).
 
