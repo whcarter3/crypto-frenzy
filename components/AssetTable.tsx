@@ -1,6 +1,6 @@
 import { Dispatch, useState } from 'react';
 import { State, Action } from '../lib/types';
-import { calculateMaxShares, numberWithCommas } from '../helpers/utils';
+import { numberWithCommas } from '../helpers/utils';
 import { cn } from '../lib/cn';
 import { playSound } from '../lib/sound';
 
@@ -30,27 +30,31 @@ const AssetTable = ({
     setAmount(assetKey, '');
   };
 
-  const getPriceColor = (price: number, avgCost: number) => {
-    if (avgCost === 0 || price === avgCost) return 'text-white/80';
-    return price > avgCost ? 'text-crt-green' : 'text-crt-red';
-  };
-
-  const getPerformanceIndicator = (
+  // Day-over-day movement — the market's motion was previously
+  // invisible (a 60% crash produced zero on-screen change unless you
+  // held the coin). Position performance vs. your avg cost still lives
+  // in the holdings panel.
+  const getDayDelta = (
+    assetKey: string,
     price: number,
-    avgCost: number,
+    previousPrice: number,
   ) => {
-    if (avgCost === 0 || price === avgCost) return null;
-    const percentChange = ((price - avgCost) / avgCost) * 100;
-    const isProfit = price > avgCost;
+    if (!previousPrice || previousPrice <= 0) return null;
+    const percentChange =
+      ((price - previousPrice) / previousPrice) * 100;
+    if (Math.abs(percentChange) < 0.05) return null;
+    const isUp = price > previousPrice;
     return (
       <span
         className={cn(
           'ml-2 text-xs',
-          isProfit && 'text-crt-green',
-          !isProfit && 'text-crt-red',
+          isUp && 'text-crt-green',
+          !isUp && 'text-crt-red',
         )}
+        data-cy={`${assetKey}DayDelta`}
+        title="Change vs yesterday"
       >
-        {isProfit ? '↑' : '↓'} {Math.abs(percentChange).toFixed(1)}%
+        {isUp ? '▲' : '▼'} {Math.abs(percentChange).toFixed(1)}%
       </span>
     );
   };
@@ -117,30 +121,23 @@ const AssetTable = ({
                   </div>
                 </td>
                 <td
-                  className={cn(
-                    'px-4 py-3 text-sm font-medium',
-                    getPriceColor(price, avgCost),
-                  )}
+                  className="px-4 py-3 text-sm font-medium text-white/90"
                   data-cy="assetPrice"
-                  title={
-                    avgCost > 0
-                      ? `Performance vs Avg. Cost: ${(
-                          ((price - avgCost) / avgCost) *
-                          100
-                        ).toFixed(1)}%`
-                      : ''
-                  }
                 >
                   <div className="flex items-center">
                     <span>${numberWithCommas(price)}</span>
-                    {getPerformanceIndicator(price, avgCost)}
+                    {getDayDelta(
+                      asset,
+                      price,
+                      state.assets[asset].previousPrice,
+                    )}
                   </div>
                 </td>
                 <td
                   className="px-4 py-3 text-sm text-white/80"
                   data-cy="assetAveragePrice"
                 >
-                  ${numberWithCommas(avgCost)}
+                  {wallet > 0 ? `$${numberWithCommas(avgCost)}` : '—'}
                 </td>
                 <td
                   className="px-4 py-3 text-sm text-crt-cyan font-medium"
@@ -165,29 +162,6 @@ const AssetTable = ({
                       title="How many to buy — leave empty to buy the max"
                       aria-label={`Amount of ${name} to buy — leave empty to buy the max`}
                     />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setAmount(
-                          asset,
-                          String(
-                            calculateMaxShares(
-                              price,
-                              walletAmount,
-                              walletCapacity,
-                              cash,
-                            ),
-                          ),
-                        )
-                      }
-                      disabled={!canBuy}
-                      className="text-xs text-crt-cyan/80 hover:text-crt-cyan disabled:opacity-40 uppercase tracking-wider"
-                      data-cy={`${asset}MaxButton`}
-                      title="Fill in the max you can afford"
-                      aria-label={`Fill in the max ${name} you can afford`}
-                    >
-                      Max
-                    </button>
                     <button
                       className={cn(
                         'btn',

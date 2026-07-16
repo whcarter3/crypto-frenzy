@@ -4,7 +4,8 @@ import { initialState } from './initialState';
 const SAVE_KEY = 'cryptoFrenzySave';
 // Bump when the State shape changes incompatibly — old saves are discarded.
 // v2: engine refactor added rngState (deterministic PRNG).
-const SAVE_VERSION = 2;
+// v3: assets gained previousPrice (day-over-day delta display).
+const SAVE_VERSION = 3;
 
 type SaveFile = {
   version: number;

@@ -87,7 +87,9 @@ export const rollDailyPrices = (
       highRangeThreshHold,
       rng
     )
-    nextAssets[assetKey] = { ...asset, price }
+    // Yesterday's price rides along so the UI can show day-over-day
+    // movement; it stays 0 on the day-1 roll (no delta to show).
+    nextAssets[assetKey] = { ...asset, price, previousPrice: asset.price }
     eventLogs.unshift(...logs)
   }
 

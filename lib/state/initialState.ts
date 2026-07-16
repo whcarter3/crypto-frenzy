@@ -41,6 +41,7 @@ export const initialState: State = {
         moon: [300000, 700000],
       },
       price: 0,
+      previousPrice: 0,
     },
     ethereum: {
       name: 'Ethereum',
@@ -56,6 +57,7 @@ export const initialState: State = {
         moon: [45000, 99999],
       },
       price: 0,
+      previousPrice: 0,
     },
     litecoin: {
       name: 'Litecoin',
@@ -71,6 +73,7 @@ export const initialState: State = {
         moon: [4500, 8500],
       },
       price: 0,
+      previousPrice: 0,
     },
     solana: {
       name: 'Solana',
@@ -86,6 +89,7 @@ export const initialState: State = {
         moon: [1000, 3000],
       },
       price: 0,
+      previousPrice: 0,
     },
     dogecoin: {
       name: 'Dogecoin',
@@ -101,6 +105,7 @@ export const initialState: State = {
         moon: [150, 250],
       },
       price: 0,
+      previousPrice: 0,
     },
   },
 };

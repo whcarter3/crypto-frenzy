@@ -1,4 +1,4 @@
-import { Dispatch, useState } from 'react';
+import { Dispatch, useRef, useState } from 'react';
 import { State, Action } from '../lib/types';
 import {
   computeNetWorth,
@@ -28,6 +28,29 @@ const GameSidebar = ({
 
   // Per-asset sell amount; empty string means "sell the whole position"
   const [amounts, setAmounts] = useState<Record<string, string>>({});
+
+  // NEW GAME wipes the run — require a second tap within 3s to confirm
+  const [confirmingReset, setConfirmingReset] = useState(false);
+  const confirmTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  const handleNewGame = () => {
+    if (!confirmingReset) {
+      setConfirmingReset(true);
+      clearTimeout(confirmTimer.current);
+      confirmTimer.current = setTimeout(
+        () => setConfirmingReset(false),
+        3000,
+      );
+      return;
+    }
+    clearTimeout(confirmTimer.current);
+    setConfirmingReset(false);
+    clearSave();
+    dispatch({
+      type: 'INIT',
+      payload: { highScore: loadHighScore(state.mode) },
+    });
+  };
 
   const copySeedLink = () => {
     navigator.clipboard
@@ -164,7 +187,7 @@ const GameSidebar = ({
                             setAmount(key, e.target.value)
                           }
                           placeholder="all"
-                          className="w-14 bg-black/40 border border-white/20 rounded px-1.5 py-1 text-sm text-white/90 placeholder:text-white/40"
+                          className="w-16 bg-black/40 border border-white/20 rounded px-1.5 py-1 text-sm text-white/90 placeholder:text-white/40"
                           data-cy={`${key}SellInput`}
                           title="How many to sell — leave empty to sell the whole position"
                           aria-label={`Amount of ${asset.name} to sell — leave empty to sell all`}
@@ -238,21 +261,6 @@ const GameSidebar = ({
         </button>
       )}
 
-      <button
-        type="button"
-        onClick={() => {
-          clearSave();
-          dispatch({
-            type: 'INIT',
-            payload: { highScore: loadHighScore(state.mode) },
-          });
-        }}
-        className="btn btn-danger w-full py-2 px-3 text-xs font-semibold"
-        id="runInfo"
-      >
-        new game
-      </button>
-
       <div className="flex gap-3">
         <button
           type="button"
@@ -273,19 +281,33 @@ const GameSidebar = ({
       </div>
 
       {hasHighScore ? (
-        <>
-          <p className="text-lg font-bold text-crt-green">
-            High Score: ${numberWithCommas(state.highScore!)}
-          </p>
-        </>
+        <p className="text-lg font-bold text-crt-green">
+          High Score: ${numberWithCommas(state.highScore!)}
+        </p>
       ) : (
-        <>
-          <p className="text-lg font-bold text-crt-cyan">—</p>
-          <p className="text-xs text-white/70">
-            Set a record this run!
-          </p>
-        </>
+        <p className="text-xs text-white/70">
+          No high score yet — set a record this run!
+        </p>
       )}
+
+      {/* Demoted from the most prominent button on screen: it wipes the
+          run, so it reads quiet and asks for a second tap to confirm. */}
+      <button
+        type="button"
+        onClick={handleNewGame}
+        className={cn(
+          'text-left text-xs tracking-wider py-1',
+          confirmingReset
+            ? 'text-crt-red font-semibold'
+            : 'text-white/50 hover:text-crt-red',
+        )}
+        id="runInfo"
+        title="Abandon this run and start over"
+      >
+        {confirmingReset
+          ? '⚠ TAP AGAIN TO ABANDON THIS RUN'
+          : 'ABANDON RUN / NEW GAME'}
+      </button>
     </aside>
   );
 };

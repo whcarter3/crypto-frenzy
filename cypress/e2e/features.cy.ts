@@ -47,19 +47,14 @@ describe("Testing main features and function", () => {
     cy.get("[data-cy='solanaAssetWallet']").should("have.text", "1")
   })
 
-  it("fills the max affordable with the Max button", () => {
+  it("opens day 1 with a live market and shows day-over-day deltas", () => {
+    // no advance needed: prices exist the moment the run starts
+    cy.get("[data-cy='assetPrice']").first().should("not.have.text", "$0")
+    cy.get("[data-cy='solanaBuyButton']").should("not.be.disabled")
+    // deltas appear once there is a yesterday to compare against
+    cy.get("[data-cy='bitcoinDayDelta']").should("not.exist")
     cy.get("#advDay").click()
-    cy.get("[data-cy='solanaMaxButton']").click()
-    cy.get("[data-cy='solanaAmountInput']")
-      .invoke("val")
-      .then((val) => {
-        expect(parseInt(String(val))).to.be.gt(0)
-        cy.get("[data-cy='solanaBuyButton']").click()
-        cy.get("[data-cy='solanaAssetWallet']").should(
-          "have.text",
-          String(val)
-        )
-      })
+    cy.get("[data-cy='bitcoinDayDelta']").should("be.visible")
   })
 
   it("starts a deterministic run from a seed typed into the modal", () => {
@@ -69,9 +64,11 @@ describe("Testing main features and function", () => {
     cy.visit("http://localhost:3000/game")
     cy.get("[data-cy='seedInput']").type("42")
     cy.get("#startGame").click()
-    cy.get("#advDay").click()
-    // seed 42 always rolls this exact day-2 market
+    // seed 42 always opens with this exact day-1 market
     cy.get("[data-cy='assetPrice']").eq(3).should("have.text", "$53")
+    cy.get("#advDay").click()
+    // contain, not equal: the cell now carries the day-over-day delta too
+    cy.get("[data-cy='assetPrice']").eq(3).should("contain.text", "$55")
     cy.get("[data-cy='seedDisplay']").should("contain", "42")
   })
 
@@ -82,21 +79,24 @@ describe("Testing main features and function", () => {
     cy.get("#startGame").should("be.visible")
     cy.get("[data-cy='seedInput']").should("have.value", "7")
     cy.get("#startGame").click()
-    cy.get("#advDay").click()
-    // seed 7 always rolls this exact day-2 market
+    // seed 7 always opens with this exact day-1 market
     cy.get("[data-cy='assetPrice']").eq(3).should("have.text", "$86")
   })
 
-  it("resets and starts a new game", () => {
+  it("resets and starts a new game (with tap-again confirm)", () => {
     cy.get("#advDay").click()
+    // first tap arms the confirm, second tap resets
+    cy.get("#runInfo").click()
+    cy.get("#runInfo").should("contain", "TAP AGAIN")
     cy.get("#runInfo").click()
     // resetting brings the difficulty modal back
     cy.get("#startGame").click()
     cy.get("[data-cy='cash']").should("have.text", "$2,000")
-    cy.get("ul").should("contain", "Click Advance Day to start.")
+    cy.get("ul").should("contain", "Market open")
   })
 
   it("starts an easy mode run with its own settings", () => {
+    cy.get("#runInfo").click()
     cy.get("#runInfo").click()
     cy.get("#easyMode").click()
     cy.get("#startGame").click()

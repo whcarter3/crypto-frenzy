@@ -46,17 +46,33 @@ describe('START_RUN', () => {
     }
   });
 
-  it('seeds the rng, stores the seed, and loads the given high score', () => {
+  it('stores the seed and loads the given high score', () => {
     const state = startRun('Normal', 1234, 9999);
-    expect(state.rngState).toBe(1234);
     expect(state.seed).toBe(1234);
     expect(state.highScore).toBe(9999);
+    // the day-1 price roll consumes rng steps, so rngState has advanced
+    expect(state.rngState).not.toBe(1234);
   });
 
   it('stores huge seeds in their wrapped form so the display matches the rng', () => {
     const state = startRun('Normal', 2 ** 32 + 7);
     expect(state.seed).toBe(7);
-    expect(state.rngState).toBe(7);
+  });
+
+  it('opens day 1 with real prices — no dead pre-game state', () => {
+    const state = startRun();
+    for (const asset of Object.values(state.assets)) {
+      expect(asset.price).toBeGreaterThan(0);
+      expect(asset.price).toBeGreaterThanOrEqual(asset.range.low[0]);
+      expect(asset.price).toBeLessThanOrEqual(asset.range.moon[1]);
+      expect(asset.previousPrice).toBe(0); // nothing to delta against yet
+    }
+  });
+
+  it('rolls identical day-1 markets from identical seeds', () => {
+    expect(startRun('Normal', 777).assets).toEqual(
+      startRun('Normal', 777).assets,
+    );
   });
 });
 
@@ -76,6 +92,14 @@ describe('ADVANCE_DAY', () => {
         expect(asset.price).toBeGreaterThanOrEqual(asset.range.low[0]);
         expect(asset.price).toBeLessThanOrEqual(asset.range.moon[1]);
       }
+    }
+  });
+
+  it("tracks yesterday's price for the day-over-day delta", () => {
+    const day1 = startRun();
+    const day2 = advance(day1);
+    for (const key of Object.keys(day2.assets)) {
+      expect(day2.assets[key].previousPrice).toBe(day1.assets[key].price);
     }
   });
 
@@ -169,14 +193,24 @@ describe('BUY_ASSET', () => {
     expect(bought.assets.solana.wallet).toBe(5);
   });
 
-  it('is a no-op before prices exist or for unknown assets', () => {
-    const state = startRun(); // prices are 0 until the first advance
-    expect(
-      reducer(state, { type: 'BUY_ASSET', payload: { assetKey: 'solana' } }),
-    ).toBe(state);
+  it('is a no-op for unknown assets or zero-price assets', () => {
+    const state = startRun();
     expect(
       reducer(state, { type: 'BUY_ASSET', payload: { assetKey: 'nope' } }),
     ).toBe(state);
+    const zeroPriced: State = {
+      ...state,
+      assets: {
+        ...state.assets,
+        solana: { ...state.assets.solana, price: 0 },
+      },
+    };
+    expect(
+      reducer(zeroPriced, {
+        type: 'BUY_ASSET',
+        payload: { assetKey: 'solana' },
+      }),
+    ).toBe(zeroPriced);
   });
 
   it('buys a specific amount when requested', () => {
