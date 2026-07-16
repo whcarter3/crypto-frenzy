@@ -10,14 +10,19 @@ import { cn } from '../lib/cn';
 import { clearSave } from '../lib/state/persistence';
 import { loadHighScore } from '../lib/state/highScores';
 import { useNotification } from '../lib/NotificationContext';
+import { playSound } from '../lib/sound';
 import Chip from './Chip';
 
 const GameSidebar = ({
   state,
   dispatch,
+  onOpenSettings,
+  onOpenHelp,
 }: {
   state: State;
   dispatch: Dispatch<Action>;
+  onOpenSettings: () => void;
+  onOpenHelp: () => void;
 }) => {
   const { showNotification } = useNotification();
 
@@ -50,6 +55,7 @@ const GameSidebar = ({
         amount: Number.isFinite(parsed) && parsed > 0 ? parsed : undefined,
       },
     });
+    playSound('sell');
     setAmount(assetKey, '');
   };
 
@@ -246,6 +252,25 @@ const GameSidebar = ({
       >
         new game
       </button>
+
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={onOpenHelp}
+          className="btn flex-1 py-2 px-3 text-xs font-semibold"
+          id="openHowToPlay"
+        >
+          How to play
+        </button>
+        <button
+          type="button"
+          onClick={onOpenSettings}
+          className="btn flex-1 py-2 px-3 text-xs font-semibold"
+          id="openSettings"
+        >
+          Settings
+        </button>
+      </div>
 
       {hasHighScore ? (
         <>

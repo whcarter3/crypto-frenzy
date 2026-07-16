@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { loadHighScore, saveHighScore } from './highScores';
+import {
+  clearHighScores,
+  loadHighScore,
+  saveHighScore,
+} from './highScores';
 
 const store = new Map<string, string>();
 
@@ -34,5 +38,14 @@ describe('high scores', () => {
   it('never writes in Test mode', () => {
     saveHighScore('Test', 999);
     expect(store.size).toBe(0);
+  });
+
+  it('clearHighScores wipes every mode', () => {
+    saveHighScore('Normal', 100);
+    saveHighScore('Easy', 200);
+    saveHighScore('Hard', 300);
+    clearHighScores();
+    expect(store.size).toBe(0);
+    expect(loadHighScore('Normal')).toBeNull();
   });
 });
