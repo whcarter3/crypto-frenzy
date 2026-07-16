@@ -59,12 +59,21 @@ const GameOver = ({
       className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-10 flex items-center justify-center p-4 md:p-8"
       data-cy="gameOverScreen"
     >
-      <div className="bg-black w-full max-w-2xl rounded-sm border border-crt-yellow box-shadow-crt p-6 md:p-8 space-y-6 overflow-y-auto">
+      <div
+        className="bg-black w-full max-w-2xl rounded-sm border border-crt-yellow box-shadow-crt p-6 md:p-8 space-y-6 overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="gameOverTitle"
+        tabIndex={0}
+      >
         <div className="flex items-center justify-between gap-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-300 text-glow-crt">
+          <h1
+            id="gameOverTitle"
+            className="text-2xl md:text-3xl font-bold text-slate-300 text-glow-crt"
+          >
             RUN COMPLETE
           </h1>
-          <span className="text-3xl">
+          <span className="text-3xl" aria-hidden="true">
             {getModeEmoji(state.mode)}
           </span>
         </div>

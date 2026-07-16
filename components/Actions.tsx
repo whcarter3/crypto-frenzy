@@ -14,7 +14,7 @@ const Actions = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <Chip
           figure={`${state.cash}`}
           label="Cash"

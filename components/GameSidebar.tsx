@@ -63,10 +63,10 @@ const GameSidebar = ({
     state.currentDay > 0 && state.cash >= state.wallet.expansionCost;
 
   return (
-    <aside className="w-full flex flex-col gap-6">
-      <p className="text-2xl text-white/90 font-semibold tracking-wide">
+    <aside className="w-full min-w-0 flex flex-col gap-6">
+      <h2 className="text-2xl text-white/90 font-semibold tracking-wide">
         NET WORTH
-      </p>
+      </h2>
       <div
         className={cn(
           'panel-crt rounded-lg p-3 h-40 text-right flex flex-col justify-center',
@@ -85,11 +85,15 @@ const GameSidebar = ({
         </div>
       </div>
 
-      <p className="text-2xl text-white/90 font-semibold tracking-wide">
+      <h2 className="text-2xl text-white/90 font-semibold tracking-wide">
         HOLDINGS
-      </p>
+      </h2>
 
-      <div className="overflow-y-auto panel-crt rounded-lg flex-1 h-[40vh]">
+      {/* overflow-x-auto: table-layout:auto resists shrinking columns
+          below their header text's natural width, which blew out the
+          whole page horizontally on narrow viewports since nothing
+          contained the excess — matches AssetTable's existing pattern. */}
+      <div className="overflow-auto panel-crt rounded-lg flex-1 h-[40vh]">
         <table className="w-full h-full text-base">
           <thead className="sticky top-0 bg-white/5">
             <tr className="border-b border-white/20">
@@ -157,6 +161,7 @@ const GameSidebar = ({
                           className="w-14 bg-black/40 border border-white/20 rounded px-1.5 py-1 text-sm text-white/90 placeholder:text-white/40"
                           data-cy={`${key}SellInput`}
                           title="How many to sell — leave empty to sell the whole position"
+                          aria-label={`Amount of ${asset.name} to sell — leave empty to sell all`}
                         />
                         <button
                           className={cn(
@@ -172,6 +177,7 @@ const GameSidebar = ({
                               ? 'No assets to sell'
                               : 'Sell this asset'
                           }
+                          aria-label={`Sell ${asset.name}`}
                         >
                           Sell
                         </button>
@@ -194,9 +200,9 @@ const GameSidebar = ({
         </table>
       </div>
 
-      <p className="text-2xl text-white/90 font-semibold tracking-wide">
+      <h2 className="text-2xl text-white/90 font-semibold tracking-wide">
         WALLET
-      </p>
+      </h2>
       <Chip
         figure={`${state.wallet.amount}/${state.wallet.capacity}`}
         label={`Lvl.${state.wallet.level}`}
