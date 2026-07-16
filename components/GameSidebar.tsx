@@ -63,7 +63,7 @@ const GameSidebar = ({
     state.currentDay > 0 && state.cash >= state.wallet.expansionCost;
 
   return (
-    <aside className="w-full flex flex-col gap-6">
+    <aside className="w-full min-w-0 flex flex-col gap-6">
       <h2 className="text-2xl text-white/90 font-semibold tracking-wide">
         NET WORTH
       </h2>

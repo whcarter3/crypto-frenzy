@@ -15,8 +15,9 @@ challenge groundwork). **Vite + React SPA** (no framework tax), and the reducer 
 **pure, deterministic game engine** — seeded RNG in state, one intent per action,
 replayable from a seed + action log. `/game` is responsive (stacks below `lg`) and
 passes an automated **cypress-axe** WCAG scan (landing page, difficulty modal,
-in-game, game-over) with zero violations. 44 Vitest unit tests + 16 Cypress E2E
-tests (12 functional + 4 accessibility), all in CI. Deployed on Vercel; Tauri 2
+in-game, game-over) with zero violations, plus a 375px viewport-overflow
+regression test. 44 Vitest unit tests + 18 Cypress E2E tests (12 functional +
+4 accessibility + 2 responsive), all in CI. Deployed on Vercel; Tauri 2
 scaffold builds.
 
 **Known debt / still missing:**
@@ -27,10 +28,9 @@ scaffold builds.
   prerender plugin in Phase 2 if organic search matters.
 - **Tauri scaffold half-configured** — identifier and product name are fixed, but
   default icons, `fullscreen: true`, and no release pipeline remain (Phase 3).
-- **No automated viewport-overflow regression test** — Phase 1d's responsive fixes
-  were verified by hand (direct DOM measurement, not screenshots, which render at
-  an unreliable size in this environment); a Cypress test for it hit enough
-  infrastructure flakiness to punt rather than force through (see Phase 1d notes).
+- **Real-device spot check still worth doing** — mobile layout is now guarded by an
+  automated 375px Cypress test (see Phase 1d notes), but nobody has played a run on
+  an actual phone yet; worth a pass on the Vercel preview before v1.0.
 
 ---
 
@@ -139,13 +139,18 @@ touch the same layout-heavy components (`AssetTable`, `GameSidebar`, `Game`).
       the trade column meant even an ordinary 1280px desktop needed to
       horizontal-scroll to reach the Buy button once Phase 1c widened the row —
       widened it to match `Actions` below, which was already full-width.
-- [ ] Deferred: a dedicated Cypress viewport-overflow test kept fighting
-      infrastructure issues (stale local Cypress profile state, `clearAllLocalStorage`
-      being a no-op before a page's first visit) rather than surfacing real app
-      bugs, and cost more time than it was worth chasing to green — the manual
-      verification (direct DOM measurement across 375/768/1280px, before/after
-      every fix) stands in for it this round. Worth revisiting in Phase 1e/2 with a
-      cleaner setup (dedicated fixture, explicit clear-then-reload from the start).
+- [x] Viewport-overflow regression test (`cypress/e2e/responsive.cy.ts`) — a
+      correction to an earlier note that called this test "infrastructure
+      flakiness": it was flagging a **real bug**. At a true 375px viewport the
+      game screen forced ~600px of width (flex items' `min-width: auto` flooring
+      them at the tables'/log's intrinsic width, plus a stray `mx-auto` that
+      disabled flex stretch and sized the trade column to its content). Manual
+      verification had missed it because the un-fixed layout inflated the dev
+      preview pane's own layout viewport to match — the environment could never
+      show a real phone width until the bug it was hiding was fixed. Cypress's
+      viewport was the honest instrument all along. Fixed with `min-w-0` on the
+      main flex chain and removing `mx-auto`; the test now guards 375px through
+      the full trade flow plus the desktop side-by-side layout.
 
 ## Phase 1e — Presentation & feel
 
