@@ -44,7 +44,7 @@ export const priceMovementEvent = (
     `The World Series of Poker's main prize is now 1 million ${asset}! All in!`,
     `A glitch in ${asset}'s code deleted half of the supply! Prices soar!`,
     `Marty McFly has traveled back in time and bought $1 million of ${asset}! Don't miss out!`,
-    `A reddit thread on r/wallstreetbets about ${asset} has gone viral! Sell high!`,
+    `A post on r/wallstreetbets about ${asset} has gone viral! Sell high!`,
     `Apes figured out how to use ${asset} to buy bananas! Prices are apeeling!`,
     `The NBA has announced that they will be paying players in ${asset}! Scores and prices are up!`,
     `For no particular technical or news event, ${asset} has gone parabolic!`,

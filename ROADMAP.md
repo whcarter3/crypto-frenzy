@@ -246,6 +246,24 @@ polish in Phase 2.
       row is the feedback. Done replaced by a ✕ dismiss in the corner,
       clear button is a ✕ icon, AVG. PRICE header shortened to AVG.
 
+*G. Post-close-out polish playtest (owner notes, 2026-07-17)*
+- [x] G1: Trade modal reads like a receipt: player stats stacked left-aligned
+      (cash / wallet space / holding) with more air under the asset price, and
+      live totals above the execute button — Cost + Cash-after on Buy,
+      Proceeds + Gain on Sell — so the decision is priced before committing.
+      All slots render on both tabs (blank space beats layout jumps); top
+      padding trimmed; ✕ dismiss borderless.
+- [x] G2: Stepper regrouped to `(Max)  (−)(+)  [n]` — the clear-to-zero ✕
+      button cut (typing 0 does the same job).
+- [x] G3: "Need $X cash" → "Ins. funds".
+- [x] G4: AVG column cut from the market table — cost basis lives in the
+      holdings panel and the trade modal; the market table is about the market.
+- [x] G5: Meta out of the gameplay loop: How to play, Abandon run (tap-again
+      confirm intact) moved into the settings menu behind a single ⚙ icon;
+      high score + seed + gear grouped bottom-left of the sidebar, as far from
+      the game as possible.
+- [x] G6: End Day gets a player-style skip icon (▸|); "reddit thread" → "post".
+
 *D. Controls polish*
 - [x] D1: "max" placeholder next to a "MAX" button reads as a stutter — pick one.
 - [x] D2: Sell input clips its own placeholder ("al]") — width vs 16px font.

@@ -110,7 +110,7 @@ const StatusBar = ({
               : 'End the day: prices re-roll and debt compounds'
           }
         >
-          End Day ▸
+          End Day <span aria-hidden="true">▸|</span>
         </button>
       </div>
     </div>

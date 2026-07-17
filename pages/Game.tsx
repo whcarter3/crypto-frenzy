@@ -11,7 +11,10 @@ import {
   saveGame,
   clearSave,
 } from '../lib/state/persistence';
-import { saveHighScore } from '../lib/state/highScores';
+import {
+  loadHighScore,
+  saveHighScore,
+} from '../lib/state/highScores';
 import { useNotification } from '../lib/NotificationContext';
 import { playSound } from '../lib/sound';
 import { AlertMessages } from '../helpers/alerts';
@@ -98,6 +101,17 @@ export default function Game() {
   // settings, not in the seeded, replayable game state.
   const { settings, update } = useSettings();
 
+  // Abandon lives in the settings menu now (meta, not gameplay) —
+  // the confirm handshake happens there; this is the commit.
+  const abandonRun = () => {
+    clearSave();
+    dispatch({
+      type: 'INIT',
+      payload: { highScore: loadHighScore(state.mode) },
+    });
+    setSettingsOpen(false);
+  };
+
   // Warn when one in-game day remains.
   const { showNotification } = useNotification();
   useEffect(() => {
@@ -131,7 +145,7 @@ export default function Game() {
               between the player and the game. Desktop keeps the
               sidebar on the left, at a width the player can drag. */}
           <div
-            className="w-full lg:w-[var(--sidebar-w,25%)] lg:shrink-0 min-w-0 order-2 lg:order-none border-t lg:border-t-0 border-white/10 bg-crt-panel/50 px-4 py-6"
+            className="w-full lg:w-[var(--sidebar-w,25%)] lg:shrink-0 min-w-0 order-2 lg:order-none border-t lg:border-t-0 border-white/10 bg-crt-panel/50 px-4 py-6 flex flex-col"
             style={
               settings.sidebarWidth != null
                 ? ({
@@ -144,7 +158,6 @@ export default function Game() {
               state={state}
               dispatch={dispatch}
               onOpenSettings={() => setSettingsOpen(true)}
-              onOpenHelp={() => setHelpOpen(true)}
               onSelectAsset={(assetKey) =>
                 setTrade({ assetKey, side: 'sell' })
               }
@@ -213,7 +226,11 @@ export default function Game() {
         <GameOver state={state} dispatch={dispatch} />
       )}
       {settingsOpen && (
-        <Settings onClose={() => setSettingsOpen(false)} />
+        <Settings
+          onClose={() => setSettingsOpen(false)}
+          onOpenHelp={() => setHelpOpen(true)}
+          onAbandonRun={abandonRun}
+        />
       )}
       {helpOpen && <HowToPlay onClose={() => setHelpOpen(false)} />}
       {trade && !state.gameOver && !state.modalOpen && (

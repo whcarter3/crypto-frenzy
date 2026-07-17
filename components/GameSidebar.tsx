@@ -1,4 +1,4 @@
-import { Dispatch, useRef, useState } from 'react';
+import { Dispatch } from 'react';
 import { State, Action } from '../lib/types';
 import {
   computeNetWorth,
@@ -7,8 +7,6 @@ import {
   seedShareUrl,
 } from '../helpers/utils';
 import { cn } from '../lib/cn';
-import { clearSave } from '../lib/state/persistence';
-import { loadHighScore } from '../lib/state/highScores';
 import { useNotification } from '../lib/NotificationContext';
 import Chip from './Chip';
 
@@ -16,39 +14,14 @@ const GameSidebar = ({
   state,
   dispatch,
   onOpenSettings,
-  onOpenHelp,
   onSelectAsset,
 }: {
   state: State;
   dispatch: Dispatch<Action>;
   onOpenSettings: () => void;
-  onOpenHelp: () => void;
   onSelectAsset: (assetKey: string) => void;
 }) => {
   const { showNotification } = useNotification();
-
-  // NEW GAME wipes the run — require a second tap within 3s to confirm
-  const [confirmingReset, setConfirmingReset] = useState(false);
-  const confirmTimer = useRef<ReturnType<typeof setTimeout>>();
-
-  const handleNewGame = () => {
-    if (!confirmingReset) {
-      setConfirmingReset(true);
-      clearTimeout(confirmTimer.current);
-      confirmTimer.current = setTimeout(
-        () => setConfirmingReset(false),
-        3000,
-      );
-      return;
-    }
-    clearTimeout(confirmTimer.current);
-    setConfirmingReset(false);
-    clearSave();
-    dispatch({
-      type: 'INIT',
-      payload: { highScore: loadHighScore(state.mode) },
-    });
-  };
 
   const copySeedLink = () => {
     navigator.clipboard
@@ -74,7 +47,7 @@ const GameSidebar = ({
     state.currentDay > 0 && state.cash >= state.wallet.expansionCost;
 
   return (
-    <aside className="w-full min-w-0 flex flex-col gap-6">
+    <aside className="w-full min-w-0 h-full flex flex-col gap-6">
       {/* B2: a stat row, not a billboard — the giant colored panel
           dominated the screen and its red state read as an alarm when
           it was just the starting debt. Green celebrates being up;
@@ -181,65 +154,45 @@ const GameSidebar = ({
         }}
       />
 
-      {state.seed > 0 && (
-        <button
-          type="button"
-          onClick={copySeedLink}
-          className="text-xs text-white/50 hover:text-crt-cyan text-left tracking-wider"
-          data-cy="seedDisplay"
-          title="Copy a link that replays this exact market"
-        >
-          MARKET SEED: {state.seed} ⧉
-        </button>
-      )}
+      {/* Meta, not gameplay (owner call, 2026-07-17): everything that
+          isn't the core loop — help, settings, abandoning, records —
+          lives bottom-left, as far from the game as it gets. The gear
+          opens the settings menu, which now also holds How to play
+          and Abandon run. */}
+      <div className="mt-auto pt-4 flex flex-col items-start gap-2">
+        {hasHighScore ? (
+          <p className="text-xs text-crt-green/80">
+            High Score: ${numberWithCommas(state.highScore!)}
+          </p>
+        ) : (
+          <p className="text-xs text-white/50">
+            No high score yet — set a record this run!
+          </p>
+        )}
 
-      <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={onOpenHelp}
-          className="btn flex-1 py-2 px-3 text-xs font-semibold"
-          id="openHowToPlay"
-        >
-          How to play
-        </button>
+        {state.seed > 0 && (
+          <button
+            type="button"
+            onClick={copySeedLink}
+            className="text-xs text-white/50 hover:text-crt-cyan text-left tracking-wider"
+            data-cy="seedDisplay"
+            title="Copy a link that replays this exact market"
+          >
+            MARKET SEED: {state.seed} ⧉
+          </button>
+        )}
+
         <button
           type="button"
           onClick={onOpenSettings}
-          className="btn flex-1 py-2 px-3 text-xs font-semibold"
+          className="btn px-3 py-2"
           id="openSettings"
+          aria-label="Settings & help"
+          title="Settings, how to play, abandon run"
         >
-          Settings
+          <span aria-hidden="true">⚙</span>
         </button>
       </div>
-
-      {hasHighScore ? (
-        <p className="text-lg font-bold text-crt-green">
-          High Score: ${numberWithCommas(state.highScore!)}
-        </p>
-      ) : (
-        <p className="text-xs text-white/70">
-          No high score yet — set a record this run!
-        </p>
-      )}
-
-      {/* Demoted from the most prominent button on screen: it wipes the
-          run, so it reads quiet and asks for a second tap to confirm. */}
-      <button
-        type="button"
-        onClick={handleNewGame}
-        className={cn(
-          'text-left text-xs tracking-wider py-1',
-          confirmingReset
-            ? 'text-crt-red font-semibold'
-            : 'text-white/50 hover:text-crt-red',
-        )}
-        id="runInfo"
-        title="Abandon this run and start over"
-      >
-        {confirmingReset
-          ? '⚠ TAP AGAIN TO ABANDON THIS RUN'
-          : 'ABANDON RUN / NEW GAME'}
-      </button>
     </aside>
   );
 };

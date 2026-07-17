@@ -102,6 +102,7 @@ describe("Accessibility (axe)", () => {
   it("how-to-play modal has no violations", () => {
     cy.visit("http://localhost:3000/game?seed=42")
     cy.get("#startGame").click()
+    cy.get("#openSettings").click()
     cy.get("#openHowToPlay").click()
     cy.get("[data-cy='howToPlayScreen']").should("be.visible")
     cy.injectAxe()

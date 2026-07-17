@@ -66,15 +66,9 @@ const AssetTable = ({
             <th className="px-2 sm:px-3 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Price
             </th>
-            {/* "Avg. Price" was the widest header in the table (owner
-                playtest) — the abbreviation costs nothing next to the
-                PRICE column and buys the phone real room */}
-            <th
-              className="px-2 sm:px-3 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider"
-              title="Your average purchase price"
-            >
-              Avg
-            </th>
+            {/* No AVG column (owner call, 2026-07-17): your cost basis
+                lives in the holdings panel and the trade modal — the
+                market table is about the market */}
             <th className="px-2 sm:px-3 py-3 text-right text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Wallet
             </th>
@@ -139,14 +133,6 @@ const AssetTable = ({
                       asset.previousPrice,
                     )}
                   </div>
-                </td>
-                <td
-                  className="px-2 sm:px-3 py-3 text-sm text-white/80"
-                  data-cy="assetAveragePrice"
-                >
-                  {asset.wallet > 0
-                    ? `$${numberWithCommas(asset.averageCost)}`
-                    : '—'}
                 </td>
                 <td
                   className="px-2 sm:px-3 py-3 text-sm text-right text-crt-cyan font-medium"

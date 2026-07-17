@@ -1,4 +1,4 @@
-import { Dispatch, useState } from 'react';
+import { Dispatch, ReactNode, useState } from 'react';
 import { State, Action } from '../lib/types';
 import { calculateMaxShares, numberWithCommas } from '../helpers/utils';
 import { cn } from '../lib/cn';
@@ -9,13 +9,15 @@ export type TradeSide = 'buy' | 'sell';
 
 /**
  * The per-asset trade surface (owner design, 2026-07-17): tap a market
- * row to trade. Third playtest iteration (2026-07-16): the combined
- * buy+sell layout made you "look all over the place to parse what to
- * do", so the modal is now tabbed — one side at a time, reading top to
- * bottom as info → playground → execute. Market rows open the Buy tab,
- * holdings rows open Sell. Both tabs' amounts survive switching.
- * Executing a trade closes the modal immediately (owner call,
- * 2026-07-16) — the updated table row is the feedback.
+ * row to trade. Reads like a receipt (owner notes, 2026-07-17): asset
+ * and price up top, then your stats stacked left-aligned (cash, wallet
+ * space, holding), Buy | Sell tabs, the quantity playground, and the
+ * live totals — cost and cash-after for buys, proceeds and gain for
+ * sells — right above the execute button, so the decision is priced
+ * before you commit. Market rows open Buy, holdings rows open Sell.
+ * Every slot renders on both tabs (blank space over layout jumps), and
+ * executing a trade closes the modal immediately — the updated table
+ * row is the feedback.
  */
 const TradeModal = ({
   assetKey,
@@ -52,7 +54,7 @@ const TradeModal = ({
     state.wallet.amount >= state.wallet.capacity
       ? 'Wallet full — upgrade capacity'
       : state.cash < asset.price
-        ? `Need $${numberWithCommas(asset.price)} cash`
+        ? 'Ins. funds'
         : undefined;
 
   const positionPct =
@@ -65,6 +67,14 @@ const TradeModal = ({
       ? ((asset.price - asset.previousPrice) / asset.previousPrice) *
         100
       : null;
+
+  // Live receipt totals, driven by the steppers
+  const cost = buy.quantity * asset.price;
+  const proceeds = sell.quantity * asset.price;
+  const gain =
+    asset.averageCost > 0
+      ? (asset.price - asset.averageCost) * sell.quantity
+      : 0;
 
   const handleBuy = () => {
     if (buy.quantity <= 0) return;
@@ -86,6 +96,17 @@ const TradeModal = ({
     onClose();
   };
 
+  const row = (
+    label: string,
+    value: ReactNode,
+    cy?: string,
+  ) => (
+    <div className="flex justify-between gap-4" data-cy={cy}>
+      <span className="text-white/50">{label}</span>
+      <span className="text-white/90">{value}</span>
+    </div>
+  );
+
   const tab = (tabSide: TradeSide, label: string) => (
     <button
       type="button"
@@ -105,6 +126,15 @@ const TradeModal = ({
     </button>
   );
 
+  const reason =
+    side === 'buy'
+      ? maxBuy <= 0
+        ? buyDisabledReason
+        : undefined
+      : asset.wallet === 0
+        ? 'Nothing held yet'
+        : undefined;
+
   return (
     <div
       className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-10 flex items-center justify-center p-4 md:p-8"
@@ -114,7 +144,7 @@ const TradeModal = ({
       }}
     >
       <div
-        className="relative bg-black w-full max-w-md rounded-sm border border-crt-yellow box-shadow-crt p-6 space-y-5"
+        className="relative bg-black w-full max-w-md rounded-sm border border-crt-yellow box-shadow-crt px-6 pb-6 pt-4 space-y-4"
         role="dialog"
         aria-modal="true"
         aria-labelledby="tradeModalTitle"
@@ -123,60 +153,60 @@ const TradeModal = ({
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-3 right-3 btn px-2.5 py-1 text-sm text-white/70"
+          className="absolute top-2 right-2 px-2 py-1 text-lg text-white/50 hover:text-white"
           id="tradeModalClose"
           aria-label="Close trade panel"
         >
           ✕
         </button>
 
-        {/* Info: everything you need to know, in one block up top */}
-        <div className="space-y-2 pr-10">
-          <div className="flex items-baseline justify-between gap-3 flex-wrap">
-            <h1
-              id="tradeModalTitle"
-              className="text-2xl font-bold text-slate-300 text-glow-crt"
-            >
-              {asset.name}{' '}
-              <span className="text-crt-cyan text-lg">
-                {asset.symbol}
-              </span>
-            </h1>
-            <span className="text-xl font-bold text-white/90">
-              ${numberWithCommas(asset.price)}
-              {dayPct !== null && Math.abs(dayPct) >= 0.05 && (
-                <span
-                  className={cn(
-                    'ml-2 text-sm',
-                    dayPct > 0 ? 'text-crt-green' : 'text-crt-red',
-                  )}
-                >
-                  {dayPct > 0 ? '▲' : '▼'}{' '}
-                  {Math.abs(dayPct).toFixed(1)}%
-                </span>
-              )}
+        <div className="flex items-baseline justify-between gap-3 flex-wrap pr-8">
+          <h1
+            id="tradeModalTitle"
+            className="text-2xl font-bold text-slate-300 text-glow-crt"
+          >
+            {asset.name}{' '}
+            <span className="text-crt-cyan text-lg">
+              {asset.symbol}
             </span>
-          </div>
-          <div className="text-xs text-white/60 uppercase tracking-wider space-y-1">
-            <div className="flex justify-between">
-              <span>
-                Cash{' '}
-                <span className="text-crt-green">
-                  ${numberWithCommas(state.cash)}
-                </span>
+          </h1>
+          <span className="text-xl font-bold text-white/90">
+            ${numberWithCommas(asset.price)}
+            {dayPct !== null && Math.abs(dayPct) >= 0.05 && (
+              <span
+                className={cn(
+                  'ml-2 text-sm',
+                  dayPct > 0 ? 'text-crt-green' : 'text-crt-red',
+                )}
+              >
+                {dayPct > 0 ? '▲' : '▼'} {Math.abs(dayPct).toFixed(1)}%
               </span>
-              <span>
-                Wallet space{' '}
-                <span className="text-crt-cyan">
-                  {state.wallet.capacity - state.wallet.amount}
-                </span>
-              </span>
-            </div>
-            {asset.wallet > 0 && (
-              <div data-cy="tradeModalPosition">
-                Holding{' '}
+            )}
+          </span>
+        </div>
+
+        {/* Your stats, stacked receipt-style — extra breathing room
+            below the price so asset info and player info read as two
+            distinct groups */}
+        <div className="pt-3 text-xs uppercase tracking-wider space-y-1.5">
+          {row(
+            'Cash',
+            <span className="text-crt-green">
+              ${numberWithCommas(state.cash)}
+            </span>,
+          )}
+          {row(
+            'Wallet space',
+            <span className="text-crt-cyan">
+              {state.wallet.capacity - state.wallet.amount}
+            </span>,
+          )}
+          {row(
+            'Holding',
+            asset.wallet > 0 ? (
+              <span data-cy="tradeModalPosition">
                 <span className="text-crt-cyan">×{asset.wallet}</span>{' '}
-                at avg ${numberWithCommas(asset.averageCost)}
+                @ ${numberWithCommas(asset.averageCost)}
                 {/* E2: suppress the green "+0.0%" right after a buy */}
                 {Math.abs(positionPct) >= 0.05 && (
                   <span
@@ -191,9 +221,11 @@ const TradeModal = ({
                     {positionPct.toFixed(1)}%
                   </span>
                 )}
-              </div>
-            )}
-          </div>
+              </span>
+            ) : (
+              <span className="text-white/40">—</span>
+            ),
+          )}
         </div>
 
         <div
@@ -205,8 +237,7 @@ const TradeModal = ({
           {tab('sell', 'Sell')}
         </div>
 
-        {/* Playground: the active side's amount, nothing else */}
-        <div id="tradePanel" role="tabpanel">
+        <div id="tradePanel" role="tabpanel" className="space-y-2">
           {side === 'buy' ? (
             <TradeStepper
               assetName={asset.name}
@@ -214,7 +245,6 @@ const TradeModal = ({
               cyPrefix={assetKey}
               control={buy}
               disabled={maxBuy <= 0}
-              disabledReason={buyDisabledReason}
             />
           ) : (
             <TradeStepper
@@ -223,14 +253,71 @@ const TradeModal = ({
               cyPrefix={`${assetKey}Sell`}
               control={sell}
               disabled={asset.wallet === 0}
-              disabledReason={
-                asset.wallet === 0 ? 'Nothing held yet' : undefined
-              }
             />
+          )}
+          {/* Fixed-height slot: present even when empty so the modal
+              doesn't jump when a reason appears */}
+          <p className="h-4 text-xs text-white/50 text-right">
+            {reason}
+          </p>
+        </div>
+
+        {/* The receipt totals: what this trade does to your money,
+            priced live from the stepper */}
+        <div className="text-xs uppercase tracking-wider space-y-1.5 border-t border-white/10 pt-3">
+          {side === 'buy' ? (
+            <>
+              {row(
+                'Cost',
+                cost > 0 ? (
+                  `−$${numberWithCommas(cost)}`
+                ) : (
+                  <span className="text-white/40">—</span>
+                ),
+                'tradeCost',
+              )}
+              {row(
+                'Cash after',
+                <span className="text-crt-green">
+                  ${numberWithCommas(state.cash - cost)}
+                </span>,
+                'tradeCashAfter',
+              )}
+            </>
+          ) : (
+            <>
+              {row(
+                'Proceeds',
+                proceeds > 0 ? (
+                  <span className="text-crt-green">
+                    +${numberWithCommas(proceeds)}
+                  </span>
+                ) : (
+                  <span className="text-white/40">—</span>
+                ),
+                'tradeProceeds',
+              )}
+              {row(
+                'Gain',
+                proceeds > 0 && asset.averageCost > 0 ? (
+                  <span
+                    className={cn(
+                      gain > 0 && 'text-crt-green',
+                      gain < 0 && 'text-crt-red',
+                    )}
+                  >
+                    {gain >= 0 ? '+' : '−'}$
+                    {numberWithCommas(Math.abs(gain))}
+                  </span>
+                ) : (
+                  <span className="text-white/40">—</span>
+                ),
+                'tradeGain',
+              )}
+            </>
           )}
         </div>
 
-        {/* Execute: one full-width commit for the active side */}
         {side === 'buy' ? (
           <button
             className={cn(

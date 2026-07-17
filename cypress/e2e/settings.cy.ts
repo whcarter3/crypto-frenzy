@@ -54,8 +54,12 @@ describe("Settings & How to play", () => {
     })
   })
 
-  it("opens and closes how to play", () => {
+  it("opens how to play from the settings menu", () => {
+    // How to play lives inside settings now (meta, not gameplay)
+    cy.get("#openSettings").click()
     cy.get("#openHowToPlay").click()
+    // opening help closes the settings menu behind it
+    cy.get("[data-cy='settingsScreen']").should("not.exist")
     cy.get("[data-cy='howToPlayScreen']").should("be.visible")
     cy.contains("cash minus debt").should("be.visible")
     cy.get("#howToPlayClose").click()
