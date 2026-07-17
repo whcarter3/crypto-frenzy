@@ -245,7 +245,7 @@ const TradeModal = ({
           ) : (
             <TradeStepper
               assetName={asset.name}
-              maxLabel="All"
+              maxLabel="Max"
               cyPrefix={`${assetKey}Sell`}
               control={sell}
               disabled={asset.wallet === 0}

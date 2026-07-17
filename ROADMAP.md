@@ -312,18 +312,25 @@ polish in Phase 2.
 
 ## Phase 2 — Web release (v1.0 on cryptofrenzy.live)
 
-- [ ] **Branding / copy / theme review** (owner, 2026-07-17) — a full pass over
-      every player-facing string. The wording runs long and the owner skips
-      reading it — and if the person who wrote the game skips it, players will
-      too. Three goals: **tighten** (cut copy length everywhere it doesn't earn
-      its screen time), **consistency** (one voice, one term per concept —
-      run/day/market/wallet/seed are named differently in different places),
-      and **calibrate handholding** (evaluate how much explanation a player
-      actually needs vs. what the game teaches by playing — some of How to
-      play / landing / tooltips may just be cut). Scope: landing page, How to
-      play, difficulty blurbs, log/event strings (engine-side — watch the
-      seeded-log tests), buttons/labels/toasts, game-over screen. Do this
-      EARLY in Phase 2, before OG images and screenshots bake the old copy in.
+- [x] **Branding / copy / theme review** (owner, 2026-07-17) — done. 258
+      strings inventoried (17 test-coupled), owner reviewed a side-by-side
+      proposal and ruled on six open calls. Outcomes: voice rule is *flavor
+      outside, utility inside* (CRT-noir at arrival/exit, plain in the game,
+      meme-ticker stays a character); one term per concept (run, day, End
+      Day, holdings — table column now HELD, coins, cash, debt, market seed,
+      **Max on both tabs**, score vs net worth kept distinct); How to play cut
+      from four sections to two (only the score rule and Pay rule — the two
+      things play can't teach); difficulty modal rewritten noir (option A) and
+      its **Easy blurb factual bug fixed** (claimed "higher starting cash";
+      Easy starts with less); **landing route stays as the start screen**
+      (owner: a desktop game needs one) but its instruction blocks (YOUR
+      CONTRACT / TERMINAL OPS / difficulty blurb) are cut per the original
+      proposal — what remains is the pitch, the save-persistence fact, and
+      the CTAs; "Ins. funds"
+      and the dirty-money tagline kept; orphaned AlertMessages deleted;
+      emoji pairs spaced in the log; pre-run "Click Advance Day" log line cut
+      (day 1 starts rolled). Zero spec churn — all asserted substrings
+      preserved.
 - [ ] **PWA** via `vite-plugin-pwa`: manifest + service worker + icons. The game is
       fully client-side, so installable + offline is nearly free.
 - [ ] SEO/social: OG image, meta tags; revisit landing-page prerender here if organic

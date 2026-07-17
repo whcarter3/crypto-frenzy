@@ -57,7 +57,7 @@ export const priceMovementEvent = (
     `The FTC has announced that they will be investigating ${asset} for fraud! Buy low!`,
     `${asset} has been banned in China! Get in now!`,
     `${asset} has been proven to accelerate global warming. Temperatures rise, prices drop!`,
-    `Aliens are are abducting everyone who owns ${asset}! Wait till they leave and buy!`,
+    `Aliens are abducting everyone who owns ${asset}! Wait till they leave and buy!`,
     `AI gains sentience and sabotages the ${asset} network! Catch the bottom!`,
     `${
       southAmericanCountries[
@@ -67,10 +67,10 @@ export const priceMovementEvent = (
     `Kim Jong Un has announced that he will be using ${asset} to fund his nuclear program! The world sells it off to stop his plans!`,
     `A top senator sells off all their holdings of ${asset}! Prices plummet!`,
     `Elon Musk tweeted only "${asset.toUpperCase()}", but misspelled! Crash!`,
-    `A submarine full of billionaires blew up near the sub-ocean internet lines and crashed the ${asset} network! Buy low!`,
+    `A submarine full of billionaires blew up an undersea cable and crashed the ${asset} network! Buy low!`,
   ]
 
   return crashOrMoon === "crash"
-    ? [`📉😲 ${crashEvents[Math.floor(rng.random() * crashEvents.length)]}`]
-    : [`🚀🌝 ${moonEvents[Math.floor(rng.random() * moonEvents.length)]}`]
+    ? [`📉 😲 ${crashEvents[Math.floor(rng.random() * crashEvents.length)]}`]
+    : [`🚀 🌝 ${moonEvents[Math.floor(rng.random() * moonEvents.length)]}`]
 }

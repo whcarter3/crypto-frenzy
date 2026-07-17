@@ -76,7 +76,8 @@ export const reducer = (state: State, action: Action): State => {
         wallet: { amount: 0, ...config.wallet },
         log: [
           ...eventLogs,
-          `Market open — you have ${config.days - 1} days to make as much money as you can! 💎🙌`,
+          // "Market open" prefix is asserted by features.cy.ts
+          `Market open — ${config.days - 1} days on the clock. 💎 🙌`,
           `You borrowed $${numberWithCommas(config.cash)} at ${
             config.interestRate * 100
           }% daily interest.`,

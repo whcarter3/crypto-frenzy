@@ -69,8 +69,10 @@ const AssetTable = ({
             {/* No AVG column (owner call, 2026-07-17): your cost basis
                 lives in the holdings panel and the trade modal — the
                 market table is about the market */}
+            {/* HELD, not WALLET: "wallet" is the capacity container;
+                this column is what you hold (copy review terminology) */}
             <th className="px-2 sm:px-3 py-3 text-right text-xs font-semibold text-crt-cyan uppercase tracking-wider">
-              Wallet
+              Held
             </th>
             {/* chevron affordance column */}
             <th className="w-6 sm:w-8 px-1 sm:px-3 py-3" aria-hidden="true"></th>

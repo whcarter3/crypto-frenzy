@@ -9,8 +9,10 @@ type GameMode = 'Easy' | 'Normal' | 'Hard' | 'Test';
 const modeDescriptions = {
   Easy: {
     title: 'Beginner Friendly',
-    description:
-      'Lower debt interest, and higher starting cash. Perfect for learning the ropes!',
+    // The old blurb claimed "higher starting cash" — Easy actually
+    // starts with LESS cash than Normal ($1,500 vs $2,000); its edge
+    // is days and interest (copy review, 2026-07-17)
+    description: 'More days, gentler interest. Room to learn.',
     features: [
       '60 days',
       '10% debt interest',
@@ -20,8 +22,7 @@ const modeDescriptions = {
   },
   Normal: {
     title: 'Balanced Challenge',
-    description:
-      'A fair balance of risk and reward. Standard interest rates and price volatility.',
+    description: 'The standard contract.',
     features: [
       '20% debt interest',
       '30 days',
@@ -31,8 +32,7 @@ const modeDescriptions = {
   },
   Hard: {
     title: 'Expert Mode',
-    description:
-      'High risk, high reward! Higher debt interest, and limited starting cash.',
+    description: 'Steep interest, short clock. For closers.',
     features: [
       '30% debt interest',
       '20 days',
@@ -129,11 +129,8 @@ const GameMode = ({
           </div>
 
           <p className="text-slate-300 leading-relaxed">
-            Make as much money as you can before the days run out!
-            But, don&apos;t forget about the money you borrowed, your
-            debt will increase every day. You buy assets, hope the
-            price rises, and sell at a profit. Diamond hands to the
-            moon!
+            Borrowed cash. Compounding debt. A market with no mercy.
+            Make your money before the clock runs out.
           </p>
         </div>
 
@@ -210,7 +207,7 @@ const GameMode = ({
             onClick={handleStart}
             id="startGame"
           >
-            Start Game!
+            Start Run
           </button>
         </div>
       </div>

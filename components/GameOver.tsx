@@ -29,8 +29,9 @@ const GameOver = ({
     navigator.clipboard
       .writeText(seedShareUrl(state.seed))
       .then(() =>
+        // Same action as the sidebar's copy button, same toast
         showNotification(
-          'Seed link copied — challenge someone to the same market',
+          'Seed link copied — same market, same moonshots',
           'success',
         ),
       )

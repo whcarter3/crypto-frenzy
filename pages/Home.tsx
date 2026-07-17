@@ -38,72 +38,23 @@ export default function Home() {
             </div>
           </header>
 
-          <section className="grid md:grid-cols-2 gap-6 text-sm md:text-base text-slate-300">
-            <div className="space-y-3">
-              <h2 className="text-lg font-semibold text-crt-green">
-                YOUR CONTRACT
-              </h2>
-              <p>
-                Survive the full run of days with more net worth than
-                you started. Prices desync every cycle and compound
-                interest hunts you in the dark.
-              </p>
-              <p>
-                Stack profits, expand your wallet, and time your
-                exits. Diamond hands… but one bad tick and you&apos;re
-                liquidated.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <h2 className="text-lg font-semibold text-crt-cyan">
-                TERMINAL OPS
-              </h2>
-              <ul className="space-y-1">
-                <li>
-                  • Click{' '}
-                  <span className="text-crt-green">Advance Day</span>{' '}
-                  to move time forward.
-                </li>
-                <li>• Buy low, sell high across hostile markets.</li>
-                <li>
-                  • Watch cash, debt, and wallet capacity like a hawk.
-                </li>
-                <li>
-                  • Push a new high score before the final cycle
-                  closes.
-                </li>
-              </ul>
-            </div>
-          </section>
-
-          {/* Menu stubs (PROFILES/CREDITS "SOON") cut per roadmap —
-              vaporware menu items undercut the "real game" feel;
-              Credits returns as a real page in Phase 2 */}
-          <section className="grid md:grid-cols-2 gap-4 text-xs md:text-sm text-slate-300 border-t border-crt-outline pt-6 mt-2">
-            <div className="space-y-2">
-              <h3 className="text-crt-cyan font-semibold">
-                DIFFICULTY (IN-GAME)
-              </h3>
-              <p>
-                Select Easy, Normal, or Hard when the run boots. Each
-                mode adjusts days, starting cash, and how fast your
-                debt mutates.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-crt-cyan font-semibold">
-                SYSTEM STATUS
-              </h3>
-              <p>
-                Save data lives in local corp archives — your run
-                survives a reboot of this browser.
-              </p>
-              <p className="text-slate-500">
-                Persistence module:{' '}
-                <span className="text-crt-green">ONLINE</span>
-              </p>
-            </div>
+          {/* Copy review (owner-approved, 2026-07-17): the instruction
+              blocks are gone — YOUR CONTRACT, TERMINAL OPS, and the
+              difficulty blurb described things the game teaches by
+              playing. The route stays: a desktop game needs its start
+              screen. What remains is the pitch and the one fact play
+              can't teach (your run survives a reboot). */}
+          <section className="text-xs md:text-sm text-slate-300 border-t border-crt-outline pt-6 mt-2 space-y-2">
+            <h2 className="text-crt-cyan font-semibold">
+              SYSTEM STATUS
+            </h2>
+            <p>
+              Runs auto-save to the local archives — safe to reboot.
+            </p>
+            <p className="text-slate-500">
+              Persistence module:{' '}
+              <span className="text-crt-green">ONLINE</span>
+            </p>
           </section>
 
           <div className="pt-6 flex flex-col sm:flex-row gap-4 items-center">
