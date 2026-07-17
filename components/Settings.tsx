@@ -76,6 +76,12 @@ const Settings = ({ onClose }: { onClose: () => void }) => {
             onChange={(sound) => update({ sound })}
           />
           <Toggle
+            id="musicToggle"
+            label="Background music"
+            checked={settings.music}
+            onChange={(music) => update({ music })}
+          />
+          <Toggle
             id="crtToggle"
             label="CRT effects (scanlines, glow)"
             checked={settings.crt}

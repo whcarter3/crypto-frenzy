@@ -24,11 +24,19 @@ describe('settings', () => {
   });
 
   it('round-trips', () => {
-    saveSettings({ sound: false, crt: false });
-    expect(loadSettings()).toEqual({ sound: false, crt: false });
+    const custom = {
+      sound: false,
+      music: true,
+      crt: false,
+      sidebarWidth: 360,
+      logHeight: 240,
+    };
+    saveSettings(custom);
+    expect(loadSettings()).toEqual(custom);
   });
 
   it('merges stored values over defaults (forward compat)', () => {
+    // e.g. a pre-music/pre-layout save from an earlier version
     store.set('cryptoFrenzySettings', JSON.stringify({ sound: false }));
     expect(loadSettings()).toEqual({ ...defaultSettings, sound: false });
   });

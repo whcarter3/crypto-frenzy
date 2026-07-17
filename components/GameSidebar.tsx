@@ -75,83 +75,94 @@ const GameSidebar = ({
 
   return (
     <aside className="w-full min-w-0 flex flex-col gap-6">
-      <h2 className="text-2xl text-white/90 font-semibold tracking-wide">
-        NET WORTH
-      </h2>
-      <div
-        className={cn(
-          'panel-crt rounded-lg p-3 h-40 text-right flex flex-col justify-center',
-          netWorth >= 0 && 'bg-crt-transparentGreen',
-          netWorth < 0 && 'bg-crt-transparentRed',
-        )}
-      >
-        <div
+      {/* B2: a stat row, not a billboard — the giant colored panel
+          dominated the screen and its red state read as an alarm when
+          it was just the starting debt. Green celebrates being up;
+          being down renders calm and neutral. */}
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 className="text-sm text-white/60 font-semibold tracking-widest uppercase">
+          Net worth
+        </h2>
+        <span
+          data-cy="netWorth"
           className={cn(
-            'text-7xl font-bold text-white/90 break-all',
-            netWorth >= 0 && 'text-crt-green',
-            netWorth < 0 && 'text-crt-red',
+            'text-3xl font-bold',
+            netWorth > 0 ? 'text-crt-green' : 'text-white/90',
           )}
         >
           {formatMoney(netWorth)}
-        </div>
+        </span>
       </div>
 
-      <h2 className="text-2xl text-white/90 font-semibold tracking-wide">
-        HOLDINGS
-      </h2>
+      {/* B3: hidden on phones — the market table already carries the
+          position (dot, avg, count) and its rows open the same modal
+          on the Sell tab, so this panel was a full screen of
+          duplicate stats standing between the player and the market. */}
+      <div className="hidden md:flex flex-col gap-3">
+        <h2 className="text-sm text-white/60 font-semibold tracking-widest uppercase">
+          Holdings
+        </h2>
 
-      {holdings.length === 0 ? (
-        <div className="panel-crt rounded-lg py-5 text-center text-crt-yellow text-sm">
-          No current holdings
-        </div>
-      ) : (
-        // Display-only: selling happens in the TradeModal (tap a row).
-        <div className="panel-crt rounded-lg divide-y divide-white/10 overflow-y-auto max-h-[40vh]">
-          {holdings.map(([key, asset]) => {
-            const pct =
-              asset.averageCost > 0
-                ? ((asset.price - asset.averageCost) /
-                    asset.averageCost) *
-                  100
-                : 0;
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => onSelectAsset(key)}
-                aria-label={`Trade ${asset.name}`}
-                className="w-full p-3 flex items-center justify-between text-sm text-white/90 hover:bg-white/5 text-left"
-                data-cy={`${key}HoldingRow`}
-              >
-                <span className="font-medium text-crt-cyan">
-                  {asset.symbol}
-                </span>
-                <span className="flex items-center gap-3">
-                  <span className="text-white/70">
-                    avg ${numberWithCommas(asset.averageCost)}
+        {holdings.length === 0 ? (
+          <div className="panel-crt rounded-lg py-5 text-center text-crt-yellow text-sm">
+            No current holdings
+          </div>
+        ) : (
+          // Display-only: selling happens in the TradeModal (tap a row).
+          <div className="panel-crt rounded-lg divide-y divide-white/10 overflow-y-auto max-h-[40vh]">
+            {holdings.map(([key, asset]) => {
+              const pct =
+                asset.averageCost > 0
+                  ? ((asset.price - asset.averageCost) /
+                      asset.averageCost) *
+                    100
+                  : 0;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => onSelectAsset(key)}
+                  aria-label={`Trade ${asset.name}`}
+                  className="w-full p-3 flex items-center justify-between text-sm text-white/90 hover:bg-white/5 text-left"
+                  data-cy={`${key}HoldingRow`}
+                >
+                  <span className="font-medium text-crt-cyan">
+                    {asset.symbol}
                   </span>
-                  <span
-                    className={cn(
-                      pct >= 0 && 'text-crt-green',
-                      pct < 0 && 'text-crt-red',
+                  <span className="flex items-center gap-3">
+                    <span className="text-white/70">
+                      avg ${numberWithCommas(asset.averageCost)}
+                    </span>
+                    {/* E2: a freshly bought coin is ±0.0% — show
+                        nothing rather than a celebratory green zero */}
+                    {Math.abs(pct) >= 0.05 && (
+                      <span
+                        className={cn(
+                          pct > 0 && 'text-crt-green',
+                          pct < 0 && 'text-crt-red',
+                        )}
+                      >
+                        {pct > 0 ? '+' : ''}
+                        {pct.toFixed(1)}%
+                      </span>
                     )}
-                  >
-                    {pct >= 0 ? '+' : ''}
-                    {pct.toFixed(1)}%
+                    <span>× {asset.wallet}</span>
+                    <span
+                      className="text-crt-cyan/60"
+                      aria-hidden="true"
+                    >
+                      ›
+                    </span>
                   </span>
-                  <span>× {asset.wallet}</span>
-                  <span className="text-crt-cyan/60" aria-hidden="true">
-                    ›
-                  </span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
-      <h2 className="text-2xl text-white/90 font-semibold tracking-wide">
-        WALLET
+      <h2 className="text-sm text-white/60 font-semibold tracking-widest uppercase">
+        Wallet
       </h2>
       <Chip
         figure={`${state.wallet.amount}/${state.wallet.capacity}`}

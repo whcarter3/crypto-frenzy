@@ -176,17 +176,21 @@ const TradeModal = ({
               <div data-cy="tradeModalPosition">
                 Holding{' '}
                 <span className="text-crt-cyan">×{asset.wallet}</span>{' '}
-                at avg ${numberWithCommas(asset.averageCost)}{' '}
-                <span
-                  className={cn(
-                    positionPct >= 0
-                      ? 'text-crt-green'
-                      : 'text-crt-red',
-                  )}
-                >
-                  {positionPct >= 0 ? '+' : ''}
-                  {positionPct.toFixed(1)}%
-                </span>
+                at avg ${numberWithCommas(asset.averageCost)}
+                {/* E2: suppress the green "+0.0%" right after a buy */}
+                {Math.abs(positionPct) >= 0.05 && (
+                  <span
+                    className={cn(
+                      'ml-1',
+                      positionPct > 0
+                        ? 'text-crt-green'
+                        : 'text-crt-red',
+                    )}
+                  >
+                    {positionPct > 0 ? '+' : ''}
+                    {positionPct.toFixed(1)}%
+                  </span>
+                )}
               </div>
             )}
           </div>

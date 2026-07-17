@@ -10,6 +10,7 @@ import {
   saveSettings,
 } from './state/settings';
 import { setSoundEnabled } from './sound';
+import { setMusicEnabled } from './music';
 
 interface SettingsContextType {
   settings: Settings;
@@ -43,6 +44,7 @@ export const SettingsProvider = ({
   useEffect(() => {
     saveSettings(settings);
     setSoundEnabled(settings.sound);
+    setMusicEnabled(settings.music);
     document.documentElement.dataset.crt = settings.crt ? 'on' : 'off';
   }, [settings]);
 

@@ -51,6 +51,45 @@ describe("Responsive layout", () => {
     // holding a coin adds the holding marker + avg price to the row
     noTableOverflow("holding a coin")
     noHorizontalOverflow("modal closed")
+    // B3: market first on phones — the table sits above the net-worth
+    // stat, and the duplicate holdings panel doesn't render at all
+    cy.get("[data-cy='marketTable']").then(($table) => {
+      cy.get("[data-cy='netWorth']").then(($net) => {
+        expect(
+          $table[0].getBoundingClientRect().top,
+          "market table above portfolio stats",
+        ).to.be.lessThan($net[0].getBoundingClientRect().top)
+      })
+    })
+    cy.get("[data-cy='solanaHoldingRow']").should("not.be.visible")
+  })
+
+  it("desktop (1280px): drag dividers resize and persist via settings", () => {
+    cy.viewport(1280, 900)
+    freshVisit()
+    cy.get("#startGame").click({ force: true })
+    // keyboard resize: two ArrowDown presses = +32px on the log
+    cy.get("[data-cy='logDivider']")
+      .should("be.visible")
+      .focus()
+      .type("{downArrow}{downArrow}")
+      .should("have.attr", "aria-valuenow", "352")
+    cy.get("[data-cy='sidebarDivider']")
+      .focus()
+      .type("{rightArrow}")
+      .should("have.attr", "aria-valuenow", "336")
+    // sizes are device preferences: they survive a reload via settings
+    cy.reload()
+    cy.get("[data-cy='logDivider']").should(
+      "have.attr",
+      "aria-valuenow",
+      "352",
+    )
+    cy.get("[data-cy='sidebarDivider']").should(
+      "have.attr",
+      "aria-valuenow",
+      "336",
+    )
   })
 
   it("desktop (1280px): sidebar and trade area sit side by side, no overflow", () => {

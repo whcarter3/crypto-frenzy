@@ -171,7 +171,7 @@ touch the same layout-heavy components (`AssetTable`, `GameSidebar`, `Game`).
       don't count toward the score. Both modals reachable from the sidebar and
       covered by axe scans + E2E (toggles persist across reload).
 
-## Phase 1f — Comprehensive UX sweep (NEXT UP)
+## Phase 1f — Comprehensive UX sweep ✅ (done — PRs #39, #40, #41, #42, + close-out PR)
 
 The layout is *responsive* after 1d, but the moment-to-moment experience is rough
 (owner verdict 2026-07-03: "the UI is definitely responsive, but the UX is awful").
@@ -190,11 +190,15 @@ polish in Phase 2.
 - [x] B1: Cash/Debt/Days chips sit at the very bottom, far from decisions — after
       buying, **cash isn't visible anywhere on the mobile screen**. Promote to a
       compact status bar near the market (pinned/top on mobile).
-- [ ] B2: NET WORTH panel is the largest element in the game and screams alarming
+- [x] B2: NET WORTH panel is the largest element in the game and screams alarming
       red for any negative value — even right after a fair-value buy when −$X is
-      just the debt. Shrink to a stat row; save red for *drops*.
-- [ ] B3: Mobile stacking order: a full screen of portfolio stats precedes the
-      market. Market + actions first; portfolio second.
+      just the debt. Now a stat row: green when up, calm neutral when down (no
+      colored panels).
+- [x] B3: Mobile stacking order: a full screen of portfolio stats preceded the
+      market. Market + actions now come first on phones, portfolio second — and
+      the sidebar holdings panel doesn't render below `md` at all (the market
+      table already carries dot/avg/qty and its rows open the trade modal on
+      Sell; the panel was pure duplication).
 - [x] B4: NEW GAME (destructive!) is the most prominent button on screen, no
       confirm. Demote + confirm.
 - [x] B5: Adv Day — the game's core verb — is the smallest control, buried in the
@@ -206,8 +210,12 @@ polish in Phase 2.
       price in the engine, show day-over-day Δ%+arrow per row; ties the news
       events to visible moves.
 - [x] C2: AVG. PRICE column shows $0 for coins you don't hold — render “—”.
-- [ ] C3: Log noise: `====` separators (including two adjacent for empty days)
-      drown signal; no visual hierarchy between trades and market events.
+- [x] C3: Log noise: `====` separators (including two adjacent for empty days)
+      drowned signal; no visual hierarchy between trades and market events.
+      Presentation-only fix (save format untouched): market events read
+      bright (moonshots green, crashes red-edged), your own trades read
+      quiet, day boundaries are thin centered markers and empty-day
+      duplicates collapse to one.
 
 *F. PR-2 scope from the owner's phone playtest (2026-07-17): the build is
 "pretty good so far" — two related items remain:*
@@ -248,12 +256,15 @@ polish in Phase 2.
 *E. Odds & ends*
 - [x] E1: Empty high-score state renders a stray "—" + "SET A RECORD THIS RUN!"
       widow.
-- [ ] E2: "+0.0%" in green immediately after every buy — noise.
-- [ ] E3: Desktop: log capped at ~3 lines while half the screen is dead space.
-- [ ] E4: Resizeable sections on desktop (owner request 2026-07-17) — drag
-      dividers between sidebar / activity log / market so players allocate
-      screen space to what they care about (log readers vs. table watchers).
-      Pairs naturally with E3; persist sizes in settings, not game state.
+- [x] E2: "+0.0%" in green immediately after every buy — noise. Near-zero
+      position deltas (<0.05%) now render nothing, in the holdings rows and
+      the trade modal both.
+- [x] E3: Desktop: log capped at ~3 lines while half the screen was dead
+      space. Default desktop log height is now 40vh, resizable (E4).
+- [x] E4: Resizeable sections on desktop (owner request 2026-07-17) — drag
+      dividers between sidebar / content and log / market (pointer drag +
+      arrow keys, `role="separator"` with value semantics). Sizes persist
+      in settings, not game state.
 - [x] E5: Removed the invisible 1×1 `#testMode` button from the difficulty modal.
       It shipped to production, was keyboard-focusable, and announced "Enable test
       mode" to screen readers; a leftover Cypress hook from PR #5 that the E2E
@@ -261,8 +272,12 @@ polish in Phase 2.
       `lib/state/modes.ts` stays: unit tests and the reducer's high-score gating
       use it, and DEV-gating it would break the `Record<State['mode'], …>`
       contract and crash restored old Test-mode saves.
-- [ ] Landing page menu stubs (PROFILES/CREDITS "SOON") — ship or cut.
-- [ ] Background music (deferred from 1e — needs a real track or a decent loop).
+- [x] Landing page menu stubs (PROFILES/CREDITS "SOON") — cut; Credits returns
+      as a real page in Phase 2 (font attribution).
+- [x] Background music: sparse generative chiptune loop, synthesized with Web
+      Audio like the SFX (no assets). Off by default — it's a taste thing —
+      with a Settings toggle; when pre-enabled it starts on the first
+      interaction (autoplay policy).
 
 ## Phase 2 — Web release (v1.0 on cryptofrenzy.live)
 
@@ -328,7 +343,7 @@ Roughly in order of value-for-effort:
 |---|---|---|
 | Mobile support in v1 | Full responsive vs. desktop-only gate | Responsive — it's a web game, half your traffic will be phones |
 | Trade entry points (owner, 2026-07-16) | Row tap → tabbed modal (current) vs. per-row Buy/Sell buttons → single-purpose modals | Ship tabs, playtest; row buttons re-add controls the slim table just shed (mobile width), and owner suspects they'd fracture the experience |
-| Sidebar holdings panel on mobile | Keep vs. drop (market table already shows dot/avg/qty) | Fold into B2/B3 in 1f PR 3 — leaning drop or collapse on phones |
+| ~~Sidebar holdings panel on mobile~~ | Keep vs. drop (market table already shows dot/avg/qty) | **Resolved 2026-07-17 (1f PR 3): dropped below `md`** — pure duplication of the table |
 | Backend for leaderboards | None (local only) vs. serverless (Vercel KV/Postgres, Supabase) | Ship v1.0 with no backend; add serverless leaderboard in Phase 4 |
 | macOS signing | $99/yr Apple Developer vs. unsigned (users must right-click-open) | Pay it if desktop is serious; skip for itch.io-only |
 | Windows signing | Cert (~$200+/yr) vs. unsigned (SmartScreen warning) | Ship unsigned initially; revisit on traction |
@@ -337,6 +352,6 @@ Roughly in order of value-for-effort:
 
 ## Suggested sequencing
 
-Phases 0–1e are shipped. Next is 1f (comprehensive UX sweep — inventory by
+Phases 0–1f are shipped. Next is Phase 2 (web release). Historical note — 1f ran as: inventory by
 playing real runs on phone + desktop, then fix). Phase 2 is a weekend. Phase 3 is a weekend plus signing paperwork
 latency. Phase 4 is open-ended, one feature at a time.

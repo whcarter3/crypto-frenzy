@@ -77,18 +77,10 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="grid md:grid-cols-3 gap-4 text-xs md:text-sm text-slate-300 border-t border-crt-outline pt-6 mt-2">
-            <div className="space-y-2">
-              <h3 className="text-crt-cyan font-semibold">
-                MAIN MENU
-              </h3>
-              <ul className="space-y-1">
-                <li>▶ START RUN</li>
-                <li className="text-slate-500">▢ PROFILES (SOON)</li>
-                <li className="text-slate-500">▢ SETTINGS (SOON)</li>
-                <li className="text-slate-500">▢ CREDITS (SOON)</li>
-              </ul>
-            </div>
+          {/* Menu stubs (PROFILES/CREDITS "SOON") cut per roadmap —
+              vaporware menu items undercut the "real game" feel;
+              Credits returns as a real page in Phase 2 */}
+          <section className="grid md:grid-cols-2 gap-4 text-xs md:text-sm text-slate-300 border-t border-crt-outline pt-6 mt-2">
             <div className="space-y-2">
               <h3 className="text-crt-cyan font-semibold">
                 DIFFICULTY (IN-GAME)

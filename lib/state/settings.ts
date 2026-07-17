@@ -7,15 +7,24 @@
 export type Settings = {
   /** Sound effects on/off */
   sound: boolean;
+  /** Background music on/off — defaults off; it's a taste thing */
+  music: boolean;
   /** CRT visual effects (scanlines, glow) on/off */
   crt: boolean;
+  /** Desktop sidebar width in px; null = the CSS default */
+  sidebarWidth: number | null;
+  /** Desktop activity-log height in px; null = the CSS default */
+  logHeight: number | null;
 };
 
 const SETTINGS_KEY = 'cryptoFrenzySettings';
 
 export const defaultSettings: Settings = {
   sound: true,
+  music: false,
   crt: true,
+  sidebarWidth: null,
+  logHeight: null,
 };
 
 export const loadSettings = (): Settings => {
