@@ -227,6 +227,11 @@ polish in Phase 2.
       sideways scroll, enforced by a dedicated E2E assertion), rows become
       tap targets, and the TradeModal unifies buy + sell with price/Δ/
       position/cash context. Holdings rows in the sidebar open it too.
+      Iterated after a second playtest (2026-07-16): both quantity clusters
+      always visible (no sell section popping in/out with the position),
+      execute buttons together at the bottom — set both numbers, then
+      commit — Done replaced by a ✕ dismiss in the corner, clear button is
+      a ✕ icon, AVG. PRICE header shortened to AVG.
 
 *D. Controls polish*
 - [x] D1: "max" placeholder next to a "MAX" button reads as a stutter — pick one.

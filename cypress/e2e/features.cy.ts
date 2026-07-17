@@ -28,9 +28,12 @@ describe("Testing main features and function", () => {
     // tap the market row to open the asset's trade panel
     cy.get("[data-cy='solanaRow']").click()
     cy.get("[data-cy='tradeModal']").should("be.visible")
+    // stable layout: the sell controls are always present, just
+    // disabled until something is held — no sections popping in/out
+    cy.get("[data-cy='solanaSellButton']").should("be.disabled")
     cy.get("[data-cy='solanaMaxButton']").click()
     cy.get("[data-cy='solanaBuyButton']").click()
-    // modal stays open; the sell section appears with the new position
+    // modal stays open; the position unlocks the sell side
     cy.get("[data-cy='solanaSellMaxButton']").click()
     cy.get("[data-cy='solanaSellButton']").click()
     cy.get("#tradeModalClose").click()

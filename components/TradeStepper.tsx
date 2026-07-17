@@ -1,42 +1,13 @@
 import { useState } from 'react';
-import { cn } from '../lib/cn';
 import { normalizeQuantity } from '../helpers/utils';
 
 /**
- * The trade control: (0) (−) [n] (+) (Max) (BUY).
- *
- * Owner-specified design (2026-07-17): explicit, editable quantity with
- * big tap targets, clamped to [0, max]; the action disables at 0. This
- * retires the old "empty input = max" convention — a default you
- * couldn't discover by looking — and replaces the native number-input
- * spinners with themed buttons.
+ * Quantity state for a stepper, owned by the caller so the execute
+ * button can live apart from the cluster (owner design, 2026-07-16:
+ * set both buy and sell amounts, then commit with big buttons at the
+ * bottom of the trade panel).
  */
-const TradeStepper = ({
-  assetName,
-  max,
-  maxLabel,
-  actionLabel,
-  actionCy,
-  onAction,
-  disabled,
-  disabledReason,
-  cyPrefix,
-}: {
-  assetName: string;
-  /** Largest executable quantity right now (affordable / held) */
-  max: number;
-  /** Label for the fill-to-max button: "Max" for buys, "All" for sells */
-  maxLabel: string;
-  actionLabel: string;
-  /** Full data-cy for the action button, e.g. "solanaBuyButton" */
-  actionCy: string;
-  onAction: (quantity: number) => void;
-  disabled: boolean;
-  /** Shown inline when the row is disabled — hover titles don't exist on touch */
-  disabledReason?: string;
-  /** data-cy prefix for the input and step buttons, e.g. "solana" or "solanaSell" */
-  cyPrefix: string;
-}) => {
+export const useTradeQuantity = (max: number) => {
   const [raw, setRaw] = useState(() => String(Math.min(1, max)));
 
   // Re-clamp whenever the ceiling moves (prices roll, cash changes,
@@ -47,7 +18,7 @@ const TradeStepper = ({
     setPrevMax(max);
     setRaw((current) =>
       // Coming back from unbuyable (mounted at price 0 behind the
-      // difficulty modal, or wallet was full): restart at the sensible
+      // difficulty modal, or nothing held yet): restart at the sensible
       // default of 1 instead of a stuck, action-disabling 0.
       prevMax <= 0 && max > 0
         ? '1'
@@ -56,6 +27,40 @@ const TradeStepper = ({
   }
 
   const quantity = normalizeQuantity(raw, max);
+  return { raw, setRaw, quantity, max };
+};
+
+export type TradeQuantity = ReturnType<typeof useTradeQuantity>;
+
+/**
+ * The quantity cluster: (✕) (−) [n] (+) (Max).
+ *
+ * Owner-specified design (2026-07-17, iterated 2026-07-16 playtest):
+ * explicit, editable quantity with big tap targets, clamped to
+ * [0, max]. This retires the old "empty input = max" convention — a
+ * default you couldn't discover by looking — and replaces the native
+ * number-input spinners with themed buttons. The execute button is the
+ * caller's: pass the same `control` to both.
+ */
+const TradeStepper = ({
+  assetName,
+  maxLabel,
+  disabled,
+  disabledReason,
+  cyPrefix,
+  control,
+}: {
+  assetName: string;
+  /** Label for the fill-to-max button: "Max" for buys, "All" for sells */
+  maxLabel: string;
+  disabled: boolean;
+  /** Shown inline when the row is disabled — hover titles don't exist on touch */
+  disabledReason?: string;
+  /** data-cy prefix for the input and step buttons, e.g. "solana" or "solanaSell" */
+  cyPrefix: string;
+  control: TradeQuantity;
+}) => {
+  const { raw, setRaw, quantity, max } = control;
   const setQuantity = (next: number) =>
     setRaw(String(normalizeQuantity(String(next), max)));
 
@@ -82,7 +87,7 @@ const TradeStepper = ({
     <div className="space-y-1">
       <div className="flex items-center gap-1.5 justify-end flex-wrap">
         {stepButton(
-          '0',
+          '✕',
           () => setQuantity(0),
           quantity === 0,
           `${cyPrefix}Zero`,
@@ -122,21 +127,6 @@ const TradeStepper = ({
           `${cyPrefix}MaxButton`,
           `Set ${assetName} amount to ${maxLabel.toLowerCase()}`,
         )}
-        <button
-          className={cn(
-            'btn px-3 py-1',
-            !disabled && quantity > 0 && 'btn-primary',
-            (disabled || quantity === 0) && 'btn-disabled',
-          )}
-          onClick={() => {
-            if (quantity > 0) onAction(quantity);
-          }}
-          disabled={disabled || quantity === 0}
-          data-cy={actionCy}
-          aria-label={`${actionLabel} ${assetName}`}
-        >
-          {actionLabel}
-        </button>
       </div>
       {disabled && disabledReason && (
         <p className="text-xs text-white/50 text-right">

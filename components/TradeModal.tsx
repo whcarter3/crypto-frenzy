@@ -3,7 +3,7 @@ import { State, Action } from '../lib/types';
 import { calculateMaxShares, numberWithCommas } from '../helpers/utils';
 import { cn } from '../lib/cn';
 import { playSound } from '../lib/sound';
-import TradeStepper from './TradeStepper';
+import TradeStepper, { useTradeQuantity } from './TradeStepper';
 
 /**
  * The per-asset trade surface (owner design, 2026-07-17): tap a market
@@ -12,6 +12,11 @@ import TradeStepper from './TradeStepper';
  * context the decision needs (price, today's move, your position, your
  * cash). Stays open after a trade so the updated position is the
  * feedback.
+ *
+ * Layout per the 2026-07-16 playtest: both quantity clusters are always
+ * present (no sell section popping in and out as the position changes),
+ * the execute buttons sit together at the bottom so you can play with
+ * the numbers before committing, and dismissal is a ✕ in the corner.
  */
 const TradeModal = ({
   assetKey,
@@ -25,10 +30,8 @@ const TradeModal = ({
   onClose: () => void;
 }) => {
   const asset = state.assets[assetKey];
-  if (!asset) return null;
-
   const maxBuy =
-    asset.price > 0
+    asset && asset.price > 0
       ? calculateMaxShares(
           asset.price,
           state.wallet.amount,
@@ -36,6 +39,13 @@ const TradeModal = ({
           state.cash,
         )
       : 0;
+
+  // Hooks before the null-guard return — hook order must not depend
+  // on whether the asset exists.
+  const buy = useTradeQuantity(maxBuy);
+  const sell = useTradeQuantity(asset ? asset.wallet : 0);
+  if (!asset) return null;
+
   const buyDisabledReason =
     state.wallet.amount >= state.wallet.capacity
       ? 'Wallet full — upgrade capacity'
@@ -54,18 +64,20 @@ const TradeModal = ({
         100
       : null;
 
-  const handleBuy = (quantity: number) => {
+  const handleBuy = () => {
+    if (buy.quantity <= 0) return;
     dispatch({
       type: 'BUY_ASSET',
-      payload: { assetKey, amount: quantity },
+      payload: { assetKey, amount: buy.quantity },
     });
     playSound('buy');
   };
 
-  const handleSell = (quantity: number) => {
+  const handleSell = () => {
+    if (sell.quantity <= 0) return;
     dispatch({
       type: 'SELL_ASSET',
-      payload: { assetKey, amount: quantity },
+      payload: { assetKey, amount: sell.quantity },
     });
     playSound('sell');
   };
@@ -79,13 +91,23 @@ const TradeModal = ({
       }}
     >
       <div
-        className="bg-black w-full max-w-md rounded-sm border border-crt-yellow box-shadow-crt p-6 space-y-5"
+        className="relative bg-black w-full max-w-md rounded-sm border border-crt-yellow box-shadow-crt p-6 space-y-5"
         role="dialog"
         aria-modal="true"
         aria-labelledby="tradeModalTitle"
         tabIndex={0}
       >
-        <div className="flex items-baseline justify-between gap-3">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-3 right-3 btn px-2.5 py-1 text-sm text-white/70"
+          id="tradeModalClose"
+          aria-label="Close trade panel"
+        >
+          ✕
+        </button>
+
+        <div className="flex items-baseline justify-between gap-3 flex-wrap pr-10">
           <h1
             id="tradeModalTitle"
             className="text-2xl font-bold text-slate-300 text-glow-crt"
@@ -131,52 +153,85 @@ const TradeModal = ({
           </p>
           <TradeStepper
             assetName={asset.name}
-            max={maxBuy}
             maxLabel="Max"
-            actionLabel="Buy"
-            actionCy={`${assetKey}BuyButton`}
             cyPrefix={assetKey}
-            onAction={handleBuy}
+            control={buy}
             disabled={maxBuy <= 0}
             disabledReason={buyDisabledReason}
           />
         </div>
 
-        {asset.wallet > 0 && (
-          <div className="space-y-1 border-t border-white/10 pt-4">
-            <p className="text-xs text-white/60 uppercase tracking-wider">
-              Sell — holding{' '}
-              <span className="text-crt-cyan">×{asset.wallet}</span> at
-              avg ${numberWithCommas(asset.averageCost)}{' '}
-              <span
-                className={cn(
-                  positionPct >= 0 ? 'text-crt-green' : 'text-crt-red',
-                )}
-              >
-                {positionPct >= 0 ? '+' : ''}
-                {positionPct.toFixed(1)}%
-              </span>
-            </p>
-            <TradeStepper
-              assetName={asset.name}
-              max={asset.wallet}
-              maxLabel="All"
-              actionLabel="Sell"
-              actionCy={`${assetKey}SellButton`}
-              cyPrefix={`${assetKey}Sell`}
-              onAction={handleSell}
-              disabled={asset.wallet === 0}
-            />
-          </div>
-        )}
+        <div className="space-y-1 border-t border-white/10 pt-4">
+          <p className="text-xs text-white/60 uppercase tracking-wider">
+            Sell
+            {asset.wallet > 0 && (
+              <>
+                {' '}
+                — holding{' '}
+                <span className="text-crt-cyan">
+                  ×{asset.wallet}
+                </span>{' '}
+                at avg ${numberWithCommas(asset.averageCost)}{' '}
+                <span
+                  className={cn(
+                    positionPct >= 0
+                      ? 'text-crt-green'
+                      : 'text-crt-red',
+                  )}
+                >
+                  {positionPct >= 0 ? '+' : ''}
+                  {positionPct.toFixed(1)}%
+                </span>
+              </>
+            )}
+          </p>
+          <TradeStepper
+            assetName={asset.name}
+            maxLabel="All"
+            cyPrefix={`${assetKey}Sell`}
+            control={sell}
+            disabled={asset.wallet === 0}
+            disabledReason={
+              asset.wallet === 0 ? 'Nothing held yet' : undefined
+            }
+          />
+        </div>
 
-        <button
-          className="btn btn-primary w-full py-2"
-          onClick={onClose}
-          id="tradeModalClose"
-        >
-          Done
-        </button>
+        <div className="space-y-2 pt-1">
+          <button
+            className={cn(
+              'btn w-full py-2',
+              buy.quantity > 0 && maxBuy > 0
+                ? 'btn-primary'
+                : 'btn-disabled',
+            )}
+            onClick={handleBuy}
+            disabled={buy.quantity <= 0 || maxBuy <= 0}
+            data-cy={`${assetKey}BuyButton`}
+            aria-label={`Buy ${asset.name}`}
+          >
+            Buy
+            {buy.quantity > 0 &&
+              ` ×${numberWithCommas(buy.quantity)}`}
+          </button>
+          <button
+            className={cn(
+              'btn w-full py-2',
+              sell.quantity > 0 && asset.wallet > 0
+                ? 'btn-primary'
+                : 'btn-disabled',
+            )}
+            onClick={handleSell}
+            disabled={sell.quantity <= 0 || asset.wallet === 0}
+            data-cy={`${assetKey}SellButton`}
+            aria-label={`Sell ${asset.name}`}
+          >
+            Sell
+            {asset.wallet > 0 &&
+              sell.quantity > 0 &&
+              ` ×${numberWithCommas(sell.quantity)}`}
+          </button>
+        </div>
       </div>
     </div>
   );

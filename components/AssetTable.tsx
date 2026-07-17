@@ -66,8 +66,14 @@ const AssetTable = ({
             <th className="px-2 sm:px-3 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Price
             </th>
-            <th className="px-2 sm:px-3 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
-              Avg. Price
+            {/* "Avg. Price" was the widest header in the table (owner
+                playtest) — the abbreviation costs nothing next to the
+                PRICE column and buys the phone real room */}
+            <th
+              className="px-2 sm:px-3 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider"
+              title="Your average purchase price"
+            >
+              Avg
             </th>
             <th className="px-2 sm:px-3 py-3 text-right text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Wallet
