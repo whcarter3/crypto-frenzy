@@ -213,15 +213,6 @@ const GameMode = ({
             Start Game!
           </button>
         </div>
-
-        <button
-          className="w-[1px] h-[1px] opacity-0"
-          onClick={() =>
-            dispatch({ type: 'CHANGE_MODE', payload: 'Test' })
-          }
-          id="testMode"
-          aria-label="Enable test mode"
-        ></button>
       </div>
     </div>
   );
