@@ -31,7 +31,20 @@ describe("Accessibility (axe)", () => {
     cy.visit("http://localhost:3000/game?seed=42")
     cy.get("#startGame").click()
     cy.get("#advDay").click()
+    cy.get("[data-cy='solanaRow']").click()
     cy.get("[data-cy='solanaBuyButton']").click()
+    cy.get("#tradeModalClose").click()
+    cy.injectAxe()
+    cy.checkA11y(undefined, undefined, logViolations)
+  })
+
+  it("trade modal has no violations", () => {
+    cy.visit("http://localhost:3000/game?seed=42")
+    cy.get("#startGame").click()
+    // buy first so the modal renders both its buy and sell sections
+    cy.get("[data-cy='solanaRow']").click()
+    cy.get("[data-cy='solanaBuyButton']").click()
+    cy.get("[data-cy='tradeModal']").should("be.visible")
     cy.injectAxe()
     cy.checkA11y(undefined, undefined, logViolations)
   })
@@ -51,12 +64,14 @@ describe("Accessibility (axe)", () => {
     cy.checkA11y(undefined, undefined, logViolations)
   })
 
-  it("mobile card layout (with a holding) has no violations", () => {
+  it("mobile layout (with a holding) has no violations", () => {
     cy.viewport(375, 812)
     cy.visit("http://localhost:3000/game?seed=42")
     cy.get("#startGame").click({ force: true })
+    cy.get("[data-cy='solanaRow']").click({ force: true })
     cy.get("[data-cy='solanaBuyButton']").click({ force: true })
-    cy.get("[data-cy='bitcoinCard']").should("exist")
+    cy.get("#tradeModalClose").click({ force: true })
+    cy.get("[data-cy='marketTable']").should("exist")
     cy.injectAxe()
     cy.checkA11y(undefined, undefined, logViolations)
   })

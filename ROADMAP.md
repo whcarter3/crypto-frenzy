@@ -217,10 +217,16 @@ polish in Phase 2.
       retires the invisible "empty = max" convention from 1c. Custom −/+
       buttons also remove the native number-input spinners (the gray steppers
       visible on the phone playtest screenshots).
-- [x] F2: **Asset cards below `sm`** — the mobile table scrolls horizontally
-      (owner: "pretty annoying"), and the stepper widens the action cluster
-      further. Each asset becomes a stacked card (symbol/price/delta, then
-      avg/wallet, then a full-width stepper row); table stays on desktop.
+- [x] F2: **Tap-to-trade modal, slim table everywhere** — the mobile table
+      scrolls horizontally (owner: "pretty annoying"), and the stepper widens
+      the action cluster further. First cut was asset cards below `sm`; the
+      owner's playtest rejected them ("the asset table makes more sense to
+      see everything together") in favor of pushing buy/sell into a modal
+      opened by tapping an asset row — at every viewport, not just mobile.
+      The market table drops its trade controls (fits a phone with no
+      sideways scroll, enforced by a dedicated E2E assertion), rows become
+      tap targets, and the TradeModal unifies buy + sell with price/Δ/
+      position/cash context. Holdings rows in the sidebar open it too.
 
 *D. Controls polish*
 - [x] D1: "max" placeholder next to a "MAX" button reads as a stutter — pick one.
@@ -297,6 +303,7 @@ Roughly in order of value-for-effort:
 | 2026-07-02 | **Reducer-as-game-engine, single-intent actions, seedable RNG** | Multi-dispatch helpers forced wrapper-reducer stats tracking (PR #31 review); engine design unlocks unit tests, daily seeds, replay verification |
 | 2026-07-03 | **Fold the mobile/tablet responsive pass into Phase 1d (accessibility)** | Both touch the same layout components; smaller viewports and assistive tech share a lot of the same fixes (focus order, semantic structure) |
 | 2026-07-03 | **Insert Phase 1f: comprehensive UX sweep before the Phase 2 release push** | Post-1d verdict: layout is responsive but the experience is rough — a dedicated feel/flow pass beats sprinkling UX fixes across release tasks |
+| 2026-07-16 | **Trade via per-asset modal at every viewport; market table stays slim and read-only** | Owner playtest rejected mobile-only asset cards ("the asset table makes more sense to see everything together"); one trade surface everywhere beats two viewport-forked layouts, and pulling controls out of the table is what lets it fit a phone without sideways scroll |
 
 ## Decisions still open
 

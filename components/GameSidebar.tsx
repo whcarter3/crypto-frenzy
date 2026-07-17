@@ -10,20 +10,20 @@ import { cn } from '../lib/cn';
 import { clearSave } from '../lib/state/persistence';
 import { loadHighScore } from '../lib/state/highScores';
 import { useNotification } from '../lib/NotificationContext';
-import { playSound } from '../lib/sound';
 import Chip from './Chip';
-import TradeStepper from './TradeStepper';
 
 const GameSidebar = ({
   state,
   dispatch,
   onOpenSettings,
   onOpenHelp,
+  onSelectAsset,
 }: {
   state: State;
   dispatch: Dispatch<Action>;
   onOpenSettings: () => void;
   onOpenHelp: () => void;
+  onSelectAsset: (assetKey: string) => void;
 }) => {
   const { showNotification } = useNotification();
 
@@ -62,14 +62,6 @@ const GameSidebar = ({
       .catch(() =>
         showNotification(`Market seed: ${state.seed}`, 'info'),
       );
-  };
-
-  const handleSell = (assetKey: string, quantity: number) => {
-    dispatch({
-      type: 'SELL_ASSET',
-      payload: { assetKey, amount: quantity },
-    });
-    playSound('sell');
   };
 
   const netWorth = computeNetWorth(state);
@@ -113,8 +105,7 @@ const GameSidebar = ({
           No current holdings
         </div>
       ) : (
-        // Stacked rows at every viewport: the sidebar is a narrow
-        // column even on desktop, and the sell stepper needs the width.
+        // Display-only: selling happens in the TradeModal (tap a row).
         <div className="panel-crt rounded-lg divide-y divide-white/10 overflow-y-auto max-h-[40vh]">
           {holdings.map(([key, asset]) => {
             const pct =
@@ -124,38 +115,36 @@ const GameSidebar = ({
                   100
                 : 0;
             return (
-              <div key={key} className="p-3 space-y-2">
-                <div className="flex items-center justify-between text-sm text-white/90">
-                  <span className="font-medium text-crt-cyan">
-                    {asset.symbol}
+              <button
+                key={key}
+                type="button"
+                onClick={() => onSelectAsset(key)}
+                aria-label={`Trade ${asset.name}`}
+                className="w-full p-3 flex items-center justify-between text-sm text-white/90 hover:bg-white/5 text-left"
+                data-cy={`${key}HoldingRow`}
+              >
+                <span className="font-medium text-crt-cyan">
+                  {asset.symbol}
+                </span>
+                <span className="flex items-center gap-3">
+                  <span className="text-white/70">
+                    avg ${numberWithCommas(asset.averageCost)}
                   </span>
-                  <span className="flex items-center gap-3">
-                    <span className="text-white/70">
-                      avg ${numberWithCommas(asset.averageCost)}
-                    </span>
-                    <span
-                      className={cn(
-                        pct >= 0 && 'text-crt-green',
-                        pct < 0 && 'text-crt-red',
-                      )}
-                    >
-                      {pct >= 0 ? '+' : ''}
-                      {pct.toFixed(1)}%
-                    </span>
-                    <span>× {asset.wallet}</span>
+                  <span
+                    className={cn(
+                      pct >= 0 && 'text-crt-green',
+                      pct < 0 && 'text-crt-red',
+                    )}
+                  >
+                    {pct >= 0 ? '+' : ''}
+                    {pct.toFixed(1)}%
                   </span>
-                </div>
-                <TradeStepper
-                  assetName={asset.name}
-                  max={asset.wallet}
-                  maxLabel="All"
-                  actionLabel="Sell"
-                  actionCy={`${key}SellButton`}
-                  cyPrefix={`${key}Sell`}
-                  onAction={(quantity) => handleSell(key, quantity)}
-                  disabled={asset.wallet === 0}
-                />
-              </div>
+                  <span>× {asset.wallet}</span>
+                  <span className="text-crt-cyan/60" aria-hidden="true">
+                    ›
+                  </span>
+                </span>
+              </button>
             );
           })}
         </div>

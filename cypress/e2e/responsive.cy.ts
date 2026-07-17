@@ -11,6 +11,18 @@ const noHorizontalOverflow = (label: string) =>
     ).to.be.at.most(doc.defaultView!.innerWidth + 1)
   })
 
+// The page not scrolling isn't enough: the market table wrapper is
+// overflow-x-auto, so it can scroll *internally* without moving the
+// page — the exact per-table sideways scrolling the modal rework was
+// meant to eliminate. Assert the table truly fits its wrapper.
+const noTableOverflow = (label: string) =>
+  cy.get("[data-cy='marketTable']").should(($el) => {
+    expect(
+      $el[0].scrollWidth,
+      `${label}: market table scrollWidth vs wrapper`,
+    ).to.be.at.most($el[0].clientWidth + 1)
+  })
+
 // clearAllLocalStorage is a no-op before the origin's first visit, so
 // visit first, clear, then reload for a genuinely fresh start.
 const freshVisit = () => {
@@ -30,14 +42,15 @@ describe("Responsive layout", () => {
     noHorizontalOverflow("run started")
     cy.get("#advDay").click({ force: true })
     noHorizontalOverflow("day advanced")
+    // deltas are now rendered — the table's widest state
+    noTableOverflow("day advanced")
+    cy.get("[data-cy='solanaRow']").click({ force: true })
+    noHorizontalOverflow("trade modal open")
     cy.get("[data-cy='solanaBuyButton']").click({ force: true })
-    cy.get("[data-cy='solanaAssetWallet']")
-      .invoke("text")
-      .then(parseInt)
-      .should("be.gt", 0)
-    noHorizontalOverflow("holding visible")
-    cy.get("[data-cy='solanaSellButton']").click({ force: true })
-    noHorizontalOverflow("after sell")
+    cy.get("#tradeModalClose").click({ force: true })
+    // holding a coin adds the holding marker + avg price to the row
+    noTableOverflow("holding a coin")
+    noHorizontalOverflow("modal closed")
   })
 
   it("desktop (1280px): sidebar and trade area sit side by side, no overflow", () => {
@@ -47,13 +60,11 @@ describe("Responsive layout", () => {
     noHorizontalOverflow("desktop in-game")
     cy.get("aside").then(($aside) => {
       const asideRight = $aside[0].getBoundingClientRect().right
-      cy.get("[data-cy='assetActions']")
-        .first()
-        .then(($action) => {
-          expect(
-            $action[0].getBoundingClientRect().left,
-          ).to.be.at.least(asideRight)
-        })
+      cy.get("[data-cy='marketTable']").then(($table) => {
+        expect(
+          $table[0].getBoundingClientRect().left,
+        ).to.be.at.least(asideRight)
+      })
     })
   })
 })

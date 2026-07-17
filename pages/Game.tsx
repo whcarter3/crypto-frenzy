@@ -19,6 +19,7 @@ import GameMode from '../components/GameMode';
 import GameOver from '../components/GameOver';
 import Settings from '../components/Settings';
 import HowToPlay from '../components/HowToPlay';
+import TradeModal from '../components/TradeModal';
 
 export default function Game() {
   usePageTitle('Crypto Frenzy – Game');
@@ -52,6 +53,9 @@ export default function Game() {
   // UI-only chrome, not game state: never saved, never seeded.
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [tradeAssetKey, setTradeAssetKey] = useState<string | null>(
+    null,
+  );
 
   // The engine is pure — localStorage writes happen out here.
   useEffect(() => {
@@ -114,6 +118,7 @@ export default function Game() {
               dispatch={dispatch}
               onOpenSettings={() => setSettingsOpen(true)}
               onOpenHelp={() => setHelpOpen(true)}
+              onSelectAsset={setTradeAssetKey}
             />
           </div>
 
@@ -125,7 +130,10 @@ export default function Game() {
           <div className="flex flex-1 flex-col min-w-0 px-4 py-6 gap-6">
             <div className="w-full space-y-6">
               <Log log={state.log} />
-              <AssetTable state={state} dispatch={dispatch} />
+              <AssetTable
+                state={state}
+                onSelectAsset={setTradeAssetKey}
+              />
             </div>
           </div>
         </div>
@@ -141,6 +149,14 @@ export default function Game() {
         <Settings onClose={() => setSettingsOpen(false)} />
       )}
       {helpOpen && <HowToPlay onClose={() => setHelpOpen(false)} />}
+      {tradeAssetKey && !state.gameOver && !state.modalOpen && (
+        <TradeModal
+          assetKey={tradeAssetKey}
+          state={state}
+          dispatch={dispatch}
+          onClose={() => setTradeAssetKey(null)}
+        />
+      )}
     </div>
   );
 }
