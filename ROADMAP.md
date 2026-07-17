@@ -312,6 +312,18 @@ polish in Phase 2.
 
 ## Phase 2 — Web release (v1.0 on cryptofrenzy.live)
 
+- [ ] **Branding / copy / theme review** (owner, 2026-07-17) — a full pass over
+      every player-facing string. The wording runs long and the owner skips
+      reading it — and if the person who wrote the game skips it, players will
+      too. Three goals: **tighten** (cut copy length everywhere it doesn't earn
+      its screen time), **consistency** (one voice, one term per concept —
+      run/day/market/wallet/seed are named differently in different places),
+      and **calibrate handholding** (evaluate how much explanation a player
+      actually needs vs. what the game teaches by playing — some of How to
+      play / landing / tooltips may just be cut). Scope: landing page, How to
+      play, difficulty blurbs, log/event strings (engine-side — watch the
+      seeded-log tests), buttons/labels/toasts, game-over screen. Do this
+      EARLY in Phase 2, before OG images and screenshots bake the old copy in.
 - [ ] **PWA** via `vite-plugin-pwa`: manifest + service worker + icons. The game is
       fully client-side, so installable + offline is nearly free.
 - [ ] SEO/social: OG image, meta tags; revisit landing-page prerender here if organic
