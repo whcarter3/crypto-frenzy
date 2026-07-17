@@ -1,0 +1,114 @@
+<!doctype html>
+<!-- Source for the social card (not shipped — lives outside public/
+     so the SPA fallback never has to special-case it). Regenerate:
+     npx cypress run --config specPattern=cypress/tools/og.cy.ts
+     sips -z 630 1200 cypress/screenshots/og.cy.ts/og.png
+     cp cypress/screenshots/og.cy.ts/og.png public/og.png -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>OG card source</title>
+    <style>
+      @font-face {
+        font-family: 'IBM Plex Mono';
+        font-weight: 700;
+        src: url('../../public/IBM_Plex_Mono/IBMPlexMono-Bold.ttf') format('truetype');
+      }
+      @font-face {
+        font-family: 'IBM Plex Mono';
+        font-weight: 400;
+        src: url('../../public/IBM_Plex_Mono/IBMPlexMono-Regular.ttf') format('truetype');
+      }
+      * { margin: 0; box-sizing: border-box; }
+      body {
+        width: 1200px;
+        height: 630px;
+        background: #0a0f0a;
+        font-family: 'IBM Plex Mono', monospace;
+        color: #d7e0d7;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      /* scanlines */
+      body::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.28) 0px,
+          rgba(0, 0, 0, 0.28) 2px,
+          transparent 2px,
+          transparent 5px
+        );
+        pointer-events: none;
+      }
+      .frame {
+        margin: 48px;
+        width: 1104px;
+        height: 534px;
+        border: 3px solid #39ff14;
+        border-radius: 6px;
+        box-shadow:
+          0 0 18px rgba(57, 255, 20, 0.55),
+          inset 0 0 42px rgba(57, 255, 20, 0.09);
+        padding: 64px 72px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 26px;
+        position: relative;
+      }
+      .eyebrow {
+        color: #35c5cf;
+        font-size: 22px;
+        letter-spacing: 0.16em;
+      }
+      h1 {
+        color: #39ff14;
+        font-size: 92px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        text-shadow:
+          0 0 6px rgba(57, 255, 20, 0.9),
+          0 0 28px rgba(57, 255, 20, 0.55);
+        text-transform: uppercase;
+      }
+      .tag {
+        font-size: 30px;
+        line-height: 1.5;
+        max-width: 820px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .rocket {
+        position: absolute;
+        right: 64px;
+        top: 52px;
+        font-size: 104px;
+        filter: drop-shadow(0 0 18px rgba(57, 255, 20, 0.5));
+      }
+      .status {
+        color: #35c5cf;
+        font-size: 20px;
+        letter-spacing: 0.14em;
+      }
+      .status b { color: #39ff14; font-weight: 400; }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <div class="eyebrow">[ ARCADE TERMINAL // CRYPTOFRENZY.LIVE ]</div>
+      <h1>Crypto Frenzy</h1>
+      <p class="tag">
+        A retro trading sim running on a hacked CRT terminal. Borrow
+        dirty money, ride volatile coins, and clear your debt before
+        the corp shuts you down.
+      </p>
+      <div class="status">NETLINK STATUS: <b>ONLINE</b></div>
+      <div class="rocket">🚀</div>
+    </div>
+  </body>
+</html>
