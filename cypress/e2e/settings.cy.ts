@@ -15,6 +15,12 @@ describe("Settings & How to play", () => {
       .click()
       .should("have.attr", "aria-checked", "false")
 
+    // music defaults off — it's a taste thing
+    cy.get("#musicToggle")
+      .should("have.attr", "aria-checked", "false")
+      .click()
+      .should("have.attr", "aria-checked", "true")
+
     cy.get("#crtToggle").click()
     // the CRT toggle stamps a data attribute on <html>
     cy.document()
@@ -27,6 +33,7 @@ describe("Settings & How to play", () => {
     cy.reload()
     cy.get("#openSettings").click()
     cy.get("#soundToggle").should("have.attr", "aria-checked", "false")
+    cy.get("#musicToggle").should("have.attr", "aria-checked", "true")
     cy.get("#crtToggle").should("have.attr", "aria-checked", "false")
     cy.document()
       .its("documentElement.dataset.crt")
@@ -47,8 +54,12 @@ describe("Settings & How to play", () => {
     })
   })
 
-  it("opens and closes how to play", () => {
+  it("opens how to play from the settings menu", () => {
+    // How to play lives inside settings now (meta, not gameplay)
+    cy.get("#openSettings").click()
     cy.get("#openHowToPlay").click()
+    // opening help closes the settings menu behind it
+    cy.get("[data-cy='settingsScreen']").should("not.exist")
     cy.get("[data-cy='howToPlayScreen']").should("be.visible")
     cy.contains("cash minus debt").should("be.visible")
     cy.get("#howToPlayClose").click()

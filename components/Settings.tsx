@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import { useSettings } from '../lib/SettingsContext';
 import { clearHighScores } from '../lib/state/highScores';
 import { useNotification } from '../lib/NotificationContext';
@@ -34,9 +35,41 @@ const Toggle = ({
   </div>
 );
 
-const Settings = ({ onClose }: { onClose: () => void }) => {
+/**
+ * The meta menu (owner call, 2026-07-17): everything that isn't the
+ * core gameplay loop lives here behind the sidebar's gear icon —
+ * preferences, How to play, high-score reset, and abandoning the run.
+ */
+const Settings = ({
+  onClose,
+  onOpenHelp,
+  onAbandonRun,
+}: {
+  onClose: () => void;
+  onOpenHelp: () => void;
+  onAbandonRun: () => void;
+}) => {
   const { settings, update } = useSettings();
   const { showNotification } = useNotification();
+
+  // Abandoning wipes the run — require a second tap within 3s
+  const [confirmingReset, setConfirmingReset] = useState(false);
+  const confirmTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  const handleAbandon = () => {
+    if (!confirmingReset) {
+      setConfirmingReset(true);
+      clearTimeout(confirmTimer.current);
+      confirmTimer.current = setTimeout(
+        () => setConfirmingReset(false),
+        3000,
+      );
+      return;
+    }
+    clearTimeout(confirmTimer.current);
+    setConfirmingReset(false);
+    onAbandonRun();
+  };
 
   const handleResetScores = () => {
     clearHighScores();
@@ -76,21 +109,56 @@ const Settings = ({ onClose }: { onClose: () => void }) => {
             onChange={(sound) => update({ sound })}
           />
           <Toggle
+            id="musicToggle"
+            label="Background music"
+            checked={settings.music}
+            onChange={(music) => update({ music })}
+          />
+          <Toggle
             id="crtToggle"
-            label="CRT effects (scanlines, glow)"
+            label="CRT effects"
             checked={settings.crt}
             onChange={(crt) => update({ crt })}
           />
         </div>
 
-        <div className="border-t border-white/10 pt-4">
+        <div className="border-t border-white/10 pt-4 space-y-3">
+          {/* Reset is not a headline CTA — quiet red, no glow — and sits
+              above How to play (owner call, 2026-07-17) */}
           <button
             type="button"
             id="resetScores"
             onClick={handleResetScores}
-            className="btn btn-danger w-full py-2 text-sm"
+            className="btn w-full py-2 text-sm text-crt-red border-crt-red/40"
           >
             Reset high scores
+          </button>
+          <button
+            type="button"
+            id="openHowToPlay"
+            onClick={() => {
+              onClose();
+              onOpenHelp();
+            }}
+            className="btn w-full py-2 text-sm"
+          >
+            How to play
+          </button>
+          <button
+            type="button"
+            id="runInfo"
+            onClick={handleAbandon}
+            className={cn(
+              'btn w-full py-2 text-sm',
+              confirmingReset
+                ? 'btn-danger font-semibold'
+                : 'text-white/60 border-white/20 hover:text-crt-red hover:border-crt-red/60',
+            )}
+            title="Abandon this run and start over"
+          >
+            {confirmingReset
+              ? '⚠ TAP AGAIN TO ABANDON THIS RUN'
+              : 'ABANDON RUN / NEW GAME'}
           </button>
         </div>
 

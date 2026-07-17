@@ -110,7 +110,21 @@ const StatusBar = ({
               : 'End the day: prices re-roll and debt compounds'
           }
         >
-          End Day ▸
+          <span className="inline-flex items-center gap-2">
+            End Day
+            {/* skip-to-next, drawn instead of typed: "▸|" as two text
+                characters kerned apart; one glyph like a player's
+                skip button */}
+            <svg
+              viewBox="0 0 16 16"
+              className="w-3.5 h-3.5"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M2 2l9 6-9 6z" />
+              <rect x="12.5" y="2" width="2.5" height="12" />
+            </svg>
+          </span>
         </button>
       </div>
     </div>

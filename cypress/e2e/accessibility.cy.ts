@@ -81,6 +81,15 @@ describe("Accessibility (axe)", () => {
     cy.checkA11y(undefined, undefined, logViolations)
   })
 
+  it("desktop layout with panel dividers has no violations", () => {
+    cy.viewport(1280, 900)
+    cy.visit("http://localhost:3000/game?seed=42")
+    cy.get("#startGame").click()
+    cy.get("[data-cy='logDivider']").should("be.visible")
+    cy.injectAxe()
+    cy.checkA11y(undefined, undefined, logViolations)
+  })
+
   it("settings modal has no violations", () => {
     cy.visit("http://localhost:3000/game?seed=42")
     cy.get("#startGame").click()
@@ -93,6 +102,7 @@ describe("Accessibility (axe)", () => {
   it("how-to-play modal has no violations", () => {
     cy.visit("http://localhost:3000/game?seed=42")
     cy.get("#startGame").click()
+    cy.get("#openSettings").click()
     cy.get("#openHowToPlay").click()
     cy.get("[data-cy='howToPlayScreen']").should("be.visible")
     cy.injectAxe()

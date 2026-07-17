@@ -4,8 +4,8 @@ import { normalizeQuantity } from '../helpers/utils';
 /**
  * Quantity state for a stepper, owned by the caller so the execute
  * button can live apart from the cluster (owner design, 2026-07-16:
- * set both buy and sell amounts, then commit with big buttons at the
- * bottom of the trade panel).
+ * set the amount, then commit with a big button at the bottom of the
+ * trade panel).
  */
 export const useTradeQuantity = (max: number) => {
   const [raw, setRaw] = useState(() => String(Math.min(1, max)));
@@ -33,20 +33,15 @@ export const useTradeQuantity = (max: number) => {
 export type TradeQuantity = ReturnType<typeof useTradeQuantity>;
 
 /**
- * The quantity cluster: (✕) (−) [n] (+) (Max).
- *
- * Owner-specified design (2026-07-17, iterated 2026-07-16 playtest):
- * explicit, editable quantity with big tap targets, clamped to
- * [0, max]. This retires the old "empty input = max" convention — a
- * default you couldn't discover by looking — and replaces the native
- * number-input spinners with themed buttons. The execute button is the
- * caller's: pass the same `control` to both.
+ * The quantity cluster, grouped as (Max)  (−)(+)  [n] per the owner's
+ * 2026-07-17 playtest notes: fill shortcut first, fine-tuning pair
+ * together, the number last — right next to the receipt amounts it
+ * drives. Editable, clamped to [0, max] on blur; no native spinners.
  */
 const TradeStepper = ({
   assetName,
   maxLabel,
   disabled,
-  disabledReason,
   cyPrefix,
   control,
 }: {
@@ -54,8 +49,6 @@ const TradeStepper = ({
   /** Label for the fill-to-max button: "Max" for buys, "All" for sells */
   maxLabel: string;
   disabled: boolean;
-  /** Shown inline when the row is disabled — hover titles don't exist on touch */
-  disabledReason?: string;
   /** data-cy prefix for the input and step buttons, e.g. "solana" or "solanaSell" */
   cyPrefix: string;
   control: TradeQuantity;
@@ -75,7 +68,7 @@ const TradeStepper = ({
       type="button"
       onClick={onClick}
       disabled={disabled || stepDisabled}
-      className="btn px-2 py-1 text-xs bg-black text-crt-cyan border-crt-cyan/50 disabled:opacity-40 disabled:cursor-not-allowed"
+      className="btn px-2.5 py-1 text-xs bg-black text-crt-cyan border-crt-cyan/50 disabled:opacity-40 disabled:cursor-not-allowed"
       data-cy={cy}
       aria-label={ariaLabel}
     >
@@ -84,15 +77,15 @@ const TradeStepper = ({
   );
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-1.5 justify-end flex-wrap">
-        {stepButton(
-          '✕',
-          () => setQuantity(0),
-          quantity === 0,
-          `${cyPrefix}Zero`,
-          `Clear ${assetName} amount`,
-        )}
+    <div className="flex items-center justify-end gap-4">
+      {stepButton(
+        maxLabel,
+        () => setQuantity(max),
+        quantity >= max,
+        `${cyPrefix}MaxButton`,
+        `Set ${assetName} amount to ${maxLabel.toLowerCase()}`,
+      )}
+      <div className="flex items-center gap-1.5">
         {stepButton(
           '−',
           () => setQuantity(quantity - 1),
@@ -100,19 +93,6 @@ const TradeStepper = ({
           `${cyPrefix}Minus`,
           `Decrease ${assetName} amount`,
         )}
-        <input
-          type="number"
-          min={0}
-          max={max}
-          value={raw}
-          onChange={(e) => setRaw(e.target.value)}
-          onBlur={() => setRaw(String(quantity))}
-          disabled={disabled}
-          inputMode="numeric"
-          className="w-14 bg-black/40 border border-white/20 rounded px-1.5 py-1 text-sm text-center text-white/90 disabled:opacity-40"
-          data-cy={`${cyPrefix}AmountInput`}
-          aria-label={`Amount of ${assetName}`}
-        />
         {stepButton(
           '+',
           () => setQuantity(quantity + 1),
@@ -120,19 +100,20 @@ const TradeStepper = ({
           `${cyPrefix}Plus`,
           `Increase ${assetName} amount`,
         )}
-        {stepButton(
-          maxLabel,
-          () => setQuantity(max),
-          quantity >= max,
-          `${cyPrefix}MaxButton`,
-          `Set ${assetName} amount to ${maxLabel.toLowerCase()}`,
-        )}
       </div>
-      {disabled && disabledReason && (
-        <p className="text-xs text-white/50 text-right">
-          {disabledReason}
-        </p>
-      )}
+      <input
+        type="number"
+        min={0}
+        max={max}
+        value={raw}
+        onChange={(e) => setRaw(e.target.value)}
+        onBlur={() => setRaw(String(quantity))}
+        disabled={disabled}
+        inputMode="numeric"
+        className="w-14 bg-black/40 border border-white/20 rounded px-1.5 py-1 text-sm text-center text-white/90 disabled:opacity-40"
+        data-cy={`${cyPrefix}AmountInput`}
+        aria-label={`Amount of ${assetName}`}
+      />
     </div>
   );
 };

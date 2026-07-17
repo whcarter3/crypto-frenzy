@@ -58,10 +58,13 @@ describe("Testing main features and function", () => {
     cy.get("[data-cy='solanaRow']").click()
     // stepper defaults to 1; typed values replace it
     cy.get("[data-cy='solanaAmountInput']").clear().type("2")
+    // the receipt prices the trade live: 2 × $55 (seed 42, day 2)
+    cy.get("[data-cy='tradeCost']").should("contain", "$110")
     cy.get("[data-cy='solanaBuyButton']").click()
     cy.get("[data-cy='solanaAssetWallet']").should("have.text", "2")
     // holdings row reopens straight onto Sell; stepper defaults to 1
     cy.get("[data-cy='solanaHoldingRow']").click()
+    cy.get("[data-cy='tradeProceeds']").should("contain", "$55")
     cy.get("[data-cy='solanaSellButton']").click()
     cy.get("[data-cy='solanaAssetWallet']").should("have.text", "1")
   })
@@ -100,8 +103,11 @@ describe("Testing main features and function", () => {
         expect(clamped).to.be.greaterThan(0)
         expect(clamped).to.be.lessThan(99999)
       })
-    // zero disables the buy action
-    cy.get("[data-cy='solanaZero']").click()
+    // a typed zero disables the buy action
+    cy.get("[data-cy='solanaAmountInput']")
+      .clear()
+      .type("0")
+      .trigger("focusout")
     cy.get("[data-cy='solanaBuyButton']").should("be.disabled")
     // plus re-enables
     cy.get("[data-cy='solanaPlus']").click()
@@ -146,8 +152,32 @@ describe("Testing main features and function", () => {
     cy.get("[data-cy='assetPrice']").eq(3).should("have.text", "$86")
   })
 
+  it("folds finished days in the activity log", () => {
+    cy.get("#advDay").click()
+    cy.get("#advDay").click()
+    // day 1's entries live under their collapsed day header. Assert
+    // the fold via the open attribute: Chrome hides closed-details
+    // content with content-visibility, which keeps layout boxes and
+    // fools Cypress's visibility check into seeing it.
+    cy.contains("summary", "end of day 1")
+      .parent("details")
+      .should("not.have.attr", "open")
+    cy.contains("summary", "end of day 1").click()
+    cy.contains("summary", "end of day 1")
+      .parent("details")
+      .should("have.attr", "open")
+    cy.contains("You borrowed").should("be.visible")
+    // and fold back up
+    cy.contains("summary", "end of day 1").click()
+    cy.contains("summary", "end of day 1")
+      .parent("details")
+      .should("not.have.attr", "open")
+  })
+
   it("resets and starts a new game (with tap-again confirm)", () => {
     cy.get("#advDay").click()
+    // abandoning lives in the settings menu now (meta, not gameplay)
+    cy.get("#openSettings").click()
     // first tap arms the confirm, second tap resets
     cy.get("#runInfo").click()
     cy.get("#runInfo").should("contain", "TAP AGAIN")
@@ -159,6 +189,7 @@ describe("Testing main features and function", () => {
   })
 
   it("starts an easy mode run with its own settings", () => {
+    cy.get("#openSettings").click()
     cy.get("#runInfo").click()
     cy.get("#runInfo").click()
     cy.get("#easyMode").click()

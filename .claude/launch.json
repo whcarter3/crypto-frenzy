@@ -5,7 +5,8 @@
       "name": "static-export",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "-s", "dist", "-l", "3000"],
-      "port": 3000
+      "port": 3000,
+      "autoPort": false
     }
   ]
 }
