@@ -35,11 +35,17 @@ describe("Testing main features and function", () => {
     )
     cy.get("[data-cy='solanaMaxButton']").click()
     cy.get("[data-cy='solanaBuyButton']").click()
-    // modal stays open; the Sell tab carries the new position
+    // executing closes the modal — the updated row is the feedback
+    cy.get("[data-cy='tradeModal']").should("not.exist")
+    cy.get("[data-cy='solanaAssetWallet']")
+      .invoke("text")
+      .then(parseInt)
+      .should("be.gt", 0)
+    // reopen from the market row and sell the lot
+    cy.get("[data-cy='solanaRow']").click()
     cy.get("[data-cy='solanaSellTab']").click()
     cy.get("[data-cy='solanaSellMaxButton']").click()
     cy.get("[data-cy='solanaSellButton']").click()
-    cy.get("#tradeModalClose").click()
     cy.get("[data-cy='tradeModal']").should("not.exist")
     cy.get("[data-cy='solanaAssetWallet']")
       .invoke("text")
@@ -53,18 +59,17 @@ describe("Testing main features and function", () => {
     // stepper defaults to 1; typed values replace it
     cy.get("[data-cy='solanaAmountInput']").clear().type("2")
     cy.get("[data-cy='solanaBuyButton']").click()
-    // sell stepper defaults to 1
-    cy.get("[data-cy='solanaSellTab']").click()
+    cy.get("[data-cy='solanaAssetWallet']").should("have.text", "2")
+    // holdings row reopens straight onto Sell; stepper defaults to 1
+    cy.get("[data-cy='solanaHoldingRow']").click()
     cy.get("[data-cy='solanaSellButton']").click()
-    cy.get("#tradeModalClose").click()
     cy.get("[data-cy='solanaAssetWallet']").should("have.text", "1")
   })
 
   it("holdings rows open the modal on the Sell tab", () => {
     cy.get("#advDay").click()
     cy.get("[data-cy='solanaRow']").click()
-    cy.get("[data-cy='solanaBuyButton']").click() // buys default 1
-    cy.get("#tradeModalClose").click()
+    cy.get("[data-cy='solanaBuyButton']").click() // buys 1, closes
     cy.get("[data-cy='solanaHoldingRow']").click()
     cy.get("[data-cy='tradeModal']").should("be.visible")
     // the row you tapped says which side you're thinking about
@@ -75,6 +80,7 @@ describe("Testing main features and function", () => {
     )
     cy.get("[data-cy='solanaSellButton']").should("not.be.disabled")
     cy.get("#tradeModalClose").click()
+    cy.get("[data-cy='tradeModal']").should("not.exist")
   })
 
   it("clamps typed amounts and disables the action at zero", () => {
@@ -165,7 +171,6 @@ describe("Testing main features and function", () => {
     cy.get("#advDay").click()
     cy.get("[data-cy='solanaRow']").click()
     cy.get("[data-cy='solanaBuyButton']").click()
-    cy.get("#tradeModalClose").click()
     cy.get("[data-cy='days left']").should("have.text", "29")
     cy.reload()
     cy.get("[data-cy='days left']").should("have.text", "29")

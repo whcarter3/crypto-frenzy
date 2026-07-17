@@ -233,9 +233,10 @@ polish in Phase 2.
       modal is now **tabbed Buy | Sell**: one info block up top (price, Δ,
       cash, space, position), one stepper playground in the middle, one
       full-width execute at the bottom. Market rows open the Buy tab,
-      holdings rows open Sell; both tabs' amounts survive switching. Done
-      replaced by a ✕ dismiss in the corner, clear button is a ✕ icon,
-      AVG. PRICE header shortened to AVG.
+      holdings rows open Sell; both tabs' amounts survive switching;
+      executing a trade closes the modal immediately — the updated table
+      row is the feedback. Done replaced by a ✕ dismiss in the corner,
+      clear button is a ✕ icon, AVG. PRICE header shortened to AVG.
 
 *D. Controls polish*
 - [x] D1: "max" placeholder next to a "MAX" button reads as a stutter — pick one.

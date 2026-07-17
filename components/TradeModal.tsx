@@ -13,9 +13,9 @@ export type TradeSide = 'buy' | 'sell';
  * buy+sell layout made you "look all over the place to parse what to
  * do", so the modal is now tabbed — one side at a time, reading top to
  * bottom as info → playground → execute. Market rows open the Buy tab,
- * holdings rows open Sell. Both tabs' amounts survive switching, and
- * the modal stays open after a trade so the updated position is the
- * feedback.
+ * holdings rows open Sell. Both tabs' amounts survive switching.
+ * Executing a trade closes the modal immediately (owner call,
+ * 2026-07-16) — the updated table row is the feedback.
  */
 const TradeModal = ({
   assetKey,
@@ -73,6 +73,7 @@ const TradeModal = ({
       payload: { assetKey, amount: buy.quantity },
     });
     playSound('buy');
+    onClose();
   };
 
   const handleSell = () => {
@@ -82,6 +83,7 @@ const TradeModal = ({
       payload: { assetKey, amount: sell.quantity },
     });
     playSound('sell');
+    onClose();
   };
 
   const tab = (tabSide: TradeSide, label: string) => (
