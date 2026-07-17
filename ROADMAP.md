@@ -322,8 +322,11 @@ polish in Phase 2.
       from four sections to two (only the score rule and Pay rule — the two
       things play can't teach); difficulty modal rewritten noir (option A) and
       its **Easy blurb factual bug fixed** (claimed "higher starting cash";
-      Easy starts with less); **landing kept as a proper start screen** (owner:
-      a desktop game needs one) with terminology fixed inside; "Ins. funds"
+      Easy starts with less); **landing route stays as the start screen**
+      (owner: a desktop game needs one) but its instruction blocks (YOUR
+      CONTRACT / TERMINAL OPS / difficulty blurb) are cut per the original
+      proposal — what remains is the pitch, the save-persistence fact, and
+      the CTAs; "Ins. funds"
       and the dirty-money tagline kept; orphaned AlertMessages deleted;
       emoji pairs spaced in the log; pre-run "Click Advance Day" log line cut
       (day 1 starts rolled). Zero spec churn — all asserted substrings
