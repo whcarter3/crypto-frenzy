@@ -46,8 +46,8 @@ describe("Responsive layout", () => {
     noTableOverflow("day advanced")
     cy.get("[data-cy='solanaRow']").click({ force: true })
     noHorizontalOverflow("trade modal open")
+    // buying closes the modal on its own
     cy.get("[data-cy='solanaBuyButton']").click({ force: true })
-    cy.get("#tradeModalClose").click({ force: true })
     // holding a coin adds the holding marker + avg price to the row
     noTableOverflow("holding a coin")
     noHorizontalOverflow("modal closed")
