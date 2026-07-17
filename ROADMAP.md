@@ -220,6 +220,10 @@ polish in Phase 2.
       widow.
 - [ ] E2: "+0.0%" in green immediately after every buy — noise.
 - [ ] E3: Desktop: log capped at ~3 lines while half the screen is dead space.
+- [ ] E4: Resizeable sections on desktop (owner request 2026-07-17) — drag
+      dividers between sidebar / activity log / market so players allocate
+      screen space to what they care about (log readers vs. table watchers).
+      Pairs naturally with E3; persist sizes in settings, not game state.
 - [ ] Landing page menu stubs (PROFILES/CREDITS "SOON") — ship or cut.
 - [ ] Background music (deferred from 1e — needs a real track or a decent loop).
 
