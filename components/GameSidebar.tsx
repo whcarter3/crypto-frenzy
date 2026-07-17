@@ -12,6 +12,7 @@ import { loadHighScore } from '../lib/state/highScores';
 import { useNotification } from '../lib/NotificationContext';
 import { playSound } from '../lib/sound';
 import Chip from './Chip';
+import TradeStepper from './TradeStepper';
 
 const GameSidebar = ({
   state,
@@ -25,9 +26,6 @@ const GameSidebar = ({
   onOpenHelp: () => void;
 }) => {
   const { showNotification } = useNotification();
-
-  // Per-asset sell amount; empty string means "sell the whole position"
-  const [amounts, setAmounts] = useState<Record<string, string>>({});
 
   // NEW GAME wipes the run — require a second tap within 3s to confirm
   const [confirmingReset, setConfirmingReset] = useState(false);
@@ -66,20 +64,12 @@ const GameSidebar = ({
       );
   };
 
-  const setAmount = (assetKey: string, value: string) =>
-    setAmounts((prev) => ({ ...prev, [assetKey]: value }));
-
-  const handleSell = (assetKey: string) => {
-    const parsed = parseInt(amounts[assetKey], 10);
+  const handleSell = (assetKey: string, quantity: number) => {
     dispatch({
       type: 'SELL_ASSET',
-      payload: {
-        assetKey,
-        amount: Number.isFinite(parsed) && parsed > 0 ? parsed : undefined,
-      },
+      payload: { assetKey, amount: quantity },
     });
     playSound('sell');
-    setAmount(assetKey, '');
   };
 
   const netWorth = computeNetWorth(state);
@@ -118,116 +108,58 @@ const GameSidebar = ({
         HOLDINGS
       </h2>
 
-      {/* overflow-x-auto: table-layout:auto resists shrinking columns
-          below their header text's natural width, which blew out the
-          whole page horizontally on narrow viewports since nothing
-          contained the excess — matches AssetTable's existing pattern. */}
-      <div className="overflow-auto panel-crt rounded-lg flex-1 h-[40vh]">
-        <table className="w-full h-full text-base">
-          <thead className="sticky top-0 bg-white/5">
-            <tr className="border-b border-white/20">
-              <th className="text-left px-4 py-3 font-semibold text-crt-cyan uppercase tracking-wider">
-                Asset
-              </th>
-              <th className="text-left px-4 py-3 font-semibold text-crt-cyan uppercase tracking-wider">
-                Avg Cost
-              </th>
-              <th className="text-left px-4 py-3 font-semibold text-crt-cyan uppercase tracking-wider">
-                %
-              </th>
-              <th className="text-right px-4 py-3 font-semibold text-crt-cyan uppercase tracking-wider">
-                #
-              </th>
-              <th className="text-right px-4 py-3 font-semibold text-crt-cyan uppercase tracking-wider">
-                Sell
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/10">
-            {holdings.length > 0 ? (
-              holdings.map(([key, asset]) => {
-                const pct =
-                  asset.averageCost > 0
-                    ? ((asset.price - asset.averageCost) /
-                        asset.averageCost) *
-                      100
-                    : 0;
-                return (
-                  <tr
-                    key={key}
-                    className="text-white/90 text-sm px-4 py-3"
-                  >
-                    <td className="px-4 py-3 font-medium text-crt-cyan">
-                      {asset.symbol}
-                    </td>
-                    <td className="px-4 py-3">
-                      ${numberWithCommas(asset.averageCost)}
-                    </td>
-                    <td
+      {holdings.length === 0 ? (
+        <div className="panel-crt rounded-lg py-5 text-center text-crt-yellow text-sm">
+          No current holdings
+        </div>
+      ) : (
+        // Stacked rows at every viewport: the sidebar is a narrow
+        // column even on desktop, and the sell stepper needs the width.
+        <div className="panel-crt rounded-lg divide-y divide-white/10 overflow-y-auto max-h-[40vh]">
+          {holdings.map(([key, asset]) => {
+            const pct =
+              asset.averageCost > 0
+                ? ((asset.price - asset.averageCost) /
+                    asset.averageCost) *
+                  100
+                : 0;
+            return (
+              <div key={key} className="p-3 space-y-2">
+                <div className="flex items-center justify-between text-sm text-white/90">
+                  <span className="font-medium text-crt-cyan">
+                    {asset.symbol}
+                  </span>
+                  <span className="flex items-center gap-3">
+                    <span className="text-white/70">
+                      avg ${numberWithCommas(asset.averageCost)}
+                    </span>
+                    <span
                       className={cn(
-                        'px-4 py-3',
                         pct >= 0 && 'text-crt-green',
                         pct < 0 && 'text-crt-red',
                       )}
                     >
                       {pct >= 0 ? '+' : ''}
                       {pct.toFixed(1)}%
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      {asset.wallet}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center gap-1.5 justify-end">
-                        <input
-                          type="number"
-                          min={1}
-                          max={asset.wallet}
-                          value={amounts[key] ?? ''}
-                          onChange={(e) =>
-                            setAmount(key, e.target.value)
-                          }
-                          placeholder="all"
-                          className="w-16 bg-black/40 border border-white/20 rounded px-1.5 py-1 text-sm text-white/90 placeholder:text-white/40"
-                          data-cy={`${key}SellInput`}
-                          title="How many to sell — leave empty to sell the whole position"
-                          aria-label={`Amount of ${asset.name} to sell — leave empty to sell all`}
-                        />
-                        <button
-                          className={cn(
-                            'btn',
-                            asset.wallet > 0 && 'btn-primary',
-                            asset.wallet === 0 && 'btn-disabled',
-                          )}
-                          onClick={() => handleSell(key)}
-                          disabled={asset.wallet === 0}
-                          data-cy={`${key}SellButton`}
-                          title={
-                            asset.wallet === 0
-                              ? 'No assets to sell'
-                              : 'Sell this asset'
-                          }
-                          aria-label={`Sell ${asset.name}`}
-                        >
-                          Sell
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="py-5 text-center text-crt-yellow text-sm"
-                >
-                  No current holdings
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+                    </span>
+                    <span>× {asset.wallet}</span>
+                  </span>
+                </div>
+                <TradeStepper
+                  assetName={asset.name}
+                  max={asset.wallet}
+                  maxLabel="All"
+                  actionLabel="Sell"
+                  actionCy={`${key}SellButton`}
+                  cyPrefix={`${key}Sell`}
+                  onAction={(quantity) => handleSell(key, quantity)}
+                  disabled={asset.wallet === 0}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <h2 className="text-2xl text-white/90 font-semibold tracking-wide">
         WALLET

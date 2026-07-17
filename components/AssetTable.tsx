@@ -1,8 +1,10 @@
-import { Dispatch, useState } from 'react';
+import { Dispatch } from 'react';
 import { State, Action } from '../lib/types';
-import { numberWithCommas } from '../helpers/utils';
+import { calculateMaxShares, numberWithCommas } from '../helpers/utils';
+import { useMediaQuery } from '../helpers/useMediaQuery';
 import { cn } from '../lib/cn';
 import { playSound } from '../lib/sound';
+import TradeStepper from './TradeStepper';
 
 const AssetTable = ({
   state,
@@ -11,23 +13,16 @@ const AssetTable = ({
   state: State;
   dispatch: Dispatch<Action>;
 }) => {
-  // Per-asset buy amount; empty string means "max affordable"
-  const [amounts, setAmounts] = useState<Record<string, string>>({});
+  // Cards on phones, table on desktop — rendered conditionally (not CSS
+  // hidden/block) so controls and their test ids exist exactly once.
+  const isDesktop = useMediaQuery('(min-width: 640px)');
 
-  const setAmount = (assetKey: string, value: string) =>
-    setAmounts((prev) => ({ ...prev, [assetKey]: value }));
-
-  const handleBuy = (assetKey: string) => {
-    const parsed = parseInt(amounts[assetKey], 10);
+  const handleBuy = (assetKey: string, quantity: number) => {
     dispatch({
       type: 'BUY_ASSET',
-      payload: {
-        assetKey,
-        amount: Number.isFinite(parsed) && parsed > 0 ? parsed : undefined,
-      },
+      payload: { assetKey, amount: quantity },
     });
     playSound('buy');
-    setAmount(assetKey, '');
   };
 
   // Day-over-day movement — the market's motion was previously
@@ -59,6 +54,107 @@ const AssetTable = ({
     );
   };
 
+  const activeKeys = Object.keys(state.assets).filter(
+    (key) => state.assets[key].active,
+  );
+
+  // Max executable quantity + a touch-visible reason when it's zero —
+  // hover-only titles explained nothing on phones.
+  const getBuyInfo = (assetKey: string) => {
+    const asset = state.assets[assetKey];
+    const maxShares =
+      asset.price > 0
+        ? calculateMaxShares(
+            asset.price,
+            state.wallet.amount,
+            state.wallet.capacity,
+            state.cash,
+          )
+        : 0;
+    const disabledReason =
+      state.wallet.amount >= state.wallet.capacity
+        ? 'Wallet full — upgrade capacity'
+        : state.cash < asset.price
+          ? `Need $${numberWithCommas(asset.price)} cash`
+          : undefined;
+    return { maxShares, disabled: maxShares <= 0, disabledReason };
+  };
+
+  const stepperFor = (assetKey: string) => {
+    const asset = state.assets[assetKey];
+    const { maxShares, disabled, disabledReason } =
+      getBuyInfo(assetKey);
+    return (
+      <TradeStepper
+        assetName={asset.name}
+        max={maxShares}
+        maxLabel="Max"
+        actionLabel="Buy"
+        actionCy={`${assetKey}BuyButton`}
+        cyPrefix={assetKey}
+        onAction={(quantity) => handleBuy(assetKey, quantity)}
+        disabled={disabled}
+        disabledReason={disabledReason}
+      />
+    );
+  };
+
+  if (!isDesktop) {
+    return (
+      <div className="space-y-3">
+        {activeKeys.map((assetKey) => {
+          const asset = state.assets[assetKey];
+          return (
+            <div
+              key={assetKey}
+              className="panel-crt rounded-lg p-3 space-y-2"
+              data-cy={`${assetKey}Card`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span
+                  className="flex items-center gap-2 font-medium text-white/90"
+                  data-cy="assetSymbol"
+                >
+                  {asset.symbol}
+                  {asset.wallet > 0 && (
+                    <span className="px-1.5 py-0.5 text-xs bg-crt-green/20 text-crt-green rounded border border-crt-green/40">
+                      Holding
+                    </span>
+                  )}
+                </span>
+                <span
+                  className="flex items-center text-sm font-medium text-white/90"
+                  data-cy="assetPrice"
+                >
+                  <span>${numberWithCommas(asset.price)}</span>
+                  {getDayDelta(assetKey, asset.price, asset.previousPrice)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs text-white/60 uppercase tracking-wider">
+                <span data-cy="assetAveragePrice">
+                  Avg{' '}
+                  {asset.wallet > 0
+                    ? `$${numberWithCommas(asset.averageCost)}`
+                    : '—'}
+                </span>
+                <span>
+                  Wallet{' '}
+                  <span
+                    className="text-crt-cyan"
+                    data-cy={`${assetKey}AssetWallet`}
+                  >
+                    {asset.wallet}
+                  </span>
+                </span>
+              </div>
+              {stepperFor(assetKey)}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-x-auto panel-crt rounded-lg">
       <table className="w-full">
@@ -82,27 +178,11 @@ const AssetTable = ({
           </tr>
         </thead>
         <tbody className="divide-y divide-white/10">
-          {Object.keys(state.assets).map((asset) => {
-            const name = state.assets[asset].name;
-            const symbol = state.assets[asset].symbol;
-            const price = state.assets[asset].price;
-            const avgCost = state.assets[asset].averageCost;
-            const wallet = state.assets[asset].wallet;
-            const walletCapacity = state.wallet.capacity;
-            const walletAmount = state.wallet.amount;
-            const cash = state.cash;
-
-            if (!state.assets[asset].active) return;
-
-            const canBuy = !(
-              cash <= price ||
-              price === 0 ||
-              walletAmount === walletCapacity
-            );
-
+          {activeKeys.map((assetKey) => {
+            const asset = state.assets[assetKey];
             return (
               <tr
-                key={asset}
+                key={assetKey}
                 className="hover:bg-white/5 transition-colors"
               >
                 <td
@@ -111,9 +191,9 @@ const AssetTable = ({
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="font-medium shrink-0">
-                      {symbol}
+                      {asset.symbol}
                     </span>
-                    {wallet > 0 && (
+                    {asset.wallet > 0 && (
                       <span className="shrink-0 px-1.5 py-0.5 text-xs bg-crt-green/20 text-crt-green rounded border border-crt-green/40">
                         Holding
                       </span>
@@ -125,63 +205,26 @@ const AssetTable = ({
                   data-cy="assetPrice"
                 >
                   <div className="flex items-center">
-                    <span>${numberWithCommas(price)}</span>
-                    {getDayDelta(
-                      asset,
-                      price,
-                      state.assets[asset].previousPrice,
-                    )}
+                    <span>${numberWithCommas(asset.price)}</span>
+                    {getDayDelta(assetKey, asset.price, asset.previousPrice)}
                   </div>
                 </td>
                 <td
                   className="px-4 py-3 text-sm text-white/80"
                   data-cy="assetAveragePrice"
                 >
-                  {wallet > 0 ? `$${numberWithCommas(avgCost)}` : '—'}
+                  {asset.wallet > 0
+                    ? `$${numberWithCommas(asset.averageCost)}`
+                    : '—'}
                 </td>
                 <td
                   className="px-4 py-3 text-sm text-crt-cyan font-medium"
-                  data-cy={`${asset}AssetWallet`}
+                  data-cy={`${assetKey}AssetWallet`}
                 >
-                  {wallet}
+                  {asset.wallet}
                 </td>
-                <td
-                  className="px-4 py-3 text-sm"
-                  data-cy="assetActions"
-                >
-                  <div className="flex items-center gap-2 justify-end">
-                    <input
-                      type="number"
-                      min={1}
-                      value={amounts[asset] ?? ''}
-                      onChange={(e) => setAmount(asset, e.target.value)}
-                      placeholder="max"
-                      disabled={!canBuy}
-                      className="w-16 bg-black/40 border border-white/20 rounded px-2 py-1 text-sm text-white/90 placeholder:text-white/40 disabled:opacity-40"
-                      data-cy={`${asset}AmountInput`}
-                      title="How many to buy — leave empty to buy the max"
-                      aria-label={`Amount of ${name} to buy — leave empty to buy the max`}
-                    />
-                    <button
-                      className={cn(
-                        'btn',
-                        canBuy && 'btn-primary',
-                        !canBuy && 'btn-disabled',
-                      )}
-                      onClick={() => handleBuy(asset)}
-                      id={`${asset}`}
-                      disabled={!canBuy}
-                      data-cy={`${asset}BuyButton`}
-                      title={
-                        !canBuy
-                          ? 'Not enough cash or wallet capacity'
-                          : 'Buy this asset'
-                      }
-                      aria-label={`Buy ${name}`}
-                    >
-                      Buy
-                    </button>
-                  </div>
+                <td className="px-4 py-3 text-sm" data-cy="assetActions">
+                  {stepperFor(assetKey)}
                 </td>
               </tr>
             );

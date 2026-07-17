@@ -51,6 +51,16 @@ describe("Accessibility (axe)", () => {
     cy.checkA11y(undefined, undefined, logViolations)
   })
 
+  it("mobile card layout (with a holding) has no violations", () => {
+    cy.viewport(375, 812)
+    cy.visit("http://localhost:3000/game?seed=42")
+    cy.get("#startGame").click({ force: true })
+    cy.get("[data-cy='solanaBuyButton']").click({ force: true })
+    cy.get("[data-cy='bitcoinCard']").should("exist")
+    cy.injectAxe()
+    cy.checkA11y(undefined, undefined, logViolations)
+  })
+
   it("settings modal has no violations", () => {
     cy.visit("http://localhost:3000/game?seed=42")
     cy.get("#startGame").click()

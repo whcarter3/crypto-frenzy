@@ -211,13 +211,13 @@ polish in Phase 2.
 
 *F. PR-2 scope from the owner's phone playtest (2026-07-17): the build is
 "pretty good so far" — two related items remain:*
-- [ ] F1: **Trade stepper** replacing the bare amount input:
+- [x] F1: **Trade stepper** replacing the bare amount input:
       `(0) (−) [n] (+) (Max|All) (BUY|SELL)`. Editable number, clamped on blur
       to [0, max affordable / held]; action disabled at 0; explicit quantity
       retires the invisible "empty = max" convention from 1c. Custom −/+
       buttons also remove the native number-input spinners (the gray steppers
       visible on the phone playtest screenshots).
-- [ ] F2: **Asset cards below `sm`** — the mobile table scrolls horizontally
+- [x] F2: **Asset cards below `sm`** — the mobile table scrolls horizontally
       (owner: "pretty annoying"), and the stepper widens the action cluster
       further. Each asset becomes a stacked card (symbol/price/delta, then
       avg/wallet, then a full-width stepper row); table stays on desktop.
@@ -225,8 +225,9 @@ polish in Phase 2.
 *D. Controls polish*
 - [x] D1: "max" placeholder next to a "MAX" button reads as a stutter — pick one.
 - [x] D2: Sell input clips its own placeholder ("al]") — width vs 16px font.
-- [ ] D3: Disabled buttons explain themselves via `title` only — invisible on
-      touch. Inline reasons or helper text.
+- [x] D3: Disabled buttons explain themselves via `title` only — invisible on
+      touch. Trade rows now show inline reasons ("Need $X cash", "Wallet full");
+      the StatusBar Pay button still relies on title (minor, revisit if flagged).
 
 *E. Odds & ends*
 - [x] E1: Empty high-score state renders a stray "—" + "SET A RECORD THIS RUN!"

@@ -23,13 +23,15 @@ describe("Testing main features and function", () => {
     cy.get("[data-cy='assetPrice']").first().should("not.have.text", "$0")
   })
 
-  it("buys and sells an asset", () => {
+  it("buys max and sells all via the stepper's fill buttons", () => {
     cy.get("#advDay").click()
+    cy.get("[data-cy='solanaMaxButton']").click()
     cy.get("[data-cy='solanaBuyButton']").click()
     cy.get("[data-cy='solanaAssetWallet']")
       .invoke("text")
       .then(parseInt)
-      .should("be.gt", 0)
+      .should("be.gt", 1)
+    cy.get("[data-cy='solanaSellMaxButton']").click()
     cy.get("[data-cy='solanaSellButton']").click()
     cy.get("[data-cy='solanaAssetWallet']")
       .invoke("text")
@@ -37,14 +39,39 @@ describe("Testing main features and function", () => {
       .should("eq", 0)
   })
 
-  it("buys and sells a specific quantity", () => {
+  it("buys and sells specific quantities via typing and steppers", () => {
     cy.get("#advDay").click()
-    cy.get("[data-cy='solanaAmountInput']").type("2")
+    // stepper defaults to 1; typed values replace it
+    cy.get("[data-cy='solanaAmountInput']").clear().type("2")
     cy.get("[data-cy='solanaBuyButton']").click()
     cy.get("[data-cy='solanaAssetWallet']").should("have.text", "2")
-    cy.get("[data-cy='solanaSellInput']").type("1")
+    // sell stepper defaults to 1
     cy.get("[data-cy='solanaSellButton']").click()
     cy.get("[data-cy='solanaAssetWallet']").should("have.text", "1")
+  })
+
+  it("clamps typed amounts and disables the action at zero", () => {
+    cy.get("#advDay").click()
+    // absurd amount normalizes down to the max affordable on blur
+    // (trigger focusout: React maps onBlur to focusout, which
+    // Cypress's .blur() does not dispatch)
+    cy.get("[data-cy='solanaAmountInput']")
+      .clear()
+      .type("99999")
+      .trigger("focusout")
+    cy.get("[data-cy='solanaAmountInput']")
+      .invoke("val")
+      .then((val) => {
+        const clamped = parseInt(String(val))
+        expect(clamped).to.be.greaterThan(0)
+        expect(clamped).to.be.lessThan(99999)
+      })
+    // zero disables the buy action
+    cy.get("[data-cy='solanaZero']").click()
+    cy.get("[data-cy='solanaBuyButton']").should("be.disabled")
+    // plus re-enables
+    cy.get("[data-cy='solanaPlus']").click()
+    cy.get("[data-cy='solanaBuyButton']").should("not.be.disabled")
   })
 
   it("opens day 1 with a live market and shows day-over-day deltas", () => {
