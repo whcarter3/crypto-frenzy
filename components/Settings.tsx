@@ -116,25 +116,24 @@ const Settings = ({
           />
           <Toggle
             id="crtToggle"
-            label="CRT effects (scanlines, glow)"
+            label="CRT effects"
             checked={settings.crt}
             onChange={(crt) => update({ crt })}
           />
         </div>
 
-        <button
-          type="button"
-          id="openHowToPlay"
-          onClick={() => {
-            onClose();
-            onOpenHelp();
-          }}
-          className="btn w-full py-2 text-sm"
-        >
-          How to play
-        </button>
-
         <div className="border-t border-white/10 pt-4 space-y-3">
+          <button
+            type="button"
+            id="openHowToPlay"
+            onClick={() => {
+              onClose();
+              onOpenHelp();
+            }}
+            className="btn w-full py-2 text-sm"
+          >
+            How to play
+          </button>
           <button
             type="button"
             id="resetScores"

@@ -263,6 +263,16 @@ polish in Phase 2.
       high score + seed + gear grouped bottom-left of the sidebar, as far from
       the game as possible.
 - [x] G6: End Day gets a player-style skip icon (▸|); "reddit thread" → "post".
+- [x] G7 (round 2): receipt trimmed to one line — Cost on Buy, Proceeds on
+      Sell; the cash-after/gain arithmetic is the player's to do.
+- [x] G8 (round 2): every finished day in the activity log folds into a
+      collapsible `<details>` group under its "end of day" header (entry
+      count shown); today's entries stay streaming in the aria-live list.
+      Eventless days render as a plain marker.
+- [x] G9 (round 2): End Day's skip icon drawn as an inline SVG instead of
+      two kerned text characters; settings toggles aligned (CRT label loses
+      its parenthetical), How to play grouped with the other buttons below
+      the divider; the sidebar gear is borderless and bigger.
 
 *D. Controls polish*
 - [x] D1: "max" placeholder next to a "MAX" button reads as a stutter — pick one.

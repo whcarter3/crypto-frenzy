@@ -11,10 +11,10 @@ export type TradeSide = 'buy' | 'sell';
  * The per-asset trade surface (owner design, 2026-07-17): tap a market
  * row to trade. Reads like a receipt (owner notes, 2026-07-17): asset
  * and price up top, then your stats stacked left-aligned (cash, wallet
- * space, holding), Buy | Sell tabs, the quantity playground, and the
- * live totals — cost and cash-after for buys, proceeds and gain for
- * sells — right above the execute button, so the decision is priced
- * before you commit. Market rows open Buy, holdings rows open Sell.
+ * space, holding), Buy | Sell tabs, the quantity playground, and one
+ * live total — cost for buys, proceeds for sells — right above the
+ * execute button; the rest of the arithmetic is the player's.
+ * Market rows open Buy, holdings rows open Sell.
  * Every slot renders on both tabs (blank space over layout jumps), and
  * executing a trade closes the modal immediately — the updated table
  * row is the feedback.
@@ -71,10 +71,6 @@ const TradeModal = ({
   // Live receipt totals, driven by the steppers
   const cost = buy.quantity * asset.price;
   const proceeds = sell.quantity * asset.price;
-  const gain =
-    asset.averageCost > 0
-      ? (asset.price - asset.averageCost) * sell.quantity
-      : 0;
 
   const handleBuy = () => {
     if (buy.quantity <= 0) return;
@@ -262,12 +258,11 @@ const TradeModal = ({
           </p>
         </div>
 
-        {/* The receipt totals: what this trade does to your money,
-            priced live from the stepper */}
-        <div className="text-xs uppercase tracking-wider space-y-1.5 border-t border-white/10 pt-3">
-          {side === 'buy' ? (
-            <>
-              {row(
+        {/* The receipt total: what this trade moves, priced live from
+            the stepper — one line, the player does their own math */}
+        <div className="text-xs uppercase tracking-wider border-t border-white/10 pt-3">
+          {side === 'buy'
+            ? row(
                 'Cost',
                 cost > 0 ? (
                   `−$${numberWithCommas(cost)}`
@@ -275,18 +270,8 @@ const TradeModal = ({
                   <span className="text-white/40">—</span>
                 ),
                 'tradeCost',
-              )}
-              {row(
-                'Cash after',
-                <span className="text-crt-green">
-                  ${numberWithCommas(state.cash - cost)}
-                </span>,
-                'tradeCashAfter',
-              )}
-            </>
-          ) : (
-            <>
-              {row(
+              )
+            : row(
                 'Proceeds',
                 proceeds > 0 ? (
                   <span className="text-crt-green">
@@ -297,25 +282,6 @@ const TradeModal = ({
                 ),
                 'tradeProceeds',
               )}
-              {row(
-                'Gain',
-                proceeds > 0 && asset.averageCost > 0 ? (
-                  <span
-                    className={cn(
-                      gain > 0 && 'text-crt-green',
-                      gain < 0 && 'text-crt-red',
-                    )}
-                  >
-                    {gain >= 0 ? '+' : '−'}$
-                    {numberWithCommas(Math.abs(gain))}
-                  </span>
-                ) : (
-                  <span className="text-white/40">—</span>
-                ),
-                'tradeGain',
-              )}
-            </>
-          )}
         </div>
 
         {side === 'buy' ? (

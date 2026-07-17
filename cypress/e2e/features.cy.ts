@@ -152,6 +152,28 @@ describe("Testing main features and function", () => {
     cy.get("[data-cy='assetPrice']").eq(3).should("have.text", "$86")
   })
 
+  it("folds finished days in the activity log", () => {
+    cy.get("#advDay").click()
+    cy.get("#advDay").click()
+    // day 1's entries live under their collapsed day header. Assert
+    // the fold via the open attribute: Chrome hides closed-details
+    // content with content-visibility, which keeps layout boxes and
+    // fools Cypress's visibility check into seeing it.
+    cy.contains("summary", "end of day 1")
+      .parent("details")
+      .should("not.have.attr", "open")
+    cy.contains("summary", "end of day 1").click()
+    cy.contains("summary", "end of day 1")
+      .parent("details")
+      .should("have.attr", "open")
+    cy.contains("You borrowed").should("be.visible")
+    // and fold back up
+    cy.contains("summary", "end of day 1").click()
+    cy.contains("summary", "end of day 1")
+      .parent("details")
+      .should("not.have.attr", "open")
+  })
+
   it("resets and starts a new game (with tap-again confirm)", () => {
     cy.get("#advDay").click()
     // abandoning lives in the settings menu now (meta, not gameplay)

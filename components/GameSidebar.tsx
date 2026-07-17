@@ -185,7 +185,7 @@ const GameSidebar = ({
         <button
           type="button"
           onClick={onOpenSettings}
-          className="btn px-3 py-2"
+          className="text-3xl leading-none text-white/60 hover:text-crt-cyan py-1"
           id="openSettings"
           aria-label="Settings & help"
           title="Settings, how to play, abandon run"
