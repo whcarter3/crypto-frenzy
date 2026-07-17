@@ -273,6 +273,9 @@ polish in Phase 2.
       two kerned text characters; settings toggles aligned (CRT label loses
       its parenthetical), How to play grouped with the other buttons below
       the divider; the sidebar gear is borderless and bigger.
+- [x] G10 (round 3): Reset high scores moved above How to play in the
+      settings menu and de-glowed (quiet red, not a headline CTA); the
+      empty-state high-score line trimmed to "No high score yet".
 
 *D. Controls polish*
 - [x] D1: "max" placeholder next to a "MAX" button reads as a stutter — pick one.

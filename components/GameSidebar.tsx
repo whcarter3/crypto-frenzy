@@ -165,9 +165,7 @@ const GameSidebar = ({
             High Score: ${numberWithCommas(state.highScore!)}
           </p>
         ) : (
-          <p className="text-xs text-white/50">
-            No high score yet — set a record this run!
-          </p>
+          <p className="text-xs text-white/50">No high score yet</p>
         )}
 
         {state.seed > 0 && (

@@ -123,6 +123,16 @@ const Settings = ({
         </div>
 
         <div className="border-t border-white/10 pt-4 space-y-3">
+          {/* Reset is not a headline CTA — quiet red, no glow — and sits
+              above How to play (owner call, 2026-07-17) */}
+          <button
+            type="button"
+            id="resetScores"
+            onClick={handleResetScores}
+            className="btn w-full py-2 text-sm text-crt-red border-crt-red/40"
+          >
+            Reset high scores
+          </button>
           <button
             type="button"
             id="openHowToPlay"
@@ -133,14 +143,6 @@ const Settings = ({
             className="btn w-full py-2 text-sm"
           >
             How to play
-          </button>
-          <button
-            type="button"
-            id="resetScores"
-            onClick={handleResetScores}
-            className="btn btn-danger w-full py-2 text-sm"
-          >
-            Reset high scores
           </button>
           <button
             type="button"
