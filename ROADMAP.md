@@ -227,11 +227,15 @@ polish in Phase 2.
       sideways scroll, enforced by a dedicated E2E assertion), rows become
       tap targets, and the TradeModal unifies buy + sell with price/Δ/
       position/cash context. Holdings rows in the sidebar open it too.
-      Iterated after a second playtest (2026-07-16): both quantity clusters
-      always visible (no sell section popping in/out with the position),
-      execute buttons together at the bottom — set both numbers, then
-      commit — Done replaced by a ✕ dismiss in the corner, clear button is
-      a ✕ icon, AVG. PRICE header shortened to AVG.
+      Iterated twice more on playtests (2026-07-16): the combined
+      buy+sell layout — even with execute buttons grouped at the bottom —
+      still read as "look all over the place to parse what to do", so the
+      modal is now **tabbed Buy | Sell**: one info block up top (price, Δ,
+      cash, space, position), one stepper playground in the middle, one
+      full-width execute at the bottom. Market rows open the Buy tab,
+      holdings rows open Sell; both tabs' amounts survive switching. Done
+      replaced by a ✕ dismiss in the corner, clear button is a ✕ icon,
+      AVG. PRICE header shortened to AVG.
 
 *D. Controls polish*
 - [x] D1: "max" placeholder next to a "MAX" button reads as a stutter — pick one.
@@ -315,6 +319,8 @@ Roughly in order of value-for-effort:
 | Decision | Options | Lean |
 |---|---|---|
 | Mobile support in v1 | Full responsive vs. desktop-only gate | Responsive — it's a web game, half your traffic will be phones |
+| Trade entry points (owner, 2026-07-16) | Row tap → tabbed modal (current) vs. per-row Buy/Sell buttons → single-purpose modals | Ship tabs, playtest; row buttons re-add controls the slim table just shed (mobile width), and owner suspects they'd fracture the experience |
+| Sidebar holdings panel on mobile | Keep vs. drop (market table already shows dot/avg/qty) | Fold into B2/B3 in 1f PR 3 — leaning drop or collapse on phones |
 | Backend for leaderboards | None (local only) vs. serverless (Vercel KV/Postgres, Supabase) | Ship v1.0 with no backend; add serverless leaderboard in Phase 4 |
 | macOS signing | $99/yr Apple Developer vs. unsigned (users must right-click-open) | Pay it if desktop is serious; skip for itch.io-only |
 | Windows signing | Cert (~$200+/yr) vs. unsigned (SmartScreen warning) | Ship unsigned initially; revisit on traction |

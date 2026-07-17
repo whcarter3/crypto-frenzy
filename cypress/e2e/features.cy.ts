@@ -25,15 +25,18 @@ describe("Testing main features and function", () => {
 
   it("trades through the modal: buy max, then sell all", () => {
     cy.get("#advDay").click()
-    // tap the market row to open the asset's trade panel
+    // tap the market row to open the asset's trade panel on Buy
     cy.get("[data-cy='solanaRow']").click()
     cy.get("[data-cy='tradeModal']").should("be.visible")
-    // stable layout: the sell controls are always present, just
-    // disabled until something is held — no sections popping in/out
-    cy.get("[data-cy='solanaSellButton']").should("be.disabled")
+    cy.get("[data-cy='solanaBuyTab']").should(
+      "have.attr",
+      "aria-selected",
+      "true",
+    )
     cy.get("[data-cy='solanaMaxButton']").click()
     cy.get("[data-cy='solanaBuyButton']").click()
-    // modal stays open; the position unlocks the sell side
+    // modal stays open; the Sell tab carries the new position
+    cy.get("[data-cy='solanaSellTab']").click()
     cy.get("[data-cy='solanaSellMaxButton']").click()
     cy.get("[data-cy='solanaSellButton']").click()
     cy.get("#tradeModalClose").click()
@@ -51,18 +54,25 @@ describe("Testing main features and function", () => {
     cy.get("[data-cy='solanaAmountInput']").clear().type("2")
     cy.get("[data-cy='solanaBuyButton']").click()
     // sell stepper defaults to 1
+    cy.get("[data-cy='solanaSellTab']").click()
     cy.get("[data-cy='solanaSellButton']").click()
     cy.get("#tradeModalClose").click()
     cy.get("[data-cy='solanaAssetWallet']").should("have.text", "1")
   })
 
-  it("opens the trade modal from a holdings row too", () => {
+  it("holdings rows open the modal on the Sell tab", () => {
     cy.get("#advDay").click()
     cy.get("[data-cy='solanaRow']").click()
     cy.get("[data-cy='solanaBuyButton']").click() // buys default 1
     cy.get("#tradeModalClose").click()
     cy.get("[data-cy='solanaHoldingRow']").click()
     cy.get("[data-cy='tradeModal']").should("be.visible")
+    // the row you tapped says which side you're thinking about
+    cy.get("[data-cy='solanaSellTab']").should(
+      "have.attr",
+      "aria-selected",
+      "true",
+    )
     cy.get("[data-cy='solanaSellButton']").should("not.be.disabled")
     cy.get("#tradeModalClose").click()
   })

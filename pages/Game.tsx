@@ -19,7 +19,7 @@ import GameMode from '../components/GameMode';
 import GameOver from '../components/GameOver';
 import Settings from '../components/Settings';
 import HowToPlay from '../components/HowToPlay';
-import TradeModal from '../components/TradeModal';
+import TradeModal, { TradeSide } from '../components/TradeModal';
 
 export default function Game() {
   usePageTitle('Crypto Frenzy – Game');
@@ -53,9 +53,12 @@ export default function Game() {
   // UI-only chrome, not game state: never saved, never seeded.
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
-  const [tradeAssetKey, setTradeAssetKey] = useState<string | null>(
-    null,
-  );
+  // Market rows open the Buy tab, holdings rows open Sell — the row
+  // you tapped says which side of the trade you're thinking about.
+  const [trade, setTrade] = useState<{
+    assetKey: string;
+    side: TradeSide;
+  } | null>(null);
 
   // The engine is pure — localStorage writes happen out here.
   useEffect(() => {
@@ -118,7 +121,9 @@ export default function Game() {
               dispatch={dispatch}
               onOpenSettings={() => setSettingsOpen(true)}
               onOpenHelp={() => setHelpOpen(true)}
-              onSelectAsset={setTradeAssetKey}
+              onSelectAsset={(assetKey) =>
+                setTrade({ assetKey, side: 'sell' })
+              }
             />
           </div>
 
@@ -132,7 +137,9 @@ export default function Game() {
               <Log log={state.log} />
               <AssetTable
                 state={state}
-                onSelectAsset={setTradeAssetKey}
+                onSelectAsset={(assetKey) =>
+                  setTrade({ assetKey, side: 'buy' })
+                }
               />
             </div>
           </div>
@@ -149,12 +156,13 @@ export default function Game() {
         <Settings onClose={() => setSettingsOpen(false)} />
       )}
       {helpOpen && <HowToPlay onClose={() => setHelpOpen(false)} />}
-      {tradeAssetKey && !state.gameOver && !state.modalOpen && (
+      {trade && !state.gameOver && !state.modalOpen && (
         <TradeModal
-          assetKey={tradeAssetKey}
+          assetKey={trade.assetKey}
+          initialSide={trade.side}
           state={state}
           dispatch={dispatch}
-          onClose={() => setTradeAssetKey(null)}
+          onClose={() => setTrade(null)}
         />
       )}
     </div>

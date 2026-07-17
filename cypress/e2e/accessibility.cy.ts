@@ -38,14 +38,16 @@ describe("Accessibility (axe)", () => {
     cy.checkA11y(undefined, undefined, logViolations)
   })
 
-  it("trade modal has no violations", () => {
+  it("trade modal has no violations on either tab", () => {
     cy.visit("http://localhost:3000/game?seed=42")
     cy.get("#startGame").click()
-    // buy first so the modal renders both its buy and sell sections
+    // buy first so the position line and sell controls render
     cy.get("[data-cy='solanaRow']").click()
     cy.get("[data-cy='solanaBuyButton']").click()
     cy.get("[data-cy='tradeModal']").should("be.visible")
     cy.injectAxe()
+    cy.checkA11y(undefined, undefined, logViolations)
+    cy.get("[data-cy='solanaSellTab']").click()
     cy.checkA11y(undefined, undefined, logViolations)
   })
 

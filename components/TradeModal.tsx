@@ -1,32 +1,33 @@
-import { Dispatch } from 'react';
+import { Dispatch, useState } from 'react';
 import { State, Action } from '../lib/types';
 import { calculateMaxShares, numberWithCommas } from '../helpers/utils';
 import { cn } from '../lib/cn';
 import { playSound } from '../lib/sound';
 import TradeStepper, { useTradeQuantity } from './TradeStepper';
 
+export type TradeSide = 'buy' | 'sell';
+
 /**
  * The per-asset trade surface (owner design, 2026-07-17): tap a market
- * row to trade. Buying and selling — previously split between the
- * market table and the holdings sidebar — live together here, with the
- * context the decision needs (price, today's move, your position, your
- * cash). Stays open after a trade so the updated position is the
+ * row to trade. Third playtest iteration (2026-07-16): the combined
+ * buy+sell layout made you "look all over the place to parse what to
+ * do", so the modal is now tabbed — one side at a time, reading top to
+ * bottom as info → playground → execute. Market rows open the Buy tab,
+ * holdings rows open Sell. Both tabs' amounts survive switching, and
+ * the modal stays open after a trade so the updated position is the
  * feedback.
- *
- * Layout per the 2026-07-16 playtest: both quantity clusters are always
- * present (no sell section popping in and out as the position changes),
- * the execute buttons sit together at the bottom so you can play with
- * the numbers before committing, and dismissal is a ✕ in the corner.
  */
 const TradeModal = ({
   assetKey,
   state,
   dispatch,
+  initialSide = 'buy',
   onClose,
 }: {
   assetKey: string;
   state: State;
   dispatch: Dispatch<Action>;
+  initialSide?: TradeSide;
   onClose: () => void;
 }) => {
   const asset = state.assets[assetKey];
@@ -44,6 +45,7 @@ const TradeModal = ({
   // on whether the asset exists.
   const buy = useTradeQuantity(maxBuy);
   const sell = useTradeQuantity(asset ? asset.wallet : 0);
+  const [side, setSide] = useState<TradeSide>(initialSide);
   if (!asset) return null;
 
   const buyDisabledReason =
@@ -82,6 +84,25 @@ const TradeModal = ({
     playSound('sell');
   };
 
+  const tab = (tabSide: TradeSide, label: string) => (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={side === tabSide}
+      aria-controls="tradePanel"
+      onClick={() => setSide(tabSide)}
+      className={cn(
+        'flex-1 py-2 text-sm font-semibold uppercase tracking-wider border rounded-sm',
+        side === tabSide
+          ? 'text-crt-green border-crt-green bg-crt-transparentGreen'
+          : 'text-white/40 border-white/20 hover:text-white/70',
+      )}
+      data-cy={`${assetKey}${label}Tab`}
+    >
+      {label}
+    </button>
+  );
+
   return (
     <div
       className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-10 flex items-center justify-center p-4 md:p-8"
@@ -107,70 +128,52 @@ const TradeModal = ({
           ✕
         </button>
 
-        <div className="flex items-baseline justify-between gap-3 flex-wrap pr-10">
-          <h1
-            id="tradeModalTitle"
-            className="text-2xl font-bold text-slate-300 text-glow-crt"
-          >
-            {asset.name}{' '}
-            <span className="text-crt-cyan text-lg">
-              {asset.symbol}
-            </span>
-          </h1>
-          <span className="text-xl font-bold text-white/90">
-            ${numberWithCommas(asset.price)}
-            {dayPct !== null && Math.abs(dayPct) >= 0.05 && (
-              <span
-                className={cn(
-                  'ml-2 text-sm',
-                  dayPct > 0 ? 'text-crt-green' : 'text-crt-red',
-                )}
-              >
-                {dayPct > 0 ? '▲' : '▼'} {Math.abs(dayPct).toFixed(1)}%
+        {/* Info: everything you need to know, in one block up top */}
+        <div className="space-y-2 pr-10">
+          <div className="flex items-baseline justify-between gap-3 flex-wrap">
+            <h1
+              id="tradeModalTitle"
+              className="text-2xl font-bold text-slate-300 text-glow-crt"
+            >
+              {asset.name}{' '}
+              <span className="text-crt-cyan text-lg">
+                {asset.symbol}
               </span>
-            )}
-          </span>
-        </div>
-
-        <div className="flex justify-between text-xs text-white/60 uppercase tracking-wider">
-          <span>
-            Cash{' '}
-            <span className="text-crt-green">
-              ${numberWithCommas(state.cash)}
+            </h1>
+            <span className="text-xl font-bold text-white/90">
+              ${numberWithCommas(asset.price)}
+              {dayPct !== null && Math.abs(dayPct) >= 0.05 && (
+                <span
+                  className={cn(
+                    'ml-2 text-sm',
+                    dayPct > 0 ? 'text-crt-green' : 'text-crt-red',
+                  )}
+                >
+                  {dayPct > 0 ? '▲' : '▼'}{' '}
+                  {Math.abs(dayPct).toFixed(1)}%
+                </span>
+              )}
             </span>
-          </span>
-          <span>
-            Wallet space{' '}
-            <span className="text-crt-cyan">
-              {state.wallet.capacity - state.wallet.amount}
-            </span>
-          </span>
-        </div>
-
-        <div className="space-y-1">
-          <p className="text-xs text-white/60 uppercase tracking-wider">
-            Buy
-          </p>
-          <TradeStepper
-            assetName={asset.name}
-            maxLabel="Max"
-            cyPrefix={assetKey}
-            control={buy}
-            disabled={maxBuy <= 0}
-            disabledReason={buyDisabledReason}
-          />
-        </div>
-
-        <div className="space-y-1 border-t border-white/10 pt-4">
-          <p className="text-xs text-white/60 uppercase tracking-wider">
-            Sell
-            {asset.wallet > 0 && (
-              <>
-                {' '}
-                — holding{' '}
+          </div>
+          <div className="text-xs text-white/60 uppercase tracking-wider space-y-1">
+            <div className="flex justify-between">
+              <span>
+                Cash{' '}
+                <span className="text-crt-green">
+                  ${numberWithCommas(state.cash)}
+                </span>
+              </span>
+              <span>
+                Wallet space{' '}
                 <span className="text-crt-cyan">
-                  ×{asset.wallet}
-                </span>{' '}
+                  {state.wallet.capacity - state.wallet.amount}
+                </span>
+              </span>
+            </div>
+            {asset.wallet > 0 && (
+              <div data-cy="tradeModalPosition">
+                Holding{' '}
+                <span className="text-crt-cyan">×{asset.wallet}</span>{' '}
                 at avg ${numberWithCommas(asset.averageCost)}{' '}
                 <span
                   className={cn(
@@ -182,25 +185,50 @@ const TradeModal = ({
                   {positionPct >= 0 ? '+' : ''}
                   {positionPct.toFixed(1)}%
                 </span>
-              </>
+              </div>
             )}
-          </p>
-          <TradeStepper
-            assetName={asset.name}
-            maxLabel="All"
-            cyPrefix={`${assetKey}Sell`}
-            control={sell}
-            disabled={asset.wallet === 0}
-            disabledReason={
-              asset.wallet === 0 ? 'Nothing held yet' : undefined
-            }
-          />
+          </div>
         </div>
 
-        <div className="space-y-2 pt-1">
+        <div
+          role="tablist"
+          aria-label={`Trade ${asset.name}`}
+          className="flex gap-2"
+        >
+          {tab('buy', 'Buy')}
+          {tab('sell', 'Sell')}
+        </div>
+
+        {/* Playground: the active side's amount, nothing else */}
+        <div id="tradePanel" role="tabpanel">
+          {side === 'buy' ? (
+            <TradeStepper
+              assetName={asset.name}
+              maxLabel="Max"
+              cyPrefix={assetKey}
+              control={buy}
+              disabled={maxBuy <= 0}
+              disabledReason={buyDisabledReason}
+            />
+          ) : (
+            <TradeStepper
+              assetName={asset.name}
+              maxLabel="All"
+              cyPrefix={`${assetKey}Sell`}
+              control={sell}
+              disabled={asset.wallet === 0}
+              disabledReason={
+                asset.wallet === 0 ? 'Nothing held yet' : undefined
+              }
+            />
+          )}
+        </div>
+
+        {/* Execute: one full-width commit for the active side */}
+        {side === 'buy' ? (
           <button
             className={cn(
-              'btn w-full py-2',
+              'btn w-full py-3',
               buy.quantity > 0 && maxBuy > 0
                 ? 'btn-primary'
                 : 'btn-disabled',
@@ -214,9 +242,10 @@ const TradeModal = ({
             {buy.quantity > 0 &&
               ` ×${numberWithCommas(buy.quantity)}`}
           </button>
+        ) : (
           <button
             className={cn(
-              'btn w-full py-2',
+              'btn w-full py-3',
               sell.quantity > 0 && asset.wallet > 0
                 ? 'btn-primary'
                 : 'btn-disabled',
@@ -231,7 +260,7 @@ const TradeModal = ({
               sell.quantity > 0 &&
               ` ×${numberWithCommas(sell.quantity)}`}
           </button>
-        </div>
+        )}
       </div>
     </div>
   );
