@@ -47,8 +47,12 @@ const HowToPlay = ({ onClose }: { onClose: () => void }) => {
               every price and compounds your debt.
             </li>
             <li>
-              Buy low, sell high. Leave the amount empty to buy the max
-              you can afford, or sell a whole position.
+              Buy low, sell high: tap any asset to open its trade
+              panel. Set an amount with −/+ or type it —
+              <span className="text-crt-green"> Max</span> fills the
+              most you can afford,{' '}
+              <span className="text-crt-green">All</span> sells the
+              whole position.
             </li>
             <li>
               <span className="text-crt-green">Pay</span> clears your

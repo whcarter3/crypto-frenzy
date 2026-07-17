@@ -107,6 +107,19 @@
   * {
     box-sizing: border-box;
   }
+
+  /* The trade stepper provides its own −/+ controls; the native number
+     spinners read as off-theme gray boxes (flagged in the owner's
+     phone playtest). */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
   html,
   body {
     padding: 0;

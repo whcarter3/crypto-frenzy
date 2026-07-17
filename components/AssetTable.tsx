@@ -1,39 +1,25 @@
-import { Dispatch, useState } from 'react';
-import { State, Action } from '../lib/types';
+import { State } from '../lib/types';
 import { numberWithCommas } from '../helpers/utils';
 import { cn } from '../lib/cn';
-import { playSound } from '../lib/sound';
 
+/**
+ * The market: a slim, scannable table at every viewport (owner call,
+ * 2026-07-17 — "the asset table makes more sense to see everything
+ * together"). Rows are tap targets that open the TradeModal; moving
+ * the trade controls out of the table is what lets it fit a phone
+ * without horizontal scroll.
+ */
 const AssetTable = ({
   state,
-  dispatch,
+  onSelectAsset,
 }: {
   state: State;
-  dispatch: Dispatch<Action>;
+  onSelectAsset: (assetKey: string) => void;
 }) => {
-  // Per-asset buy amount; empty string means "max affordable"
-  const [amounts, setAmounts] = useState<Record<string, string>>({});
-
-  const setAmount = (assetKey: string, value: string) =>
-    setAmounts((prev) => ({ ...prev, [assetKey]: value }));
-
-  const handleBuy = (assetKey: string) => {
-    const parsed = parseInt(amounts[assetKey], 10);
-    dispatch({
-      type: 'BUY_ASSET',
-      payload: {
-        assetKey,
-        amount: Number.isFinite(parsed) && parsed > 0 ? parsed : undefined,
-      },
-    });
-    playSound('buy');
-    setAmount(assetKey, '');
-  };
-
   // Day-over-day movement — the market's motion was previously
   // invisible (a 60% crash produced zero on-screen change unless you
-  // held the coin). Position performance vs. your avg cost still lives
-  // in the holdings panel.
+  // held the coin). Position performance vs. your avg cost lives in
+  // the holdings panel and the trade modal.
   const getDayDelta = (
     assetKey: string,
     price: number,
@@ -47,7 +33,7 @@ const AssetTable = ({
     return (
       <span
         className={cn(
-          'ml-2 text-xs',
+          'text-xs sm:ml-2',
           isUp && 'text-crt-green',
           !isUp && 'text-crt-red',
         )}
@@ -59,129 +45,120 @@ const AssetTable = ({
     );
   };
 
+  const activeKeys = Object.keys(state.assets).filter(
+    (key) => state.assets[key].active,
+  );
+
   return (
-    <div className="overflow-x-auto panel-crt rounded-lg">
+    <div
+      className="overflow-x-auto panel-crt rounded-lg"
+      data-cy="marketTable"
+    >
+      {/* px-2 below sm: five columns × px-3 alone overflow a 375px
+          phone, and this table scrolling sideways is the exact
+          complaint that killed the previous layout */}
       <table className="w-full">
         <thead className="bg-white/5">
           <tr className="border-b border-white/20">
-            <th className="w-28 min-w-28 max-w-28 px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
+            <th className="px-2 sm:px-3 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Asset
             </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
+            <th className="px-2 sm:px-3 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Price
             </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
-              Avg. Price
+            {/* "Avg. Price" was the widest header in the table (owner
+                playtest) — the abbreviation costs nothing next to the
+                PRICE column and buys the phone real room */}
+            <th
+              className="px-2 sm:px-3 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider"
+              title="Your average purchase price"
+            >
+              Avg
             </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
+            <th className="px-2 sm:px-3 py-3 text-right text-xs font-semibold text-crt-cyan uppercase tracking-wider">
               Wallet
             </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-crt-cyan uppercase tracking-wider">
-              Action
-            </th>
+            {/* chevron affordance column */}
+            <th className="w-6 sm:w-8 px-1 sm:px-3 py-3" aria-hidden="true"></th>
           </tr>
         </thead>
         <tbody className="divide-y divide-white/10">
-          {Object.keys(state.assets).map((asset) => {
-            const name = state.assets[asset].name;
-            const symbol = state.assets[asset].symbol;
-            const price = state.assets[asset].price;
-            const avgCost = state.assets[asset].averageCost;
-            const wallet = state.assets[asset].wallet;
-            const walletCapacity = state.wallet.capacity;
-            const walletAmount = state.wallet.amount;
-            const cash = state.cash;
-
-            if (!state.assets[asset].active) return;
-
-            const canBuy = !(
-              cash <= price ||
-              price === 0 ||
-              walletAmount === walletCapacity
-            );
-
+          {activeKeys.map((assetKey) => {
+            const asset = state.assets[assetKey];
             return (
               <tr
-                key={asset}
-                className="hover:bg-white/5 transition-colors"
+                key={assetKey}
+                role="button"
+                tabIndex={0}
+                aria-label={`Trade ${asset.name}`}
+                onClick={() => onSelectAsset(assetKey)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onSelectAsset(assetKey);
+                  }
+                }}
+                className="cursor-pointer hover:bg-white/5 focus-visible:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-crt-cyan transition-colors"
+                data-cy={`${assetKey}Row`}
               >
                 <td
-                  className="w-28 min-w-28 max-w-28 px-4 py-3 text-sm text-white/90"
+                  className="px-2 sm:px-3 py-3 text-sm text-white/90"
                   data-cy="assetSymbol"
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="font-medium shrink-0">
-                      {symbol}
+                      {asset.symbol}
                     </span>
-                    {wallet > 0 && (
-                      <span className="shrink-0 px-1.5 py-0.5 text-xs bg-crt-green/20 text-crt-green rounded border border-crt-green/40">
-                        Holding
-                      </span>
+                    {asset.wallet > 0 && (
+                      <>
+                        <span
+                          className="sm:hidden text-crt-green text-xs"
+                          title="Holding"
+                          aria-hidden="true"
+                        >
+                          ●
+                        </span>
+                        <span className="hidden sm:inline-flex shrink-0 px-1.5 py-0.5 text-xs bg-crt-green/20 text-crt-green rounded border border-crt-green/40">
+                          Holding
+                        </span>
+                      </>
                     )}
                   </div>
                 </td>
                 <td
-                  className="px-4 py-3 text-sm font-medium text-white/90"
+                  className="px-2 sm:px-3 py-3 text-sm font-medium text-white/90"
                   data-cy="assetPrice"
                 >
-                  <div className="flex items-center">
-                    <span>${numberWithCommas(price)}</span>
+                  {/* delta stacks under the price below sm — inline it
+                      adds ~50px to the widest column on a phone */}
+                  <div className="flex flex-col items-start sm:flex-row sm:items-center whitespace-nowrap">
+                    <span>${numberWithCommas(asset.price)}</span>
                     {getDayDelta(
-                      asset,
-                      price,
-                      state.assets[asset].previousPrice,
+                      assetKey,
+                      asset.price,
+                      asset.previousPrice,
                     )}
                   </div>
                 </td>
                 <td
-                  className="px-4 py-3 text-sm text-white/80"
+                  className="px-2 sm:px-3 py-3 text-sm text-white/80"
                   data-cy="assetAveragePrice"
                 >
-                  {wallet > 0 ? `$${numberWithCommas(avgCost)}` : '—'}
+                  {asset.wallet > 0
+                    ? `$${numberWithCommas(asset.averageCost)}`
+                    : '—'}
                 </td>
                 <td
-                  className="px-4 py-3 text-sm text-crt-cyan font-medium"
-                  data-cy={`${asset}AssetWallet`}
+                  className="px-2 sm:px-3 py-3 text-sm text-right text-crt-cyan font-medium"
+                  data-cy={`${assetKey}AssetWallet`}
                 >
-                  {wallet}
+                  {asset.wallet}
                 </td>
                 <td
-                  className="px-4 py-3 text-sm"
-                  data-cy="assetActions"
+                  className="w-6 sm:w-8 px-1 sm:px-3 py-3 text-crt-cyan/60 text-right"
+                  aria-hidden="true"
                 >
-                  <div className="flex items-center gap-2 justify-end">
-                    <input
-                      type="number"
-                      min={1}
-                      value={amounts[asset] ?? ''}
-                      onChange={(e) => setAmount(asset, e.target.value)}
-                      placeholder="max"
-                      disabled={!canBuy}
-                      className="w-16 bg-black/40 border border-white/20 rounded px-2 py-1 text-sm text-white/90 placeholder:text-white/40 disabled:opacity-40"
-                      data-cy={`${asset}AmountInput`}
-                      title="How many to buy — leave empty to buy the max"
-                      aria-label={`Amount of ${name} to buy — leave empty to buy the max`}
-                    />
-                    <button
-                      className={cn(
-                        'btn',
-                        canBuy && 'btn-primary',
-                        !canBuy && 'btn-disabled',
-                      )}
-                      onClick={() => handleBuy(asset)}
-                      id={`${asset}`}
-                      disabled={!canBuy}
-                      data-cy={`${asset}BuyButton`}
-                      title={
-                        !canBuy
-                          ? 'Not enough cash or wallet capacity'
-                          : 'Buy this asset'
-                      }
-                      aria-label={`Buy ${name}`}
-                    >
-                      Buy
-                    </button>
-                  </div>
+                  ›
                 </td>
               </tr>
             );

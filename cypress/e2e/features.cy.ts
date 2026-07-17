@@ -23,34 +23,91 @@ describe("Testing main features and function", () => {
     cy.get("[data-cy='assetPrice']").first().should("not.have.text", "$0")
   })
 
-  it("buys and sells an asset", () => {
+  it("trades through the modal: buy max, then sell all", () => {
     cy.get("#advDay").click()
+    // tap the market row to open the asset's trade panel on Buy
+    cy.get("[data-cy='solanaRow']").click()
+    cy.get("[data-cy='tradeModal']").should("be.visible")
+    cy.get("[data-cy='solanaBuyTab']").should(
+      "have.attr",
+      "aria-selected",
+      "true",
+    )
+    cy.get("[data-cy='solanaMaxButton']").click()
     cy.get("[data-cy='solanaBuyButton']").click()
-    cy.get("[data-cy='solanaAssetWallet']")
-      .invoke("text")
-      .then(parseInt)
-      .should("be.gt", 0)
+    // modal stays open; the Sell tab carries the new position
+    cy.get("[data-cy='solanaSellTab']").click()
+    cy.get("[data-cy='solanaSellMaxButton']").click()
     cy.get("[data-cy='solanaSellButton']").click()
+    cy.get("#tradeModalClose").click()
+    cy.get("[data-cy='tradeModal']").should("not.exist")
     cy.get("[data-cy='solanaAssetWallet']")
       .invoke("text")
       .then(parseInt)
       .should("eq", 0)
   })
 
-  it("buys and sells a specific quantity", () => {
+  it("buys and sells specific quantities in the modal", () => {
     cy.get("#advDay").click()
-    cy.get("[data-cy='solanaAmountInput']").type("2")
+    cy.get("[data-cy='solanaRow']").click()
+    // stepper defaults to 1; typed values replace it
+    cy.get("[data-cy='solanaAmountInput']").clear().type("2")
     cy.get("[data-cy='solanaBuyButton']").click()
-    cy.get("[data-cy='solanaAssetWallet']").should("have.text", "2")
-    cy.get("[data-cy='solanaSellInput']").type("1")
+    // sell stepper defaults to 1
+    cy.get("[data-cy='solanaSellTab']").click()
     cy.get("[data-cy='solanaSellButton']").click()
+    cy.get("#tradeModalClose").click()
     cy.get("[data-cy='solanaAssetWallet']").should("have.text", "1")
+  })
+
+  it("holdings rows open the modal on the Sell tab", () => {
+    cy.get("#advDay").click()
+    cy.get("[data-cy='solanaRow']").click()
+    cy.get("[data-cy='solanaBuyButton']").click() // buys default 1
+    cy.get("#tradeModalClose").click()
+    cy.get("[data-cy='solanaHoldingRow']").click()
+    cy.get("[data-cy='tradeModal']").should("be.visible")
+    // the row you tapped says which side you're thinking about
+    cy.get("[data-cy='solanaSellTab']").should(
+      "have.attr",
+      "aria-selected",
+      "true",
+    )
+    cy.get("[data-cy='solanaSellButton']").should("not.be.disabled")
+    cy.get("#tradeModalClose").click()
+  })
+
+  it("clamps typed amounts and disables the action at zero", () => {
+    cy.get("#advDay").click()
+    cy.get("[data-cy='solanaRow']").click()
+    // absurd amount normalizes down to the max affordable on blur
+    // (trigger focusout: React maps onBlur to focusout, which
+    // Cypress's .blur() does not dispatch)
+    cy.get("[data-cy='solanaAmountInput']")
+      .clear()
+      .type("99999")
+      .trigger("focusout")
+    cy.get("[data-cy='solanaAmountInput']")
+      .invoke("val")
+      .then((val) => {
+        const clamped = parseInt(String(val))
+        expect(clamped).to.be.greaterThan(0)
+        expect(clamped).to.be.lessThan(99999)
+      })
+    // zero disables the buy action
+    cy.get("[data-cy='solanaZero']").click()
+    cy.get("[data-cy='solanaBuyButton']").should("be.disabled")
+    // plus re-enables
+    cy.get("[data-cy='solanaPlus']").click()
+    cy.get("[data-cy='solanaBuyButton']").should("not.be.disabled")
   })
 
   it("opens day 1 with a live market and shows day-over-day deltas", () => {
     // no advance needed: prices exist the moment the run starts
     cy.get("[data-cy='assetPrice']").first().should("not.have.text", "$0")
+    cy.get("[data-cy='solanaRow']").click()
     cy.get("[data-cy='solanaBuyButton']").should("not.be.disabled")
+    cy.get("#tradeModalClose").click()
     // deltas appear once there is a yesterday to compare against
     cy.get("[data-cy='bitcoinDayDelta']").should("not.exist")
     cy.get("#advDay").click()
@@ -106,7 +163,9 @@ describe("Testing main features and function", () => {
 
   it("restores a run after a reload", () => {
     cy.get("#advDay").click()
+    cy.get("[data-cy='solanaRow']").click()
     cy.get("[data-cy='solanaBuyButton']").click()
+    cy.get("#tradeModalClose").click()
     cy.get("[data-cy='days left']").should("have.text", "29")
     cy.reload()
     cy.get("[data-cy='days left']").should("have.text", "29")

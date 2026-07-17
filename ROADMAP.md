@@ -211,22 +211,38 @@ polish in Phase 2.
 
 *F. PR-2 scope from the owner's phone playtest (2026-07-17): the build is
 "pretty good so far" — two related items remain:*
-- [ ] F1: **Trade stepper** replacing the bare amount input:
+- [x] F1: **Trade stepper** replacing the bare amount input:
       `(0) (−) [n] (+) (Max|All) (BUY|SELL)`. Editable number, clamped on blur
       to [0, max affordable / held]; action disabled at 0; explicit quantity
       retires the invisible "empty = max" convention from 1c. Custom −/+
       buttons also remove the native number-input spinners (the gray steppers
       visible on the phone playtest screenshots).
-- [ ] F2: **Asset cards below `sm`** — the mobile table scrolls horizontally
-      (owner: "pretty annoying"), and the stepper widens the action cluster
-      further. Each asset becomes a stacked card (symbol/price/delta, then
-      avg/wallet, then a full-width stepper row); table stays on desktop.
+- [x] F2: **Tap-to-trade modal, slim table everywhere** — the mobile table
+      scrolls horizontally (owner: "pretty annoying"), and the stepper widens
+      the action cluster further. First cut was asset cards below `sm`; the
+      owner's playtest rejected them ("the asset table makes more sense to
+      see everything together") in favor of pushing buy/sell into a modal
+      opened by tapping an asset row — at every viewport, not just mobile.
+      The market table drops its trade controls (fits a phone with no
+      sideways scroll, enforced by a dedicated E2E assertion), rows become
+      tap targets, and the TradeModal unifies buy + sell with price/Δ/
+      position/cash context. Holdings rows in the sidebar open it too.
+      Iterated twice more on playtests (2026-07-16): the combined
+      buy+sell layout — even with execute buttons grouped at the bottom —
+      still read as "look all over the place to parse what to do", so the
+      modal is now **tabbed Buy | Sell**: one info block up top (price, Δ,
+      cash, space, position), one stepper playground in the middle, one
+      full-width execute at the bottom. Market rows open the Buy tab,
+      holdings rows open Sell; both tabs' amounts survive switching. Done
+      replaced by a ✕ dismiss in the corner, clear button is a ✕ icon,
+      AVG. PRICE header shortened to AVG.
 
 *D. Controls polish*
 - [x] D1: "max" placeholder next to a "MAX" button reads as a stutter — pick one.
 - [x] D2: Sell input clips its own placeholder ("al]") — width vs 16px font.
-- [ ] D3: Disabled buttons explain themselves via `title` only — invisible on
-      touch. Inline reasons or helper text.
+- [x] D3: Disabled buttons explain themselves via `title` only — invisible on
+      touch. Trade rows now show inline reasons ("Need $X cash", "Wallet full");
+      the StatusBar Pay button still relies on title (minor, revisit if flagged).
 
 *E. Odds & ends*
 - [x] E1: Empty high-score state renders a stray "—" + "SET A RECORD THIS RUN!"
@@ -303,12 +319,15 @@ Roughly in order of value-for-effort:
 | 2026-07-02 | **Reducer-as-game-engine, single-intent actions, seedable RNG** | Multi-dispatch helpers forced wrapper-reducer stats tracking (PR #31 review); engine design unlocks unit tests, daily seeds, replay verification |
 | 2026-07-03 | **Fold the mobile/tablet responsive pass into Phase 1d (accessibility)** | Both touch the same layout components; smaller viewports and assistive tech share a lot of the same fixes (focus order, semantic structure) |
 | 2026-07-03 | **Insert Phase 1f: comprehensive UX sweep before the Phase 2 release push** | Post-1d verdict: layout is responsive but the experience is rough — a dedicated feel/flow pass beats sprinkling UX fixes across release tasks |
+| 2026-07-16 | **Trade via per-asset modal at every viewport; market table stays slim and read-only** | Owner playtest rejected mobile-only asset cards ("the asset table makes more sense to see everything together"); one trade surface everywhere beats two viewport-forked layouts, and pulling controls out of the table is what lets it fit a phone without sideways scroll |
 
 ## Decisions still open
 
 | Decision | Options | Lean |
 |---|---|---|
 | Mobile support in v1 | Full responsive vs. desktop-only gate | Responsive — it's a web game, half your traffic will be phones |
+| Trade entry points (owner, 2026-07-16) | Row tap → tabbed modal (current) vs. per-row Buy/Sell buttons → single-purpose modals | Ship tabs, playtest; row buttons re-add controls the slim table just shed (mobile width), and owner suspects they'd fracture the experience |
+| Sidebar holdings panel on mobile | Keep vs. drop (market table already shows dot/avg/qty) | Fold into B2/B3 in 1f PR 3 — leaning drop or collapse on phones |
 | Backend for leaderboards | None (local only) vs. serverless (Vercel KV/Postgres, Supabase) | Ship v1.0 with no backend; add serverless leaderboard in Phase 4 |
 | macOS signing | $99/yr Apple Developer vs. unsigned (users must right-click-open) | Pay it if desktop is serious; skip for itch.io-only |
 | Windows signing | Cert (~$200+/yr) vs. unsigned (SmartScreen warning) | Ship unsigned initially; revisit on traction |

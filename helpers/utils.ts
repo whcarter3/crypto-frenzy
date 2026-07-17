@@ -33,6 +33,21 @@ export const numberWithCommas = (num: number | string): string => {
 };
 
 /**
+ * Normalizes a typed trade quantity: invalid or negative input becomes
+ * 0, anything above the cap becomes the cap. Powers the trade stepper's
+ * clamp-on-blur behavior.
+ *
+ * @param {string} raw The raw input string.
+ * @param {number} max The largest allowed quantity.
+ * @returns {number} The normalized quantity in [0, max].
+ */
+export const normalizeQuantity = (raw: string, max: number): number => {
+  const parsed = parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed < 0) return 0;
+  return Math.min(parsed, Math.max(0, max));
+};
+
+/**
  * Computes the player's net worth: cash minus debt plus the market
  * value of all active holdings.
  *

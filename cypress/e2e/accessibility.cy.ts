@@ -31,8 +31,23 @@ describe("Accessibility (axe)", () => {
     cy.visit("http://localhost:3000/game?seed=42")
     cy.get("#startGame").click()
     cy.get("#advDay").click()
+    cy.get("[data-cy='solanaRow']").click()
     cy.get("[data-cy='solanaBuyButton']").click()
+    cy.get("#tradeModalClose").click()
     cy.injectAxe()
+    cy.checkA11y(undefined, undefined, logViolations)
+  })
+
+  it("trade modal has no violations on either tab", () => {
+    cy.visit("http://localhost:3000/game?seed=42")
+    cy.get("#startGame").click()
+    // buy first so the position line and sell controls render
+    cy.get("[data-cy='solanaRow']").click()
+    cy.get("[data-cy='solanaBuyButton']").click()
+    cy.get("[data-cy='tradeModal']").should("be.visible")
+    cy.injectAxe()
+    cy.checkA11y(undefined, undefined, logViolations)
+    cy.get("[data-cy='solanaSellTab']").click()
     cy.checkA11y(undefined, undefined, logViolations)
   })
 
@@ -47,6 +62,18 @@ describe("Accessibility (axe)", () => {
     cy.contains("Last day!", { timeout: 6000 }).should("not.exist")
     cy.get("#advDay").click()
     cy.get("[data-cy='gameOverScreen']").should("be.visible")
+    cy.injectAxe()
+    cy.checkA11y(undefined, undefined, logViolations)
+  })
+
+  it("mobile layout (with a holding) has no violations", () => {
+    cy.viewport(375, 812)
+    cy.visit("http://localhost:3000/game?seed=42")
+    cy.get("#startGame").click({ force: true })
+    cy.get("[data-cy='solanaRow']").click({ force: true })
+    cy.get("[data-cy='solanaBuyButton']").click({ force: true })
+    cy.get("#tradeModalClose").click({ force: true })
+    cy.get("[data-cy='marketTable']").should("exist")
     cy.injectAxe()
     cy.checkA11y(undefined, undefined, logViolations)
   })
