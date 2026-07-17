@@ -237,6 +237,13 @@ polish in Phase 2.
       dividers between sidebar / activity log / market so players allocate
       screen space to what they care about (log readers vs. table watchers).
       Pairs naturally with E3; persist sizes in settings, not game state.
+- [x] E5: Removed the invisible 1×1 `#testMode` button from the difficulty modal.
+      It shipped to production, was keyboard-focusable, and announced "Enable test
+      mode" to screen readers; a leftover Cypress hook from PR #5 that the E2E
+      rewrite orphaned — nothing references it anymore. The `Test` entry in
+      `lib/state/modes.ts` stays: unit tests and the reducer's high-score gating
+      use it, and DEV-gating it would break the `Record<State['mode'], …>`
+      contract and crash restored old Test-mode saves.
 - [ ] Landing page menu stubs (PROFILES/CREDITS "SOON") — ship or cut.
 - [ ] Background music (deferred from 1e — needs a real track or a decent loop).
 
