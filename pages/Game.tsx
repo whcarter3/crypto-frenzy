@@ -12,7 +12,7 @@ import { playSound } from '../lib/sound';
 import { AlertMessages } from '../helpers/alerts';
 import { usePageTitle } from '../helpers/usePageTitle';
 import AssetTable from '../components/AssetTable';
-import Actions from '../components/Actions';
+import StatusBar from '../components/StatusBar';
 import GameSidebar from '../components/GameSidebar';
 import Log from '../components/Log';
 import GameMode from '../components/GameMode';
@@ -97,35 +97,37 @@ export default function Game() {
           were propagating ~600px minimums all the way up and forcing
           horizontal page scroll on phones. min-w-0 lets the overflow-x
           wrappers inside actually do their job. */}
-      <main className="flex-1 flex flex-col lg:flex-row min-w-0">
+      <main className="flex-1 flex flex-col min-w-0">
         {/* Visually hidden: the modals carry their own visible h1 when
             open, but the bare game screen had no heading at all for
             screen-reader users to navigate by. Inside <main> so it's
             contained by a landmark region. */}
         <h1 className="sr-only">Crypto Frenzy – Game</h1>
-        <div className="w-full lg:w-1/4 lg:shrink-0 min-w-0 border-b lg:border-b-0 lg:border-r border-white/10 bg-crt-panel/50 px-4 py-6">
-          <GameSidebar
-            state={state}
-            dispatch={dispatch}
-            onOpenSettings={() => setSettingsOpen(true)}
-            onOpenHelp={() => setHelpOpen(true)}
-          />
-        </div>
 
-        {/* No mx-auto: auto margins disable flex-item stretch, which at
-            mobile widths sized this column to its content's intrinsic
-            width (the unwrapped log/table, ~600px) instead of the
-            viewport — the root cause of horizontal overflow on phones.
-            flex-1 already fills the row on desktop. */}
-        <div className="flex flex-1 flex-col lg:justify-between min-w-0 px-4 py-6 gap-6">
-          {/* Full width, matching Actions below — a lingering w-1/2 cap
-              forced the per-row buy controls into horizontal scroll on
-              ordinary 1280px desktops once Phase 1c widened the table. */}
-          <div className="w-full space-y-6">
-            <Log log={state.log} />
-            <AssetTable state={state} dispatch={dispatch} />
+        {/* Vitals + End Day, sticky above both columns on every viewport */}
+        <StatusBar dispatch={dispatch} state={state} />
+
+        <div className="flex-1 flex flex-col lg:flex-row min-w-0">
+          <div className="w-full lg:w-1/4 lg:shrink-0 min-w-0 border-b lg:border-b-0 lg:border-r border-white/10 bg-crt-panel/50 px-4 py-6">
+            <GameSidebar
+              state={state}
+              dispatch={dispatch}
+              onOpenSettings={() => setSettingsOpen(true)}
+              onOpenHelp={() => setHelpOpen(true)}
+            />
           </div>
-          <Actions dispatch={dispatch} state={state} />
+
+          {/* No mx-auto: auto margins disable flex-item stretch, which at
+              mobile widths sized this column to its content's intrinsic
+              width (the unwrapped log/table, ~600px) instead of the
+              viewport — the root cause of horizontal overflow on phones.
+              flex-1 already fills the row on desktop. */}
+          <div className="flex flex-1 flex-col min-w-0 px-4 py-6 gap-6">
+            <div className="w-full space-y-6">
+              <Log log={state.log} />
+              <AssetTable state={state} dispatch={dispatch} />
+            </div>
+          </div>
         </div>
       </main>
 

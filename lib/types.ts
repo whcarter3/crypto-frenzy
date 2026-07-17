@@ -13,6 +13,7 @@
  * @property {number[]} range.high - The high price range of the asset.
  * @property {number[]} range.moon - The moon price range of the asset.
  * @property {number} price - The current price of the asset.
+ * @property {number} previousPrice - Yesterday's price (0 before the first roll) — drives the day-over-day delta display.
  */
 export type Asset = {
   name: string
@@ -28,6 +29,7 @@ export type Asset = {
     moon: number[]
   }
   price: number
+  previousPrice: number
 }
 
 /**

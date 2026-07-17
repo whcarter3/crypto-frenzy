@@ -49,13 +49,24 @@ export const reducer = (state: State, action: Action): State => {
     case 'START_RUN': {
       const { mode, seed, highScore } = action.payload;
       const config = modeConfigs[mode];
+      // Day 1 opens with real prices — a market of $0 rows and disabled
+      // buttons made the first screen look broken and hid the game
+      // behind an unexplained "advance day to start" step.
+      const rng = createRng(seedRng(seed));
+      const { assets, eventLogs } = rollDailyPrices(
+        initialState.assets,
+        config.lowRangePriceChance,
+        config.highRangePriceChance,
+        rng,
+      );
       return {
         ...initialState,
         mode,
         modalOpen: false,
         highScore,
         seed: seedRng(seed),
-        rngState: seedRng(seed),
+        rngState: rng.state(),
+        assets,
         days: config.days,
         cash: config.cash,
         debt: config.debt,
@@ -64,8 +75,8 @@ export const reducer = (state: State, action: Action): State => {
         highRangePriceChance: config.highRangePriceChance,
         wallet: { amount: 0, ...config.wallet },
         log: [
-          '- Click Advance Day to start.',
-          `You have ${config.days - 1} days to make as much money as you can! 💎🙌`,
+          ...eventLogs,
+          `Market open — you have ${config.days - 1} days to make as much money as you can! 💎🙌`,
           `You borrowed $${numberWithCommas(config.cash)} at ${
             config.interestRate * 100
           }% daily interest.`,
