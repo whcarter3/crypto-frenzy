@@ -48,7 +48,7 @@ const rollAssetPrice = (
   if (percentRoll >= 98) {
     return {
       price: randomizePrice(rng, asset.range.moon[0], asset.range.moon[1]),
-      eventLogs: [`🚀🚀🚀 OMG A ${assetName.toUpperCase()} MOONSHOT! 🚀🚀🚀`],
+      eventLogs: [`🚀 🚀 🚀 OMG A ${assetName.toUpperCase()} MOONSHOT! 🚀 🚀 🚀`],
     }
   }
   return {

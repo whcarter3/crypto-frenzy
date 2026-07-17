@@ -45,7 +45,7 @@ export default function Home() {
               </h2>
               <p>
                 Survive the full run of days with more net worth than
-                you started. Prices desync every cycle and compound
+                you started. Prices desync every day and compound
                 interest hunts you in the dark.
               </p>
               <p>
@@ -61,16 +61,16 @@ export default function Home() {
               </h2>
               <ul className="space-y-1">
                 <li>
-                  • Click{' '}
-                  <span className="text-crt-green">Advance Day</span>{' '}
-                  to move time forward.
+                  • Press{' '}
+                  <span className="text-crt-green">End Day</span> to
+                  move time forward.
                 </li>
                 <li>• Buy low, sell high across hostile markets.</li>
                 <li>
                   • Watch cash, debt, and wallet capacity like a hawk.
                 </li>
                 <li>
-                  • Push a new high score before the final cycle
+                  • Push a new high score before the final day
                   closes.
                 </li>
               </ul>
@@ -96,8 +96,8 @@ export default function Home() {
                 SYSTEM STATUS
               </h3>
               <p>
-                Save data lives in local corp archives — your run
-                survives a reboot of this browser.
+                Runs auto-save to the local archives — safe to
+                reboot.
               </p>
               <p className="text-slate-500">
                 Persistence module:{' '}

@@ -21,19 +21,23 @@ const HowToPlay = ({ onClose }: { onClose: () => void }) => {
           How to play
         </h1>
 
+        {/* Two sections, not four (copy review, 2026-07-17): only the
+            rules play can't teach — the score rule and Pay's
+            all-or-nothing — plus the non-discoverable seed. Everything
+            else is taught by the UI at point of use. */}
         <section className="space-y-2 text-slate-300 text-sm leading-relaxed">
           <h2 className="text-crt-green text-base font-semibold">
             Your contract
           </h2>
           <p>
-            You start in debt, with a little cash and a wallet that only
-            holds so many coins. Survive the run and finish with as much
-            money as you can.
+            You start in debt. Trade coins, grow your cash, settle up
+            before the run ends.
           </p>
           <p className="text-crt-yellow">
-            Your score is cash minus debt — coins still in your wallet
-            when the run ends count for nothing. Sell before the final
-            day, and pay off the loan.
+            {/* "cash minus debt" is asserted by settings.cy.ts */}
+            Your score is cash minus debt — coins still held when the
+            run ends count for nothing. Sell out and clear your debt
+            before the close.
           </p>
         </section>
 
@@ -43,16 +47,9 @@ const HowToPlay = ({ onClose }: { onClose: () => void }) => {
           </h2>
           <ul className="space-y-1 list-disc list-inside">
             <li>
-              <span className="text-crt-green">Adv Day</span> re-rolls
-              every price and compounds your debt.
-            </li>
-            <li>
-              Buy low, sell high: tap any asset to open its trade
-              panel. Set an amount with −/+ or type it —
-              <span className="text-crt-green"> Max</span> fills the
-              most you can afford,{' '}
-              <span className="text-crt-green">All</span> sells the
-              whole position.
+              Tap a coin to trade.{' '}
+              <span className="text-crt-green">Max</span> fills the
+              most you can buy — or sell.
             </li>
             <li>
               <span className="text-crt-green">Pay</span> clears your
@@ -60,34 +57,10 @@ const HowToPlay = ({ onClose }: { onClose: () => void }) => {
               is brutal, don&apos;t sit on it.
             </li>
             <li>
-              Expand your wallet when capacity pinches — each upgrade
-              doubles it, and doubles the next upgrade&apos;s price.
+              Same market seed, same market — copy the link from the
+              sidebar to race a friend.
             </li>
           </ul>
-        </section>
-
-        <section className="space-y-2 text-slate-300 text-sm leading-relaxed">
-          <h2 className="text-crt-cyan text-base font-semibold">
-            The market
-          </h2>
-          <p>
-            Prices swing between crash, normal, and hot ranges — and once
-            in a while a coin <span className="text-crt-green">moons</span>.
-            Watch the activity feed: news events tell you when something
-            crashed or took off.
-          </p>
-        </section>
-
-        <section className="space-y-2 text-slate-300 text-sm leading-relaxed">
-          <h2 className="text-crt-cyan text-base font-semibold">
-            Seeds
-          </h2>
-          <p>
-            Every run has a market seed. The same seed always produces
-            the same prices and events — copy the seed link from the
-            sidebar or game-over screen to race a friend on the exact
-            same market.
-          </p>
         </section>
 
         <button

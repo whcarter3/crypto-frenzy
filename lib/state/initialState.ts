@@ -6,7 +6,10 @@ export const initialState: State = {
   debt: 2000,
   cash: 2000,
   interestRate: 0.2,
-  log: ['- Click Advance Day to start.'],
+  // Empty until the run starts — day-1 prices roll at START_RUN, so a
+  // "click to start" prompt would describe a state the player never
+  // sees (owner call, copy review 2026-07-17)
+  log: [],
   highScore: null,
   modalOpen: true,
   gameOver: null,
