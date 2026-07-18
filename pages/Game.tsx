@@ -48,6 +48,13 @@ export default function Game() {
     const saved = loadGame();
     if (seedParam === null) return saved ?? fresh;
     const urlSeed = Number(seedParam) >>> 0;
+    // 0 is never a real seed: share links always carry a nonzero
+    // uint32, and 0 is the "unknown seed" sentinel stamped on
+    // migrated pre-seed saves. A ?seed= that coerces to 0 (empty,
+    // garbage, wrap-around) is a mangled link, not intent — treat it
+    // like no param rather than matching the sentinel or torching a
+    // resumable run.
+    if (urlSeed === 0) return saved ?? fresh;
     return saved && saved.seed === urlSeed ? saved : fresh;
   });
 
