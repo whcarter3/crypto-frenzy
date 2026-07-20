@@ -349,10 +349,21 @@ polish in Phase 2.
 - [ ] Analytics events beyond page views: run started/finished, mode, score.
 - [ ] Privacy page (required once you have analytics) + Credits page (IBM Plex Mono
       OFL attribution already lives in the repo).
-- [ ] Save-file schema + migrations (PR #34 review): validate saves against a real
-      schema (e.g. zod) and migrate old versions forward instead of discarding them.
-      Pre-1.0 the manual `SAVE_VERSION` bump-and-discard is intentional; this lands
-      before v1.0 ships, once real players have runs worth preserving.
+- [x] Save-file schema + migrations (PR #34 review): saves are validated with
+      zod (`lib/state/saveSchema.ts`) and older versions migrate forward
+      stepwise instead of being discarded — v1 (pre-engine) derives a pure
+      rngState and gets the seed-0 "unknown" sentinel; v2 gains previousPrice.
+      Review discovery: SAVE_VERSION 2 spans TWO shapes in the wild (`seed`
+      landed mid-version without a bump) — the migration defaults it, and the
+      schema header documents the rule: a new required State field means a
+      version bump + one migration entry; same-version additions must be
+      schema-optional with their default from the initialState spread. A
+      compile-time guard pins StateSchema to the State type so the schema
+      can't silently fall behind. Future-version saves load as null (an old
+      build never mangles a newer save). Junk `?seed=` URLs (coerce to 0) now
+      read as "no seed" so they can't false-match migrated pre-seed saves or
+      torch a resumable run. Historical fixtures are frozen literals
+      transcribed from git, not derived from the present shape.
 - [ ] Balance/playtest pass — get 5–10 people through full runs on all three modes.
 - [ ] Tag **v1.0.0**, announce.
 

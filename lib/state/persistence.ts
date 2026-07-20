@@ -1,53 +1,44 @@
 import { State } from '../types';
 import { initialState } from './initialState';
+import {
+  CURRENT_SAVE_VERSION,
+  migrateAndValidate,
+} from './saveSchema';
 
 const SAVE_KEY = 'cryptoFrenzySave';
-// Bump when the State shape changes incompatibly — old saves are discarded.
-// v2: engine refactor added rngState (deterministic PRNG).
-// v3: assets gained previousPrice (day-over-day delta display).
-const SAVE_VERSION = 3;
-
-type SaveFile = {
-  version: number;
-  savedAt: string;
-  state: State;
-};
 
 const isBrowser = () => typeof window !== 'undefined';
 
-const readSaveFile = (): SaveFile | null => {
+/**
+ * Read + migrate + validate the save. Old-version saves are walked
+ * forward through lib/state/saveSchema.ts migrations instead of being
+ * discarded (Phase 2; resolves the PR #34 review note) — only corrupt
+ * data or saves from an unknown FUTURE version return null.
+ */
+const readValidState = (): State | null => {
   if (!isBrowser()) return null;
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as SaveFile;
-    if (parsed?.version !== SAVE_VERSION) return null;
-    const saved = parsed.state;
-    if (
-      typeof saved?.currentDay !== 'number' ||
-      typeof saved?.days !== 'number' ||
-      typeof saved?.rngState !== 'number' ||
-      !saved.assets ||
-      !saved.wallet
-    ) {
-      return null;
-    }
-    return parsed;
+    return migrateAndValidate(JSON.parse(raw));
   } catch {
     return null;
   }
 };
 
-export const hasSave = (): boolean => readSaveFile() !== null;
+export const hasSave = (): boolean => readValidState() !== null;
 
 export const loadGame = (): State | null => {
-  const file = readSaveFile();
-  if (!file) return null;
-  // Spread over initialState so fields added in newer builds get defaults.
-  // A restored run is always mid-run: modal closed, no game-over summary.
+  const saved = readValidState();
+  if (!saved) return null;
+  // Spread over initialState so SCHEMA-OPTIONAL fields added at the
+  // same save version pick up defaults. A field the schema requires
+  // needs a version bump + migration instead — see the recipe in
+  // saveSchema.ts. A restored run is always mid-run: modal closed,
+  // no game-over summary.
   return {
     ...initialState,
-    ...file.state,
+    ...saved,
     modalOpen: false,
     gameOver: null,
   };
@@ -56,8 +47,8 @@ export const loadGame = (): State | null => {
 export const saveGame = (state: State): void => {
   if (!isBrowser()) return;
   try {
-    const file: SaveFile = {
-      version: SAVE_VERSION,
+    const file = {
+      version: CURRENT_SAVE_VERSION,
       savedAt: new Date().toISOString(),
       state,
     };
