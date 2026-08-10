@@ -386,6 +386,12 @@ polish in Phase 2.
       + OG/Twitter URLs, README, og.png card art, and the Tauri identifier
       (`win.cryptofrenzy.app` — safe to change, no desktop build shipped)
       all moved off cryptofrenzy.live.
+- [x] Support link (owner request 2026-08-10): Buy Me a Coffee, phrased in the
+      cabinet's own voice — **INSERT COIN** in the landing footer and a "Coin
+      slot" line on /credits ("the game stays free either way"). Deliberately
+      not in the gameplay loop or on the game-over screen — same meta-out-of-
+      the-way principle as 1f G5; monetization row in the open-decisions table
+      still reads free web + PWYW itch.
 
 ## Phase 3 — Desktop release (Tauri)
 

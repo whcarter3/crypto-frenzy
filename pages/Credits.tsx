@@ -75,6 +75,25 @@ export default function Credits() {
                   sell-high terminal sim that came before it.
                 </dd>
               </div>
+              <div>
+                <dt className="text-crt-cyan uppercase tracking-wider text-xs">
+                  Coin slot
+                </dt>
+                <dd>
+                  This terminal runs on coffee. If a run made you smile,
+                  you can{' '}
+                  <a
+                    href="https://buymeacoffee.com/zzayphod"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-crt-cyan hover:text-crt-green underline"
+                  >
+                    buy the dev one
+                  </a>
+                  . No subscription, no paywall — the game stays free
+                  either way.
+                </dd>
+              </div>
             </dl>
           </section>
 

@@ -97,6 +97,19 @@ export default function Home() {
             <Link to="/credits" className="hover:text-crt-cyan">
               CREDITS
             </Link>
+            <span aria-hidden="true">{'//'}</span>
+            {/* Tip jar, in the only voice an arcade cabinet has. Kept
+                out of the gameplay loop on purpose — same principle as
+                the 1f G5 meta move. */}
+            <a
+              href="https://buymeacoffee.com/zzayphod"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-crt-cyan"
+              aria-label="Insert coin — buy the developer a coffee"
+            >
+              INSERT COIN
+            </a>
           </footer>
         </div>
       </main>
