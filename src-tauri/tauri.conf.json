@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Crypto Frenzy",
   "version": "../package.json",
-  "identifier": "live.cryptofrenzy.app",
+  "identifier": "win.cryptofrenzy.app",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:3000",

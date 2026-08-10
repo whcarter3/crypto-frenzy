@@ -4,7 +4,7 @@ A retro CRT-styled crypto trading sim. Borrow dirty money, ride volatile coins, 
 clear your debt before the days run out — buy low, sell high, and don't let the
 compounding interest eat you alive.
 
-**Play it live:** [cryptofrenzy.live](https://cryptofrenzy.live)
+**Play it live:** [cryptofrenzy.win](https://cryptofrenzy.win)
 
 ## How it works
 

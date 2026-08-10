@@ -17,6 +17,7 @@ import {
 } from '../lib/state/highScores';
 import { useNotification } from '../lib/NotificationContext';
 import { playSound } from '../lib/sound';
+import { trackEvent } from '../lib/analytics';
 import { AlertMessages } from '../helpers/alerts';
 import { usePageTitle } from '../helpers/usePageTitle';
 import AssetTable from '../components/AssetTable';
@@ -88,7 +89,16 @@ export default function Game() {
   // gameOver flipping, the moonshot fanfare off the day's fresh log
   // entries (everything above the newest day separator).
   useEffect(() => {
-    if (state.gameOver) playSound('gameOver');
+    if (state.gameOver) {
+      playSound('gameOver');
+      trackEvent('run_finished', {
+        mode: state.mode,
+        score: state.gameOver.score,
+        newHighScore: state.gameOver.newHighScore,
+      });
+    }
+    // mode is fixed for the life of a run — gameOver is the only real trigger
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.gameOver]);
 
   useEffect(() => {

@@ -1,8 +1,9 @@
 # Crypto Frenzy — Release Roadmap
 
-Goal: take the current prototype (playable core loop, live at cryptofrenzy.live) to a
-releasable **v1.0 webapp**, then a **downloadable desktop build** via the existing Tauri
-scaffold, then optional retention features (leaderboards, daily runs).
+Goal: take the current prototype (playable core loop, now live at **cryptofrenzy.win**;
+formerly cryptofrenzy.live) to a releasable **v1.0 webapp**, then a **downloadable
+desktop build** via the existing Tauri scaffold, then optional retention features
+(leaderboards, daily runs).
 
 ## Where the game stands (post Phase 1e)
 
@@ -310,7 +311,7 @@ polish in Phase 2.
       with a Settings toggle; when pre-enabled it starts on the first
       interaction (autoplay policy).
 
-## Phase 2 — Web release (v1.0 on cryptofrenzy.live)
+## Phase 2 — Web release (v1.0 on cryptofrenzy.win)
 
 - [x] **Branding / copy / theme review** (owner, 2026-07-17) — done. 258
       strings inventoried (17 test-coupled), owner reviewed a side-by-side
@@ -345,10 +346,20 @@ polish in Phase 2.
       whose SPA fallback rewrites standalone pages into the app; regen
       instructions in the file). Landing-page prerender: still deferred,
       revisit if organic search matters.
-- [ ] Error tracking (Sentry) — currently zero visibility into player crashes.
-- [ ] Analytics events beyond page views: run started/finished, mode, score.
-- [ ] Privacy page (required once you have analytics) + Credits page (IBM Plex Mono
-      OFL attribution already lives in the repo).
+- [ ] Error tracking (Sentry) — **deferred to post-1.0** (owner ship call
+      2026-08-10): needs a Sentry account/DSN only the owner can create.
+      Zero-crash-visibility risk accepted for launch; first post-launch task.
+- [x] Analytics events beyond page views: `run_started` (mode, seeded?) fires
+      from the difficulty modal's Start Run, `run_finished` (mode, score,
+      newHighScore) from the game-over effect. `lib/analytics.ts` wraps
+      `track()` behind the same `__VERCEL__` gate as the `<Analytics />`
+      component — off Vercel it no-ops instead of warning. Engine stays pure:
+      events fire from the UI layer, never the reducer.
+- [x] Privacy page (`/privacy` — no accounts, saves in localStorage, cookieless
+      anonymous analytics incl. the two gameplay events) + Credits page
+      (`/credits` — IBM Plex Mono OFL attribution, Web Audio sound note,
+      Dopewars lineage, agentic-development credit). Linked from a new
+      landing-page footer; flavor-outside voice rule applied.
 - [x] Save-file schema + migrations (PR #34 review): saves are validated with
       zod (`lib/state/saveSchema.ts`) and older versions migrate forward
       stepwise instead of being discarded — v1 (pre-engine) derives a pure
@@ -364,8 +375,17 @@ polish in Phase 2.
       read as "no seed" so they can't false-match migrated pre-seed saves or
       torch a resumable run. Historical fixtures are frozen literals
       transcribed from git, not derived from the present shape.
-- [ ] Balance/playtest pass — get 5–10 people through full runs on all three modes.
-- [ ] Tag **v1.0.0**, announce.
+- [x] Balance/playtest pass — closed by owner call (2026-08-10): the 1f/G-series
+      owner playtests (phone + desktop, all modes) stand in for the formal
+      5–10-person pass; wider feedback arrives post-launch via analytics +
+      the announcement post.
+- [ ] Tag **v1.0.0**, announce — version bumped to 1.0.0 in the ship PR; tag
+      `v1.0.0` on main after merge. Announcement: owner's agentic-development
+      blog post links the game.
+- [x] Domain: **cryptofrenzy.win** purchased (Cloudflare, 2026-08-10). Canonical
+      + OG/Twitter URLs, README, og.png card art, and the Tauri identifier
+      (`win.cryptofrenzy.app` — safe to change, no desktop build shipped)
+      all moved off cryptofrenzy.live.
 
 ## Phase 3 — Desktop release (Tauri)
 
@@ -407,6 +427,8 @@ Roughly in order of value-for-effort:
 | 2026-07-03 | **Fold the mobile/tablet responsive pass into Phase 1d (accessibility)** | Both touch the same layout components; smaller viewports and assistive tech share a lot of the same fixes (focus order, semantic structure) |
 | 2026-07-03 | **Insert Phase 1f: comprehensive UX sweep before the Phase 2 release push** | Post-1d verdict: layout is responsive but the experience is rough — a dedicated feel/flow pass beats sprinkling UX fixes across release tasks |
 | 2026-07-16 | **Trade via per-asset modal at every viewport; market table stays slim and read-only** | Owner playtest rejected mobile-only asset cards ("the asset table makes more sense to see everything together"); one trade surface everywhere beats two viewport-forked layouts, and pulling controls out of the table is what lets it fit a phone without sideways scroll |
+| 2026-08-10 | **Ship domain is cryptofrenzy.win** (purchased on Cloudflare); .live redirects | Owner call; a game about winning ends in .win. Tauri identifier follows (`win.cryptofrenzy.app`) while it's still free to change — no desktop build has shipped |
+| 2026-08-10 | **Ship v1.0 without Sentry; owner playtests stand in for the formal balance pass** | Sentry needs an owner-created account/DSN (post-launch task #1); the 1f/G-series playtests covered all modes on real devices, and analytics events now measure balance at scale |
 
 ## Decisions still open
 
