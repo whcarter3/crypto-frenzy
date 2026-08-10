@@ -21,6 +21,20 @@ describe("Accessibility (axe)", () => {
     cy.checkA11y(undefined, undefined, logViolations)
   })
 
+  it("privacy page has no violations", () => {
+    cy.visit("http://localhost:3000/privacy")
+    cy.contains("h1", "PRIVACY").should("be.visible")
+    cy.injectAxe()
+    cy.checkA11y(undefined, undefined, logViolations)
+  })
+
+  it("credits page has no violations", () => {
+    cy.visit("http://localhost:3000/credits")
+    cy.contains("h1", "CREDITS").should("be.visible")
+    cy.injectAxe()
+    cy.checkA11y(undefined, undefined, logViolations)
+  })
+
   it("difficulty modal has no violations", () => {
     cy.visit("http://localhost:3000/game?seed=42")
     cy.injectAxe()

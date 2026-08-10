@@ -3,6 +3,7 @@ import { Action, State } from '../lib/types';
 import { cn } from '../lib/cn';
 import { clearSave } from '../lib/state/persistence';
 import { loadHighScore } from '../lib/state/highScores';
+import { trackEvent } from '../lib/analytics';
 
 type GameMode = 'Easy' | 'Normal' | 'Hard' | 'Test';
 
@@ -62,6 +63,12 @@ const GameMode = ({
       seedInput.trim() !== '' && Number.isFinite(parsed) && parsed > 0
         ? parsed
         : Date.now() >>> 0;
+    trackEvent('run_started', {
+      mode: state.mode,
+      // whether the player brought a seed (shared/challenge link),
+      // not the seed itself
+      seeded: seedInput.trim() !== '',
+    });
     dispatch({
       type: 'START_RUN',
       payload: {

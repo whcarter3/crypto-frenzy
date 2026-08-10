@@ -86,6 +86,31 @@ export default function Home() {
               </Link>
             )}
           </div>
+
+          {/* Meta pages live off the landing screen, out of the game's
+              way — same principle as the settings-menu move in 1f G5 */}
+          <footer className="flex gap-4 justify-center text-xs text-crt-cyan/60 border-t border-crt-outline pt-4">
+            <Link to="/privacy" className="hover:text-crt-cyan">
+              PRIVACY
+            </Link>
+            <span aria-hidden="true">{'//'}</span>
+            <Link to="/credits" className="hover:text-crt-cyan">
+              CREDITS
+            </Link>
+            <span aria-hidden="true">{'//'}</span>
+            {/* Tip jar, in the only voice an arcade cabinet has. Kept
+                out of the gameplay loop on purpose — same principle as
+                the 1f G5 meta move. */}
+            <a
+              href="https://buymeacoffee.com/zzayphod"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-crt-cyan"
+              aria-label="Insert coin — buy the developer a coffee"
+            >
+              INSERT COIN
+            </a>
+          </footer>
         </div>
       </main>
     </div>

@@ -9,6 +9,8 @@ import { NotificationProvider } from './lib/NotificationContext';
 import { SettingsProvider } from './lib/SettingsContext';
 import Home from './pages/Home';
 import Game from './pages/Game';
+import Privacy from './pages/Privacy';
+import Credits from './pages/Credits';
 
 const App = () => (
   <SettingsProvider>
@@ -17,6 +19,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/game" element={<Game />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/credits" element={<Credits />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
